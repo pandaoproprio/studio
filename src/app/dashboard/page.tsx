@@ -2,7 +2,7 @@
 import { AccountStatus } from "@/components/dashboard/account-status";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, KanbanSquare, Users, FileText, Truck } from "lucide-react";
+import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -40,6 +40,13 @@ export default function DashboardPage() {
             title="Gestão de Fornecedores"
             description="Centralize as informações e o relacionamento com seus fornecedores."
             buttonText="Ver Fornecedores"
+        />
+        <ActionCard
+            href="/dashboard/assets"
+            icon={Package}
+            title="Gestão de Ativos"
+            description="Monitore e gerencie os ativos da sua organização."
+            buttonText="Ver Ativos"
         />
         <ActionCard
             href="/dashboard/reports/impact-generator"

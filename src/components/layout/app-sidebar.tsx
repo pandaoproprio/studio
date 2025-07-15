@@ -19,6 +19,7 @@ import {
   Bot,
   Leaf,
   Truck,
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,6 +29,7 @@ const menuItems = [
   { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
   { href: "/dashboard/hr", label: "AnnIRH", icon: Users },
   { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
+  { href: "/dashboard/assets", label: "Ativos", icon: Package },
   { href: "/dashboard/billing", label: "Assinatura", icon: CreditCard },
   { href: "/dashboard/reports", label: "Relatórios IA", icon: Bot,
     subItems: [
