@@ -1,7 +1,8 @@
+
 import { AccountStatus } from "@/components/dashboard/account-status";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, KanbanSquare, Users, FileText } from "lucide-react";
+import { PlusCircle, KanbanSquare, Users, FileText, Truck } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -33,19 +34,19 @@ export default function DashboardPage() {
             description="Administre colaboradores, férias e avaliações."
             buttonText="Acessar AnnIRH"
         />
+         <ActionCard
+            href="/dashboard/suppliers"
+            icon={Truck}
+            title="Gestão de Fornecedores"
+            description="Centralize as informações e o relacionamento com seus fornecedores."
+            buttonText="Ver Fornecedores"
+        />
         <ActionCard
             href="/dashboard/reports/impact-generator"
             icon={FileText}
             title="Gerar Relatório"
             description="Use IA para criar relatórios de impacto detalhados."
             buttonText="Novo Relatório"
-        />
-        <ActionCard
-            href="/dashboard/billing"
-            icon={PlusCircle}
-            title="Explorar Módulos"
-            description="Adicione novas funcionalidades à sua assinatura."
-            buttonText="Ver Módulos"
         />
       </div>
     </div>

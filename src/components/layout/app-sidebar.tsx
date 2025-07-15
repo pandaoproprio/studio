@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -17,6 +18,7 @@ import {
   FileText,
   Bot,
   Leaf,
+  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +27,7 @@ const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
   { href: "/dashboard/hr", label: "AnnIRH", icon: Users },
+  { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
   { href: "/dashboard/billing", label: "Assinatura", icon: CreditCard },
   { href: "/dashboard/reports", label: "Relatórios IA", icon: Bot,
     subItems: [
@@ -37,7 +40,8 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    return pathname === href;
+    // This will also match parent routes
+    return pathname.startsWith(href);
   };
 
   return (
@@ -55,20 +59,20 @@ export function AppSidebar() {
       <SidebarContent className="p-2">
         <SidebarMenu>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.href)}
-                tooltip={{
-                  children: item.label,
-                  side: "right",
-                }}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
+             <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive(item.href)}
+                  tooltip={{
+                    children: item.label,
+                    side: "right",
+                  }}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
