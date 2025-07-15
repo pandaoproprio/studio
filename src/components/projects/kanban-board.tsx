@@ -15,8 +15,9 @@ import {
   useSensor,
   useSensors,
   closestCorners,
+  DragOverlay,
 } from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const initialColumns: Column[] = [
@@ -70,6 +71,20 @@ export function KanbanBoard() {
     })
   );
 
+  const findColumn = (id: ColumnId | string): Column | undefined => {
+    return columns.find((col) => col.id === id);
+  };
+  
+  const findTask = (id: string): { column: Column, task: Task } | undefined => {
+    for (const column of columns) {
+      const task = column.tasks.find(t => t.id === id);
+      if (task) {
+        return { column, task };
+      }
+    }
+    return undefined;
+  }
+
   const onDragStart = (event: DragStartEvent) => {
     if (event.active.data.current?.type === "Task") {
       setActiveTask(event.active.data.current.task);
@@ -78,40 +93,89 @@ export function KanbanBoard() {
 
   const onDragEnd = (event: DragEndEvent) => {
     setActiveTask(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
+    
+    const activeTaskData = findTask(activeId);
+    if (!activeTaskData) return;
+
+    const activeColumnId = activeTaskData.column.id;
+    const overColumnId = over.data.current?.type === "Column" ? overId : findTask(overId)?.column.id;
+
+    if (!overColumnId || activeColumnId === overColumnId) {
+      // Logic for reordering within the same column
+      const activeColumn = findColumn(activeColumnId);
+      if (!activeColumn) return;
+
+      setColumns(prev => {
+        const activeColumnIndex = prev.findIndex(c => c.id === activeColumnId);
+        if (activeColumnIndex === -1) return prev;
+
+        const oldIndex = activeColumn.tasks.findIndex(t => t.id === activeId);
+        const newIndex = activeColumn.tasks.findIndex(t => t.id === overId);
+        if (oldIndex === -1 || newIndex === -1) return prev;
+        
+        const newColumns = [...prev];
+        newColumns[activeColumnIndex] = {
+            ...newColumns[activeColumnIndex],
+            tasks: arrayMove(activeColumn.tasks, oldIndex, newIndex)
+        }
+        return newColumns;
+      });
+
+      return;
+    }
   };
 
   const onDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
-
-    if (activeId === overId) return;
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
 
     const isActiveATask = active.data.current?.type === "Task";
+    if (!isActiveATask) return;
+
     const isOverAColumn = over.data.current?.type === "Column";
+    const isOverATask = over.data.current?.type === "Task";
 
-    if (isActiveATask && isOverAColumn) {
+    if (isActiveATask && (isOverAColumn || isOverATask)) {
       setColumns((prev) => {
-        const activeColumnIndex = prev.findIndex((col) =>
-          col.tasks.some((task) => task.id === activeId)
-        );
-        const overColumnIndex = prev.findIndex((col) => col.id === overId);
+        const activeTaskData = findTask(activeId);
+        if (!activeTaskData) return prev;
 
-        if (activeColumnIndex === -1 || overColumnIndex === -1 || activeColumnIndex === overColumnIndex) {
-          return prev;
+        const activeColumnId = activeTaskData.column.id;
+        const overColumnId = isOverAColumn ? overId : findTask(overId)?.column.id;
+        
+        if (!overColumnId || activeColumnId === overColumnId) {
+            return prev;
         }
 
         const newColumns = [...prev];
-        const activeColumn = newColumns[activeColumnIndex];
-        const overColumn = newColumns[overColumnIndex];
-        const activeTaskIndex = activeColumn.tasks.findIndex(
-          (task) => task.id === activeId
-        );
+        const activeColumn = newColumns.find(c => c.id === activeColumnId);
+        const overColumn = newColumns.find(c => c.id === overColumnId);
+        
+        if (!activeColumn || !overColumn) return prev;
+
+        const activeTaskIndex = activeColumn.tasks.findIndex(t => t.id === activeId);
+        if (activeTaskIndex === -1) return prev;
         
         const [movedTask] = activeColumn.tasks.splice(activeTaskIndex, 1);
-        overColumn.tasks.push(movedTask);
+        
+        if (isOverATask) {
+            const overTaskIndex = overColumn.tasks.findIndex(t => t.id === overId);
+            if (overTaskIndex !== -1) {
+                overColumn.tasks.splice(overTaskIndex, 0, movedTask);
+            } else {
+                 overColumn.tasks.push(movedTask);
+            }
+        } else {
+            overColumn.tasks.push(movedTask);
+        }
 
         return newColumns;
       });
@@ -131,6 +195,9 @@ export function KanbanBoard() {
           <KanbanColumn key={col.id} column={col} />
         ))}
       </div>
+      <DragOverlay>
+        {activeTask ? <KanbanTaskCard task={activeTask} isOverlay /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }
@@ -165,7 +232,7 @@ function KanbanColumn({ column }: { column: Column }) {
   );
 }
 
-function KanbanTaskCard({ task }: { task: Task }) {
+function KanbanTaskCard({ task, isOverlay }: { task: Task, isOverlay?: boolean }) {
   const {
     setNodeRef,
     attributes,
@@ -191,7 +258,7 @@ function KanbanTaskCard({ task }: { task: Task }) {
         <div
         ref={setNodeRef}
         style={style}
-        className="h-32 rounded-lg bg-primary/10 border-2 border-dashed border-primary"
+        className="h-[148px] rounded-lg bg-primary/10 border-2 border-dashed border-primary"
         />
     );
   }
@@ -202,7 +269,7 @@ function KanbanTaskCard({ task }: { task: Task }) {
         style={style}
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing shadow-md hover:shadow-lg transition-shadow"
+        className={`cursor-grab shadow-md hover:shadow-lg transition-shadow ${isOverlay ? 'ring-2 ring-primary' : 'active:cursor-grabbing'}`}
     >
       <CardHeader className="p-4">
         <CardTitle className="text-base">{task.title}</CardTitle>
