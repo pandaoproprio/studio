@@ -1,3 +1,4 @@
+// src/components/projects/kanban-board.tsx
 "use client";
 
 import { useState } from "react";
@@ -19,6 +20,11 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 const initialColumns: Column[] = [
   {
@@ -85,6 +91,20 @@ export function KanbanBoard() {
     return undefined;
   }
 
+  const updateTask = (updatedTask: Task) => {
+    setColumns(prev => {
+        const newColumns = [...prev];
+        for (const column of newColumns) {
+            const taskIndex = column.tasks.findIndex(t => t.id === updatedTask.id);
+            if (taskIndex !== -1) {
+                column.tasks[taskIndex] = updatedTask;
+                break;
+            }
+        }
+        return newColumns;
+    });
+  }
+
   const onDragStart = (event: DragStartEvent) => {
     if (event.active.data.current?.type === "Task") {
       setActiveTask(event.active.data.current.task);
@@ -103,28 +123,35 @@ export function KanbanBoard() {
     if (!activeTaskData) return;
 
     const activeColumnId = activeTaskData.column.id;
-    const overColumnId = over.data.current?.type === "Column" ? overId : findTask(overId)?.column.id;
+    let overColumnId: ColumnId | string | undefined;
+
+    if (over.data.current?.type === 'Column') {
+      overColumnId = overId;
+    } else {
+      overColumnId = findTask(overId)?.column.id;
+    }
 
     if (!overColumnId || activeColumnId === overColumnId) {
       // Logic for reordering within the same column
       const activeColumn = findColumn(activeColumnId);
       if (!activeColumn) return;
 
-      setColumns(prev => {
-        const activeColumnIndex = prev.findIndex(c => c.id === activeColumnId);
-        if (activeColumnIndex === -1) return prev;
+      const oldIndex = activeColumn.tasks.findIndex(t => t.id === activeId);
+      const newIndex = activeColumn.tasks.findIndex(t => t.id === overId);
 
-        const oldIndex = activeColumn.tasks.findIndex(t => t.id === activeId);
-        const newIndex = activeColumn.tasks.findIndex(t => t.id === overId);
-        if (oldIndex === -1 || newIndex === -1) return prev;
-        
-        const newColumns = [...prev];
-        newColumns[activeColumnIndex] = {
-            ...newColumns[activeColumnIndex],
-            tasks: arrayMove(activeColumn.tasks, oldIndex, newIndex)
-        }
-        return newColumns;
-      });
+      if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
+        setColumns(prev => {
+            const newColumns = [...prev];
+            const activeColumnIndex = newColumns.findIndex(c => c.id === activeColumnId);
+            if (activeColumnIndex === -1) return prev;
+
+            newColumns[activeColumnIndex] = {
+                ...newColumns[activeColumnIndex],
+                tasks: arrayMove(activeColumn.tasks, oldIndex, newIndex)
+            }
+            return newColumns;
+        });
+      }
 
       return;
     }
@@ -133,50 +160,62 @@ export function KanbanBoard() {
   const onDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (!over) return;
-
+  
     const activeId = active.id.toString();
     const overId = over.id.toString();
-
+  
+    if (activeId === overId) return;
+  
     const isActiveATask = active.data.current?.type === "Task";
     if (!isActiveATask) return;
-
-    const isOverAColumn = over.data.current?.type === "Column";
+  
     const isOverATask = over.data.current?.type === "Task";
-
-    if (isActiveATask && (isOverAColumn || isOverATask)) {
+    const isOverAColumn = over.data.current?.type === "Column";
+  
+    if (isActiveATask && (isOverATask || isOverAColumn)) {
       setColumns((prev) => {
         const activeTaskData = findTask(activeId);
         if (!activeTaskData) return prev;
-
-        const activeColumnId = activeTaskData.column.id;
-        const overColumnId = isOverAColumn ? overId : findTask(overId)?.column.id;
-        
-        if (!overColumnId || activeColumnId === overColumnId) {
-            return prev;
+  
+        const { column: activeColumn, task: activeTask } = activeTaskData;
+  
+        const overColumnId = isOverAColumn
+          ? overId
+          : findTask(overId)?.column.id;
+  
+        if (!overColumnId || activeColumn.id === overColumnId) {
+          return prev;
         }
-
+  
         const newColumns = [...prev];
-        const activeColumn = newColumns.find(c => c.id === activeColumnId);
-        const overColumn = newColumns.find(c => c.id === overColumnId);
-        
-        if (!activeColumn || !overColumn) return prev;
-
-        const activeTaskIndex = activeColumn.tasks.findIndex(t => t.id === activeId);
+        const originalColumn = newColumns.find((c) => c.id === activeColumn.id);
+        const targetColumn = newColumns.find((c) => c.id === overColumnId);
+  
+        if (!originalColumn || !targetColumn) return prev;
+  
+        const activeTaskIndex = originalColumn.tasks.findIndex(
+          (t) => t.id === activeId
+        );
         if (activeTaskIndex === -1) return prev;
-        
-        const [movedTask] = activeColumn.tasks.splice(activeTaskIndex, 1);
-        
+  
+        // Remove task from original column
+        originalColumn.tasks.splice(activeTaskIndex, 1);
+  
+        // Add task to new column
         if (isOverATask) {
-            const overTaskIndex = overColumn.tasks.findIndex(t => t.id === overId);
-            if (overTaskIndex !== -1) {
-                overColumn.tasks.splice(overTaskIndex, 0, movedTask);
-            } else {
-                 overColumn.tasks.push(movedTask);
-            }
+          const overTaskIndex = targetColumn.tasks.findIndex(
+            (t) => t.id === overId
+          );
+          if (overTaskIndex !== -1) {
+            targetColumn.tasks.splice(overTaskIndex, 0, activeTask);
+          } else {
+            targetColumn.tasks.push(activeTask);
+          }
         } else {
-            overColumn.tasks.push(movedTask);
+          // Dropped on a column
+          targetColumn.tasks.push(activeTask);
         }
-
+  
         return newColumns;
       });
     }
@@ -192,7 +231,7 @@ export function KanbanBoard() {
     >
       <div className="flex h-full w-full gap-4 overflow-x-auto pb-4">
         {columns.map((col) => (
-          <KanbanColumn key={col.id} column={col} />
+          <KanbanColumn key={col.id} column={col} updateTask={updateTask} />
         ))}
       </div>
       <DragOverlay>
@@ -202,7 +241,7 @@ export function KanbanBoard() {
   );
 }
 
-function KanbanColumn({ column }: { column: Column }) {
+function KanbanColumn({ column, updateTask }: { column: Column; updateTask: (task: Task) => void }) {
     const { setNodeRef } = useSortable({
         id: column.id,
         data: {
@@ -220,7 +259,7 @@ function KanbanColumn({ column }: { column: Column }) {
       <div className="flex-1 space-y-4 p-4 overflow-y-auto">
         <SortableContext items={column.tasks.map(t => t.id)}>
             {column.tasks.map((task) => (
-                <KanbanTaskCard key={task.id} task={task} />
+                <KanbanTaskCard key={task.id} task={task} updateTask={updateTask} />
             ))}
         </SortableContext>
         <Button variant="ghost" className="w-full">
@@ -232,7 +271,7 @@ function KanbanColumn({ column }: { column: Column }) {
   );
 }
 
-function KanbanTaskCard({ task, isOverlay }: { task: Task, isOverlay?: boolean }) {
+function KanbanTaskCard({ task, isOverlay, updateTask }: { task: Task, isOverlay?: boolean, updateTask?: (task: Task) => void }) {
   const {
     setNodeRef,
     attributes,
@@ -246,6 +285,7 @@ function KanbanTaskCard({ task, isOverlay }: { task: Task, isOverlay?: boolean }
       type: "Task",
       task,
     },
+    disabled: isOverlay, // Disable sorting when it's an overlay
   });
 
   const style = {
@@ -256,14 +296,14 @@ function KanbanTaskCard({ task, isOverlay }: { task: Task, isOverlay?: boolean }
   if (isDragging) {
     return (
         <div
-        ref={setNodeRef}
-        style={style}
-        className="h-[148px] rounded-lg bg-primary/10 border-2 border-dashed border-primary"
+            ref={setNodeRef}
+            style={style}
+            className="h-[148px] rounded-lg bg-primary/10 border-2 border-dashed border-primary"
         />
     );
   }
 
-  return (
+  const card = (
     <Card 
         ref={setNodeRef}
         style={style}
@@ -271,11 +311,11 @@ function KanbanTaskCard({ task, isOverlay }: { task: Task, isOverlay?: boolean }
         {...listeners}
         className={`cursor-grab shadow-md hover:shadow-lg transition-shadow ${isOverlay ? 'ring-2 ring-primary' : 'active:cursor-grabbing'}`}
     >
-      <CardHeader className="p-4">
+      <CardHeader className="p-4 pb-2">
         <CardTitle className="text-base">{task.title}</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <p className="text-sm text-muted-foreground">{task.description}</p>
+      <CardContent className="p-4 pt-2">
+        <p className="text-sm text-muted-foreground line-clamp-2">{task.description}</p>
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge
@@ -289,4 +329,86 @@ function KanbanTaskCard({ task, isOverlay }: { task: Task, isOverlay?: boolean }
       </CardContent>
     </Card>
   );
+
+  if (isOverlay || !updateTask) {
+    return card;
+  }
+
+  return (
+    <TaskEditDialog task={task} onUpdate={updateTask}>
+      {card}
+    </TaskEditDialog>
+  )
+}
+
+function TaskEditDialog({ task, onUpdate, children }: { task: Task; onUpdate: (task: Task) => void; children: React.ReactNode }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [editedTask, setEditedTask] = useState(task);
+
+    const handleSave = () => {
+        onUpdate(editedTask);
+        setIsOpen(false);
+    };
+
+    const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const tags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
+        setEditedTask(prev => ({ ...prev, tags }));
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Editar Tarefa</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="title">Título</Label>
+                        <Input 
+                            id="title" 
+                            value={editedTask.title}
+                            onChange={(e) => setEditedTask(prev => ({...prev, title: e.target.value}))}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Descrição</Label>
+                        <Textarea 
+                            id="description" 
+                            value={editedTask.description}
+                            onChange={(e) => setEditedTask(prev => ({...prev, description: e.target.value}))}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="priority">Prioridade</Label>
+                        <Select 
+                            value={editedTask.priority} 
+                            onValueChange={(value: "low" | "medium" | "high") => setEditedTask(prev => ({...prev, priority: value}))}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecione a prioridade" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="low">Baixa</SelectItem>
+                                <SelectItem value="medium">Média</SelectItem>
+                                <SelectItem value="high">Alta</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
+                        <Input 
+                            id="tags" 
+                            value={editedTask.tags.join(', ')}
+                            onChange={handleTagsChange}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancelar</Button>
+                    <Button onClick={handleSave}>Salvar Alterações</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
