@@ -5,14 +5,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { Leaf } from "lucide-react";
+import { Leaf, UserPlus } from "lucide-react";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    // In a real application, you would handle user creation here.
+    // For this prototype, we'll just redirect to the dashboard.
     router.push("/dashboard");
   };
 
@@ -22,46 +24,47 @@ export default function LoginPage() {
         <Card className="shadow-2xl">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex items-center justify-center rounded-full bg-primary p-3">
-              <Leaf className="h-8 w-8 text-primary-foreground" />
+              <UserPlus className="h-8 w-8 text-primary-foreground" />
             </div>
             <CardTitle className="font-headline text-3xl font-bold tracking-tight text-primary">
-              AnnIConecta
+              Criar Conta
             </CardTitle>
             <CardDescription>
-              A plataforma para transformação digital de organizações sociais.
+              Junte-se à AnnIConecta e transforme sua organização.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome Completo</Label>
+                <Input id="name" type="text" placeholder="Seu nome" required />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required />
+                <Input id="email" type="email" placeholder="seu@email.com" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Senha</Label>
                 <Input id="password" type="password" required />
               </div>
               <Button type="submit" className="w-full font-bold">
-                Entrar
+                Criar minha conta
               </Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col items-center space-y-2">
-            <Button variant="link" size="sm">
-              Esqueceu sua senha?
-            </Button>
             <p className="text-sm text-muted-foreground">
-              Não tem uma conta?{" "}
-              <Link href="/signup" passHref>
+              Já tem uma conta?{" "}
+              <Link href="/" passHref>
                 <Button variant="link" size="sm" className="p-0">
-                  Crie uma agora
+                  Faça o login
                 </Button>
               </Link>
             </p>
           </CardFooter>
         </Card>
       </div>
-      <footer className="mt-8 text-center text-sm text-muted-foreground">
+       <footer className="mt-8 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} AnnITech – IT Solutions. Todos os direitos reservados.
       </footer>
     </div>
