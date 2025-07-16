@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -22,7 +22,48 @@ const bookings = [
 ];
 
 export default function RoomsPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined);
+
+  useEffect(() => {
+    setDate(new Date());
+  }, []);
+
+  const getLocaleDateString = async () => {
+    if (!date) return 'Selecione uma data';
+    const ptBRLocale = (await import('date-fns/locale/pt-BR')).default;
+    return date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', locale: ptBRLocale });
+  };
+  
+  const [localeDate, setLocaleDate] = useState('Carregando data...');
+
+  useEffect(() => {
+    async function loadCalendar() {
+        const locale = (await import('date-fns/locale/pt-BR')).default;
+        setLocaleDate(new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', locale: locale }));
+    }
+    loadCalendar();
+  }, []);
+
+  useEffect(() => {
+    async function updateDate() {
+        if (date) {
+            const locale = (await import('date-fns/locale/pt-BR')).default;
+            setLocaleDate(date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', locale: locale }));
+        }
+    }
+    updateDate();
+  }, [date]);
+  
+  const [calendarLocale, setCalendarLocale] = useState(undefined);
+  
+  useEffect(() => {
+      async function loadLocale() {
+          const locale = (await import('date-fns/locale/pt-BR')).default;
+          setCalendarLocale(locale as any);
+      }
+      loadLocale();
+  }, [])
+
 
   return (
     <div className="space-y-6">
@@ -46,7 +87,7 @@ export default function RoomsPage() {
                 </Button>
               </div>
               <CardDescription>
-                {date ? date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Selecione uma data'}
+                {localeDate}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -90,7 +131,8 @@ export default function RoomsPage() {
                 selected={date}
                 onSelect={setDate}
                 className="w-full"
-                locale={(await import('date-fns/locale/pt-BR')).default}
+                locale={calendarLocale}
+                disabled={!calendarLocale}
               />
             </CardContent>
           </Card>
