@@ -51,6 +51,20 @@ const employees = [
 ];
 
 export default function HrPage() {
+
+   const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case "Ativo":
+        return "bg-green-100 text-green-800";
+      case "Férias":
+        return "bg-blue-100 text-blue-800";
+      case "Licença":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -111,12 +125,7 @@ export default function HrPage() {
                   </TableCell>
                   <TableCell>{employee.role}</TableCell>
                   <TableCell>
-                    <Badge variant={employee.status === 'Ativo' ? 'secondary' : 'default'}
-                           className={
-                            employee.status === 'Ativo' ? 'bg-green-100 text-green-800' :
-                            employee.status === 'Férias' ? 'bg-blue-100 text-blue-800' :
-                            'bg-yellow-100 text-yellow-800'
-                           }>
+                    <Badge variant="secondary" className={getStatusBadgeClass(employee.status)}>
                       {employee.status}
                     </Badge>
                   </TableCell>
