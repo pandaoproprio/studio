@@ -2,7 +2,7 @@
 import { AccountStatus } from "@/components/dashboard/account-status";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package } from "lucide-react";
+import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package, Clapperboard } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -47,6 +47,13 @@ export default function DashboardPage() {
             title="Gestão de Ativos"
             description="Monitore e gerencie os ativos da sua organização."
             buttonText="Ver Ativos"
+        />
+        <ActionCard
+            href="/dashboard/feed"
+            icon={Clapperboard}
+            title="Comunicação"
+            description="Acesse o feed de notícias e comunicados."
+            buttonText="Ver Feed"
         />
         <ActionCard
             href="/dashboard/reports/impact-generator"

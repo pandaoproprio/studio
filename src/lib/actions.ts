@@ -11,6 +11,7 @@ import {
   AccountStatusSummaryInput,
   AccountStatusSummaryOutput,
 } from "@/ai/flows/account-status-summary";
+import { summarizePost, SummarizePostInput, SummarizePostOutput } from "@/ai/flows/summarize-post";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -65,6 +66,26 @@ export async function getAccountStatusSummaryAction(): Promise<AccountStatusStat
     try {
         const input: AccountStatusSummaryInput = { tenantId: 'tenant-123' }; // Dummy tenant ID
         const result = await getAccountStatusSummary(input);
+        return { message: "Summary loaded.", data: result };
+    } catch(e) {
+        console.error(e);
+        return { message: "Failed to load summary.", error: "An unexpected error occurred."};
+    }
+}
+
+
+type SummarizePostState = {
+    message: string;
+    data?: SummarizePostOutput;
+    error?: string;
+};
+
+export async function summarizePostAction(postContent: string): Promise<SummarizePostState> {
+    if (!postContent || postContent.trim().length < 10) {
+        return { message: "Content is too short to summarize.", error: "Content too short" };
+    }
+    try {
+        const result = await summarizePost(postContent);
         return { message: "Summary loaded.", data: result };
     } catch(e) {
         console.error(e);
