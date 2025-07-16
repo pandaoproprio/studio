@@ -24,6 +24,16 @@ import {
   type DescribeColaboradorProfileInput,
   type DescribeColaboradorProfileOutput
 } from "@/ai/flows/describe-profile";
+import { 
+    generateVideoStory,
+    type GenerateVideoStoryOutput
+} from "@/ai/flows/generate-video-story";
+import {
+    diagnoseRelationship,
+    DiagnoseRelationshipInputSchema,
+    type DiagnoseRelationshipInput,
+    type DiagnoseRelationshipOutput,
+} from "@/ai/flows/diagnose-relationship";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -189,5 +199,53 @@ export async function describeColaboradorAction(input: DescribeColaboradorProfil
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
         return { message: "Failed to describe profile.", error: errorMessage };
+    }
+}
+
+
+type GenerateVideoStoryState = {
+    message: string;
+    data?: GenerateVideoStoryOutput;
+    error?: string;
+};
+
+export async function generateVideoStoryAction(text: string): Promise<GenerateVideoStoryState> {
+    if (!text || text.trim().length < 20) {
+        return { message: "Text is too short for a video story.", error: "Text too short" };
+    }
+
+    try {
+        const result = await generateVideoStory(text);
+        return { message: "Video generated", data: result };
+    } catch(e) {
+        console.error(e);
+        return { message: "Failed to generate video.", error: "An unexpected error occurred."};
+    }
+}
+
+
+type DiagnoseRelationshipState = {
+    message: string;
+    data?: DiagnoseRelationshipOutput;
+    error?: string;
+};
+
+export async function diagnoseRelationshipAction(input: DiagnoseRelationshipInput): Promise<DiagnoseRelationshipState> {
+    const validatedFields = DiagnoseRelationshipInputSchema.safeParse(input);
+
+    if (!validatedFields.success) {
+        return {
+            message: "Validation failed.",
+            error: JSON.stringify(validatedFields.error.flatten().fieldErrors),
+        };
+    }
+
+    try {
+        const result = await diagnoseRelationship(validatedFields.data);
+        return { message: "Diagnosis complete.", data: result };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to generate diagnosis.", error: errorMessage };
     }
 }
