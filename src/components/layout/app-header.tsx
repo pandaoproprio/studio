@@ -8,6 +8,7 @@ import {
   Search,
   Settings,
   User,
+  CreditCard,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -110,13 +111,13 @@ export function AppHeader() {
                   <User className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/dashboard/billing')}>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  <span>Assinatura</span>
+                </DropdownMenuItem>
+                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configurações</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/dashboard/billing')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Assinatura</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
