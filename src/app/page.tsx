@@ -19,7 +19,7 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "juanpablorj" && password === "doce2806$") {
+    if (email === "test@example.com" && password === "password") {
       router.push("/dashboard");
     } else {
       setError("Email ou senha inválidos.");
@@ -55,7 +55,7 @@ export default function LoginPage() {
                 <Input 
                   id="email" 
                   type="email" 
-                  placeholder="m@example.com" 
+                  placeholder="test@example.com" 
                   required 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
