@@ -43,7 +43,7 @@ export function ImpactReportForm() {
           <CardTitle className="font-headline">Gerador de Relatório de Impacto</CardTitle>
           <CardDescription>
             Descreva seu projeto e deixe a IA criar um relatório de impacto profissional.
-          </CardDescription>
+          </Description>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="space-y-6">
