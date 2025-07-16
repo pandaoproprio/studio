@@ -2,7 +2,7 @@
 import { AccountStatus } from "@/components/dashboard/account-status";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package, Clapperboard, Handshake } from "lucide-react";
+import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package, Clapperboard, Handshake, DoorOpen } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -40,6 +40,13 @@ export default function DashboardPage() {
             title="Gestão de Pessoas"
             description="Administre colaboradores, férias e avaliações."
             buttonText="Acessar AnnIRH"
+        />
+        <ActionCard
+            href="/dashboard/rooms"
+            icon={DoorOpen}
+            title="Reservar Salas"
+            description="Agende e gerencie o uso das salas de reunião."
+            buttonText="Ver Calendário"
         />
          <ActionCard
             href="/dashboard/suppliers"

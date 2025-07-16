@@ -22,6 +22,7 @@ import {
   Package,
   Clapperboard,
   Handshake,
+  DoorOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -31,6 +32,7 @@ const menuItems = [
   { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
   { href: "/dashboard/crm", label: "CRM", icon: Handshake },
   { href: "/dashboard/hr", label: "AnnIRH", icon: Users },
+  { href: "/dashboard/rooms", label: "Salas", icon: DoorOpen },
   { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
   { href: "/dashboard/assets", label: "Ativos", icon: Package },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },
@@ -70,7 +72,7 @@ export function AppSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
              <SidebarMenuItem key={item.href}>
-                <Link href={item.href} passHref>
+                <Link href={item.href}>
                   <SidebarMenuButton
                     isActive={isActive(item.href)}
                     tooltip={{
