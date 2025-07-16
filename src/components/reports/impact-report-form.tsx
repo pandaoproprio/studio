@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Wand2 } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const initialState = {
   message: "",
@@ -43,7 +44,7 @@ export function ImpactReportForm() {
           <CardTitle className="font-headline">Gerador de Relatório de Impacto</CardTitle>
           <CardDescription>
             Descreva seu projeto e deixe a IA criar um relatório de impacto profissional.
-          </Description>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="space-y-6">
