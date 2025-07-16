@@ -23,9 +23,9 @@ export default function DashboardPage() {
         <ActionCard
             href="/dashboard/projects"
             icon={KanbanSquare}
-            title="Gerenciar Projetos"
+            title="Gerenciar Tarefas"
             description="Acesse seus quadros Kanban e cronogramas Gantt."
-            buttonText="Ver Projetos"
+            buttonText="Ver Tarefas"
         />
          <ActionCard
             href="/dashboard/crm"
