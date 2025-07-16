@@ -30,19 +30,29 @@ export async function getAccountStatusSummary(input: AccountStatusSummaryInput):
   return accountStatusSummaryFlow(input);
 }
 
+// TODO: Fetch tenant data from Firestore or other data source using the tenantId
+// This is a placeholder implementation that returns dummy data
+const tenantData = {
+  numberOfUsers: 50,
+  modulesUsed: ['Projects', 'AnnIRH', 'CRM'],
+  spendLevel: 'medium',
+  projectedSpendNextYear: '$10,000',
+};
+
+
 const accountStatusSummaryPrompt = ai.definePrompt({
   name: 'accountStatusSummaryPrompt',
   input: {schema: AccountStatusSummaryInputSchema},
   output: {schema: AccountStatusSummaryOutputSchema},
   prompt: `You are an AI assistant that summarizes the account status of a tenant.
 
-  Given the tenant ID: {{{tenantId}}}, provide a summary of the account status, including:
-  - Number of users
-  - Modules used
-  - Spend level (low, medium, high)
-  - Projected spend for the following year
+  Given the tenant ID: {{{tenantId}}}, and the following data:
+  - Number of users: ${tenantData.numberOfUsers}
+  - Modules used: ${tenantData.modulesUsed.join(', ')}
+  - Spend level: ${tenantData.spendLevel}
+  - Projected spend for the following year: ${tenantData.projectedSpendNextYear}
 
-  Return the information in JSON format.
+  Return the information in the requested JSON format.
   `,
 });
 
@@ -53,24 +63,9 @@ const accountStatusSummaryFlow = ai.defineFlow(
     outputSchema: AccountStatusSummaryOutputSchema,
   },
   async input => {
-    // TODO: Fetch tenant data from Firestore or other data source using the tenantId
-    // This is a placeholder implementation that returns dummy data
-
-    // Replace the following with actual data retrieval logic
-    const tenantData = {
-      numberOfUsers: 50,
-      modulesUsed: ['Projects', 'AnnIRH', 'CRM'],
-      spendLevel: 'medium',
-      projectedSpendNextYear: '$10,000',
-    };
-
-    const {output} = await accountStatusSummaryPrompt({
-      ...input,
-      numberOfUsers: tenantData.numberOfUsers,
-      modulesUsed: tenantData.modulesUsed,
-      spendLevel: tenantData.spendLevel,
-      projectedSpendNextYear: tenantData.projectedSpendNextYear,
-    });
+    // In a real app, you would fetch tenant data from a database.
+    // Here we are using dummy data defined above.
+    const {output} = await accountStatusSummaryPrompt(input);
     return output!;
   }
 );
