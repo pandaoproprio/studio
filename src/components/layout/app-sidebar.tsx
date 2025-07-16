@@ -23,6 +23,7 @@ import {
   Clapperboard,
   Handshake,
   DoorOpen,
+  UserCog
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,6 +33,7 @@ const menuItems = [
   { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
   { href: "/dashboard/crm", label: "CRM", icon: Handshake },
   { href: "/dashboard/hr", label: "RH", icon: Users },
+  { href: "/dashboard/users", label: "Gerenciar Usuários", icon: UserCog },
   { href: "/dashboard/rooms", label: "Salas", icon: DoorOpen },
   { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
   { href: "/dashboard/assets", label: "Ativos", icon: Package },
