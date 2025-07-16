@@ -4,25 +4,16 @@
  * @fileOverview Generates a project progress report using AI based on Kanban board data.
  *
  * - generateProgressReport - A function that generates a progress report.
- * - GenerateProgressReportInput - The input type for the generateProgressReport function.
- * - GenerateProgressReportOutput - The return type for the generateProgressReport function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {
+    GenerateProgressReportInputSchema,
+    GenerateProgressReportOutputSchema,
+    type GenerateProgressReportInput,
+    type GenerateProgressReportOutput
+} from '@/ai/schemas/generate-progress-report-schemas';
 
-export const GenerateProgressReportInputSchema = z.object({
-  projectName: z.string().describe('The name of the project.'),
-  tasksTodo: z.array(z.string()).describe('A list of tasks in the "To Do" column.'),
-  tasksInProgress: z.array(z.string()).describe('A list of tasks in the "In Progress" column.'),
-  tasksDone: z.array(z.string()).describe('A list of tasks in the "Done" column.'),
-});
-export type GenerateProgressReportInput = z.infer<typeof GenerateProgressReportInputSchema>;
-
-export const GenerateProgressReportOutputSchema = z.object({
-  report: z.string().describe('The generated progress report in Markdown format.'),
-});
-export type GenerateProgressReportOutput = z.infer<typeof GenerateProgressReportOutputSchema>;
 
 export async function generateProgressReport(input: GenerateProgressReportInput): Promise<GenerateProgressReportOutput> {
   return generateProgressReportFlow(input);

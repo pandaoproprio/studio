@@ -1,34 +1,18 @@
-// src/ai/flows/diagnose-relationship.ts
 'use server';
 /**
  * @fileOverview An AI flow to diagnose the relationship with a contact based on their interaction history.
  *
  * - diagnoseRelationship - A function that handles the relationship diagnosis process.
- * - DiagnoseRelationshipInput - The input type for the diagnoseRelationship function.
- * - DiagnoseRelationshipOutput - The return type for the diagnoseRelationship function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import {
+    DiagnoseRelationshipInputSchema,
+    DiagnoseRelationshipOutputSchema,
+    type DiagnoseRelationshipInput,
+    type DiagnoseRelationshipOutput,
+} from '@/ai/schemas/diagnose-relationship-schemas';
 
-const InteractionSchema = z.object({
-  type: z.string(),
-  date: z.string(),
-  notes: z.string(),
-});
-
-export const DiagnoseRelationshipInputSchema = z.object({
-  contactName: z.string().describe("The name of the contact."),
-  interactions: z.array(InteractionSchema).describe("The history of interactions with the contact."),
-});
-export type DiagnoseRelationshipInput = z.infer<typeof DiagnoseRelationshipInputSchema>;
-
-export const DiagnoseRelationshipOutputSchema = z.object({
-  engagementLevel: z.string().describe("The assessed engagement level of the contact (e.g., Alto, Médio, Baixo)."),
-  overallSentiment: z.string().describe("The overall sentiment of the relationship (e.g., Positivo, Neutro, Negativo)."),
-  nextActionSuggestion: z.string().describe("A concrete suggestion for the next action to take with this contact."),
-});
-export type DiagnoseRelationshipOutput = z.infer<typeof DiagnoseRelationshipOutputSchema>;
 
 export async function diagnoseRelationship(input: DiagnoseRelationshipInput): Promise<DiagnoseRelationshipOutput> {
   return diagnoseRelationshipFlow(input);

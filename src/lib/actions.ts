@@ -8,8 +8,8 @@ import {
 } from "@/ai/flows/generate-impact-report";
 import {
   generateProgressReport,
-  GenerateProgressReportInput,
-  GenerateProgressReportOutput,
+  type GenerateProgressReportInput,
+  type GenerateProgressReportOutput,
 } from "@/ai/flows/generate-progress-report";
 import {
   getAccountStatusSummary,
@@ -20,26 +20,26 @@ import { summarizePost } from "@/ai/flows/summarize-post";
 import type { SummarizePostOutput } from "@/ai/schemas/summarize-post-schemas";
 import {
   describeColaboradorProfile,
-  DescribeColaboradorProfileInputSchema,
   type DescribeColaboradorProfileInput,
   type DescribeColaboradorProfileOutput
 } from "@/ai/flows/describe-profile";
+import { DescribeColaboradorProfileInputSchema } from "@/ai/schemas/describe-profile-schemas";
 import { 
     generateVideoStory,
     type GenerateVideoStoryOutput
 } from "@/ai/flows/generate-video-story";
 import {
     diagnoseRelationship,
-    DiagnoseRelationshipInputSchema,
     type DiagnoseRelationshipInput,
     type DiagnoseRelationshipOutput,
 } from "@/ai/flows/diagnose-relationship";
+import { DiagnoseRelationshipInputSchema } from "@/ai/schemas/diagnose-relationship-schemas";
 import {
     analyzeTaskRisk,
-    AnalyzeTaskRiskInputSchema,
     type AnalyzeTaskRiskInput,
     type AnalyzeTaskRiskOutput,
 } from "@/ai/flows/project-risk-analysis";
+import { AnalyzeTaskRiskInputSchema } from "@/ai/schemas/project-risk-analysis-schemas";
 import { z } from "zod";
 
 const impactReportSchema = z.object({

@@ -4,23 +4,16 @@
  * @fileOverview A flow that describes a collaborator's behavioral profile using AI.
  *
  * - describeColaboradorProfile - A function that returns the behavioral profile.
- * - DescribeColaboradorProfileInput - The input type for the function.
- * - DescribeColaboradorProfileOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {
+    DescribeColaboradorProfileInputSchema,
+    DescribeColaboradorProfileOutputSchema,
+    type DescribeColaboradorProfileInput,
+    type DescribeColaboradorProfileOutput
+} from '@/ai/schemas/describe-profile-schemas';
 
-export const DescribeColaboradorProfileInputSchema = z.object({
-  role: z.string().describe('O cargo do colaborador.'),
-  description: z.string().describe('Uma breve descrição sobre o colaborador ou suas responsabilidades.'),
-});
-export type DescribeColaboradorProfileInput = z.infer<typeof DescribeColaboradorProfileInputSchema>;
-
-export const DescribeColaboradorProfileOutputSchema = z.object({
-  profile: z.string().describe('A descrição do perfil comportamental gerada pela IA.'),
-});
-export type DescribeColaboradorProfileOutput = z.infer<typeof DescribeColaboradorProfileOutputSchema>;
 
 export async function describeColaboradorProfile(input: DescribeColaboradorProfileInput): Promise<DescribeColaboradorProfileOutput> {
   return describeProfileFlow(input);
