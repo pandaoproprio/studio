@@ -158,7 +158,8 @@ export async function getAccountStatusSummaryAction(): Promise<AccountStatusStat
         return { message: "Summary loaded.", data: result };
     } catch(e) {
         console.error(e);
-        return { message: "Failed to load summary.", error: "An unexpected error occurred."};
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to load summary.", error: errorMessage};
     }
 }
 
