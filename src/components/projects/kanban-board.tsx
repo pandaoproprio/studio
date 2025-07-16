@@ -28,7 +28,7 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
 
-const initialColumns: Column[] = [
+export const initialColumns: Column[] = [
   {
     id: "backlog",
     title: "Backlog",
