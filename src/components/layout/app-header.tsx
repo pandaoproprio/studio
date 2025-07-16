@@ -10,6 +10,7 @@ import {
   Settings,
   User,
   CreditCard,
+  Bot,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -34,11 +35,25 @@ import {
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useCommandMenu } from "@/hooks/use-command-menu";
+import { useEffect } from "react";
 
 
 export function AppHeader() {
   const { isMobile } = useSidebar();
   const router = useRouter();
+  const { setOpen } = useCommandMenu();
+  
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setOpen(true)
+      }
+    }
+    document.addEventListener("keydown", down)
+    return () => document.removeEventListener("keydown", down)
+  }, [setOpen])
 
   return (
     <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -49,21 +64,19 @@ export function AppHeader() {
       <div className="h-full w-px bg-border lg:hidden" aria-hidden="true" />
 
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-        <form className="relative flex flex-1" action="#" method="GET">
-          <label htmlFor="search-field" className="sr-only">
-            Search
-          </label>
-          <Search
-            className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <Input
-            id="search-field"
-            className="block h-full w-full border-0 py-0 pl-8 pr-0 text-foreground placeholder:text-muted-foreground sm:text-sm"
-            placeholder="Pesquisar..."
-            name="search"
-          />
-        </form>
+        <div className="relative flex flex-1">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-muted-foreground"
+            onClick={() => setOpen(true)}
+          >
+            <Search className="h-4 w-4 mr-2" />
+            <span className="flex-1 text-left">Pesquisar ou digitar um comando...</span>
+            <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </Button>
+        </div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           <Select defaultValue="pt-br">
             <SelectTrigger className="w-[120px] h-9">

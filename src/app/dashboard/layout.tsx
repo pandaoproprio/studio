@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { CommandMenu } from "@/components/layout/command-menu";
 import {
   SidebarProvider,
   SidebarInset,
@@ -21,6 +22,7 @@ export default function DashboardLayout({
           </main>
         </div>
       </SidebarInset>
+      <CommandMenu />
     </SidebarProvider>
   );
 }
