@@ -1,6 +1,6 @@
 // src/components/dashboard/quick-access-carousel.tsx
 "use client"
-import { KanbanSquare, Handshake, Users, DoorOpen, Truck, Package, Clapperboard, FileText } from "lucide-react";
+import { KanbanSquare, Handshake, Users, DoorOpen, Truck, Package, Clapperboard, FileText, FileSignature } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ const actions = [
   { href: "/dashboard/projects", icon: KanbanSquare, title: "Gerenciar Projetos", description: "Acesse seus quadros Kanban e cronogramas." },
   { href: "/dashboard/crm", icon: Handshake, title: "Gestão de Relacionamento", description: "Gerencie doadores, voluntários e parceiros." },
   { href: "/dashboard/hr", icon: Users, title: "Gestão de Pessoas", description: "Administre colaboradores, férias e avaliações." },
+  { href: "/dashboard/contracts", icon: FileSignature, title: "Gestão de Contratos", description: "Monitore e gerencie todos os contratos." },
   { href: "/dashboard/rooms", icon: DoorOpen, title: "Reservar Salas", description: "Agende e gerencie o uso das salas de reunião." },
   { href: "/dashboard/suppliers", icon: Truck, title: "Gestão de Fornecedores", description: "Centralize as informações dos fornecedores." },
   { href: "/dashboard/assets", icon: Package, title: "Gestão de Ativos", description: "Monitore e gerencie os ativos da organização." },

@@ -25,7 +25,8 @@ import {
   Clapperboard,
   Handshake,
   DoorOpen,
-  UserCog
+  UserCog,
+  FileSignature
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,6 +43,7 @@ const menuItems = [
   { href: "/dashboard/rooms", label: "Salas", icon: DoorOpen },
   { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
   { href: "/dashboard/assets", label: "Ativos", icon: Package },
+  { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },
   { href: "/dashboard/billing", label: "Assinatura", icon: CreditCard },
   { 
