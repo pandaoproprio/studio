@@ -19,7 +19,7 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "superadmin@anniconecta.com" && password === "password") {
+    if (email === "juanpablorj" && password === "doce2806$") {
       router.push("/dashboard");
     } else {
       setError("Email ou senha inválidos.");
