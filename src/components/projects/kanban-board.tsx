@@ -6,7 +6,7 @@ import { Column, ColumnId, Task, Subtask } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, GripVertical, Plus, PlusCircle, Trash2 } from "lucide-react";
+import { GripVertical, Plus, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   DndContext,
