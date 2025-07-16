@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { PlusCircle, Video, Users, Clock } from 'lucide-react';
+import { PlusCircle, Video, Users, Clock, Check, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,18 +21,38 @@ const allRooms = [
   { id: 'sala-3', name: 'Sala de Brainstorm 3', capacity: 12, hasVideo: true },
 ];
 
-const initialBookings = [
-  { id: 'b1', roomId: 'sala-1', date: new Date(), title: 'Reunião de Planejamento Semanal', startTime: '10:00', endTime: '11:00', user: 'Joana Silva', avatar: 'https://placehold.co/100x100.png' },
-  { id: 'b2', roomId: 'sala-3', date: new Date(), title: 'Brainstorm Nova Campanha', startTime: '14:00', endTime: '15:30', user: 'Carlos Andrade', avatar: 'https://placehold.co/100x100.png' },
-  { id: 'b3', roomId: 'sala-1', date: new Date(), title: 'Alinhamento com Parceiros', startTime: '16:00', endTime: '17:00', user: 'Beatriz Costa', avatar: 'https://placehold.co/100x100.png' },
+type BookingStatus = 'Aprovado' | 'Pendente' | 'Recusado';
+
+interface Booking {
+  id: string;
+  roomId: string;
+  date: Date;
+  title: string;
+  startTime: string;
+  endTime: string;
+  user: string;
+  avatar: string;
+  status: BookingStatus;
+}
+
+
+const initialBookings: Booking[] = [
+  { id: 'b1', roomId: 'sala-1', date: new Date(), title: 'Reunião de Planejamento Semanal', startTime: '10:00', endTime: '11:00', user: 'Joana Silva', avatar: 'https://placehold.co/100x100.png', status: 'Aprovado' },
+  { id: 'b2', roomId: 'sala-3', date: new Date(), title: 'Brainstorm Nova Campanha', startTime: '14:00', endTime: '15:30', user: 'Carlos Andrade', avatar: 'https://placehold.co/100x100.png', status: 'Pendente' },
+  { id: 'b3', roomId: 'sala-1', date: new Date(), title: 'Alinhamento com Parceiros', startTime: '16:00', endTime: '17:00', user: 'Beatriz Costa', avatar: 'https://placehold.co/100x100.png', status: 'Aprovado' },
+  { id: 'b4', roomId: 'sala-2', date: new Date(), title: 'Entrevista com Candidato', startTime: '11:00', endTime: '12:00', user: 'Mariana Ferreira', avatar: 'https://placehold.co/100x100.png', status: 'Recusado' },
 ];
 
 
 export default function RoomsPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [bookings, setBookings] = useState(initialBookings);
+  const [date, setDate] = useState<Date | undefined>();
+  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [selectedRoom, setSelectedRoom] = useState<string | 'all'>('all');
   const [isNewBookingOpen, setIsNewBookingOpen] = useState(false);
+
+  useEffect(() => {
+    setDate(new Date());
+  }, []);
 
   const filteredBookings = useMemo(() => {
     return bookings
@@ -53,7 +73,7 @@ export default function RoomsPage() {
   const handleCreateBooking = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const newBooking = {
+    const newBooking: Booking = {
       id: `b-${Date.now()}`,
       roomId: formData.get('room') as string,
       date: date || new Date(),
@@ -62,10 +82,28 @@ export default function RoomsPage() {
       endTime: formData.get('endTime') as string,
       user: 'Joana Silva', // Logged-in user
       avatar: 'https://placehold.co/100x100.png',
+      status: 'Pendente',
     };
     setBookings(prev => [...prev, newBooking]);
     setIsNewBookingOpen(false);
   }
+
+  const handleBookingStatusChange = (bookingId: string, status: BookingStatus) => {
+    setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
+  }
+
+  const getStatusBadgeClass = (status: BookingStatus) => {
+    switch (status) {
+      case 'Aprovado':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'Pendente':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Recusado':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -147,19 +185,36 @@ export default function RoomsPage() {
                         </div>
                          <div className="border-l pl-4">
                             <p className="font-semibold">{booking.title}</p>
-                            <p className="text-sm text-muted-foreground">{room?.name}</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-muted-foreground">{room?.name}</p>
+                                <Badge variant="outline" className={getStatusBadgeClass(booking.status)}>{booking.status}</Badge>
+                            </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                                 <span className="flex items-center gap-1"><Users className="h-4 w-4" /> {room?.capacity}</span>
                                 {room?.hasVideo && <span className="flex items-center gap-1"><Video className="h-4 w-4" /> Vídeo</span>}
                             </div>
                          </div>
                       </div>
-                      <div className="flex items-center gap-2" title={booking.user}>
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={booking.avatar} alt={booking.user} data-ai-hint="person portrait"/>
-                          <AvatarFallback>{booking.user.split(' ').map(n=>n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium hidden md:inline">{booking.user}</span>
+                      <div className="flex items-center gap-2 text-right">
+                         <div className="flex flex-col items-end">
+                            <div className="flex items-center gap-2" title={booking.user}>
+                                <span className="text-sm font-medium hidden md:inline">{booking.user}</span>
+                                <Avatar className="h-8 w-8">
+                                <AvatarImage src={booking.avatar} alt={booking.user} data-ai-hint="person portrait"/>
+                                <AvatarFallback>{booking.user.split(' ').map(n=>n[0]).join('')}</AvatarFallback>
+                                </Avatar>
+                            </div>
+                            {booking.status === 'Pendente' && (
+                                <div className="flex gap-2 mt-2">
+                                    <Button size="sm" variant="outline" className="h-7 px-2 border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600" onClick={() => handleBookingStatusChange(booking.id, 'Recusado')}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                    <Button size="sm" variant="outline" className="h-7 px-2 border-green-500 text-green-500 hover:bg-green-50 hover:text-green-600" onClick={() => handleBookingStatusChange(booking.id, 'Aprovado')}>
+                                        <Check className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            )}
+                         </div>
                       </div>
                     </div>
                   )
