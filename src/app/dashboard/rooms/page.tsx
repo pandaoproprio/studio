@@ -45,20 +45,17 @@ const initialBookings: Booking[] = [
 
 
 export default function RoomsPage() {
-  const [date, setDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<Date | undefined>(new Date());
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [selectedRoom, setSelectedRoom] = useState<string | 'all'>('all');
   const [isNewBookingOpen, setIsNewBookingOpen] = useState(false);
 
-  useEffect(() => {
-    setDate(new Date());
-  }, []);
-
   const filteredBookings = useMemo(() => {
     return bookings
       .filter(booking => {
+        if (!date) return false;
         const bookingDate = format(booking.date, 'yyyy-MM-dd');
-        const selectedDate = date ? format(date, 'yyyy-MM-dd') : '';
+        const selectedDate = format(date, 'yyyy-MM-dd');
         return bookingDate === selectedDate;
       })
       .filter(booking => selectedRoom === 'all' || booking.roomId === selectedRoom)
