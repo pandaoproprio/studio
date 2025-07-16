@@ -1,7 +1,7 @@
 // src/app/dashboard/video-generator/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { generateVideoStoryAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Wand2, Film, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { GenerateVideoStoryOutput } from "@/ai/schemas/generate-video-story-schemas";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import Image from "next/image";
 
 function SubmitButton() {
@@ -35,8 +35,11 @@ function SubmitButton() {
 
 export default function VideoGeneratorPage() {
   const [result, setResult] = useState<{data?: GenerateVideoStoryOutput; error?: string} | null>(null);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const handleFormAction = async (formData: FormData) => {
+    setResult(null);
     const text = formData.get("storyText") as string;
     if (!text || text.trim().length < 20) {
         setResult({error: "O texto precisa ter pelo menos 20 caracteres."});
@@ -45,6 +48,30 @@ export default function VideoGeneratorPage() {
     const response = await generateVideoStoryAction(text);
     setResult(response);
   };
+  
+  useEffect(() => {
+    if (!carouselApi || !result?.data) {
+      return;
+    }
+
+    const handleSelect = () => {
+        const currentSlide = carouselApi.selectedScrollSnap();
+        const scene = result.data?.scenes[currentSlide];
+        if (scene && audioRef.current) {
+            audioRef.current.src = scene.audioUri;
+            audioRef.current.play().catch(e => console.error("Audio play failed", e));
+        }
+    }
+    
+    handleSelect(); // Play audio for the initial slide
+    carouselApi.on("select", handleSelect);
+    
+    return () => {
+      carouselApi.off("select", handleSelect);
+    };
+
+  }, [carouselApi, result?.data]);
+
 
   return (
     <div className="space-y-6">
@@ -90,7 +117,7 @@ export default function VideoGeneratorPage() {
             {result?.data ? (
                 <div className="w-full space-y-4">
                      <h3 className="text-center text-lg font-semibold">{result.data.title}</h3>
-                     <Carousel className="w-full">
+                     <Carousel className="w-full" setApi={setCarouselApi}>
                         <CarouselContent>
                             {result.data.scenes.map((scene, index) => (
                                 <CarouselItem key={index}>
@@ -106,8 +133,8 @@ export default function VideoGeneratorPage() {
                         <CarouselPrevious className="left-2" />
                         <CarouselNext className="right-2"/>
                     </Carousel>
-                    <audio controls src={result.data.audioUri} className="w-full">
-                        Your browser does not support the audio element.
+                    <audio ref={audioRef} className="w-full hidden" controls>
+                        Seu navegador não suporta o elemento de áudio.
                     </audio>
                 </div>
             ) : result?.error ? (

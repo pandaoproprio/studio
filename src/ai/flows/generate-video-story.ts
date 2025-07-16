@@ -130,26 +130,26 @@ const generateVideoStoryFlow = ai.defineFlow(
         throw new Error('Failed to generate script.');
     }
 
-    // 2. Combine all narration and generate audio in parallel
-    const fullNarration = script.scenes.map(s => s.text).join('\n\n');
-    const audioPromise = generateNarrationFlow(fullNarration);
+    // 2. Generate images and audio for each scene in parallel
+    const sceneProcessingPromises = script.scenes.map(async (scene) => {
+        const [imageUrl, audioUri] = await Promise.all([
+            generateImageFlow(scene.visuals),
+            generateNarrationFlow(scene.text)
+        ]);
+        return {
+            text: scene.text,
+            imageUrl,
+            audioUri,
+        };
+    });
+    
+    // 3. Await all promises
+    const processedScenes = await Promise.all(sceneProcessingPromises);
 
-    // 3. Generate images for each scene in parallel
-    const imagePromises = script.scenes.map(scene => generateImageFlow(scene.visuals));
-
-    // 4. Await all promises
-    const [audioUri, imageUrls] = await Promise.all([audioPromise, Promise.all(imagePromises)]);
-
-    // 5. Combine results
-    const finalScenes = script.scenes.map((scene, index) => ({
-      text: scene.text,
-      imageUrl: imageUrls[index],
-    }));
-
+    // 4. Combine results
     return {
       title: script.title,
-      audioUri,
-      scenes: finalScenes,
+      scenes: processedScenes,
     };
   }
 );
