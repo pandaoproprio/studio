@@ -13,6 +13,11 @@ import {
 } from "@/ai/flows/account-status-summary";
 import { summarizePost } from "@/ai/flows/summarize-post";
 import type { SummarizePostOutput } from "@/ai/schemas/summarize-post-schemas";
+import {
+  describeColaboradorProfile,
+  DescribeColaboradorProfileInput,
+  DescribeColaboradorProfileOutput
+} from "@/ai/flows/describe-profile";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -91,5 +96,22 @@ export async function summarizePostAction(postContent: string): Promise<Summariz
     } catch(e) {
         console.error(e);
         return { message: "Failed to load summary.", error: "An unexpected error occurred."};
+    }
+}
+
+type DescribeColaboradorState = {
+    message: string;
+    data?: DescribeColaboradorProfileOutput;
+    error?: string;
+};
+
+export async function describeColaboradorAction(input: DescribeColaboradorProfileInput): Promise<DescribeColaboradorState> {
+    try {
+        const result = await describeColaboradorProfile(input);
+        return { message: "Profile described.", data: result };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to describe profile.", error: errorMessage };
     }
 }
