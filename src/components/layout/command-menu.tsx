@@ -1,3 +1,4 @@
+
 // src/components/layout/command-menu.tsx
 "use client";
 
@@ -80,6 +81,11 @@ export function CommandMenu() {
           icon: DoorOpen,
           label: 'Ir para Salas',
           action: () => router.push('/dashboard/rooms'),
+        },
+        {
+          icon: Package,
+          label: 'Ir para Ativos',
+          action: () => router.push('/dashboard/assets'),
         }
       ],
     },
