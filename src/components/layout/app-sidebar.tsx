@@ -26,7 +26,8 @@ import {
   Handshake,
   DoorOpen,
   UserCog,
-  FileSignature
+  FileSignature,
+  Film
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -53,6 +54,7 @@ const menuItems = [
     subItems: [
         { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto"},
         { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso"},
+        { href: "/dashboard/video-generator", label: "Gerador de Vídeo", icon: Film },
     ]
   },
 ];
@@ -67,7 +69,7 @@ export function AppSidebar() {
     return pathname.startsWith(href);
   };
   
-  const isReportsSectionActive = pathname.startsWith('/dashboard/reports');
+  const isReportsSectionActive = pathname.startsWith('/dashboard/reports') || pathname.startsWith('/dashboard/video-generator');
 
   return (
     <Sidebar variant="sidebar" side="left" collapsible="icon">
@@ -109,6 +111,7 @@ export function AppSidebar() {
                                 <SidebarMenuSubItem key={subItem.href}>
                                     <Link href={subItem.href}>
                                     <SidebarMenuSubButton isActive={isActive(subItem.href)}>
+                                        {subItem.icon && <subItem.icon />}
                                         {subItem.label}
                                     </SidebarMenuSubButton>
                                     </Link>
