@@ -25,9 +25,7 @@ export default function ProjectBoardPage({ params }: { params: { projectId: stri
               </Link>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold font-headline tracking-tight">
-                  <ProjectSwitcher />
-              </h1>
+              <ProjectSwitcher />
               <p className="text-muted-foreground">
                   Projeto: {params.projectId}
               </p>
