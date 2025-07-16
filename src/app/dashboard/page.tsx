@@ -21,11 +21,11 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <ActionCard
-            href="/dashboard/tasks"
+            href="/dashboard/projects"
             icon={KanbanSquare}
-            title="Gerenciar Tarefas"
+            title="Gerenciar Projetos"
             description="Acesse seus quadros Kanban e cronogramas Gantt."
-            buttonText="Ver Tarefas"
+            buttonText="Ver Projetos"
         />
          <ActionCard
             href="/dashboard/crm"
