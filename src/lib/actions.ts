@@ -34,6 +34,12 @@ import {
     type DiagnoseRelationshipInput,
     type DiagnoseRelationshipOutput,
 } from "@/ai/flows/diagnose-relationship";
+import {
+    analyzeTaskRisk,
+    AnalyzeTaskRiskInputSchema,
+    type AnalyzeTaskRiskInput,
+    type AnalyzeTaskRiskOutput,
+} from "@/ai/flows/project-risk-analysis";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -247,5 +253,31 @@ export async function diagnoseRelationshipAction(input: DiagnoseRelationshipInpu
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
         return { message: "Failed to generate diagnosis.", error: errorMessage };
+    }
+}
+
+type ProjectRiskAnalysisState = {
+    message: string;
+    data?: AnalyzeTaskRiskOutput;
+    error?: string;
+};
+
+export async function projectRiskAnalysisAction(input: AnalyzeTaskRiskInput): Promise<ProjectRiskAnalysisState> {
+    const validatedFields = AnalyzeTaskRiskInputSchema.safeParse(input);
+
+    if (!validatedFields.success) {
+        return {
+            message: "Validation failed.",
+            error: "Invalid input data provided for risk analysis.",
+        };
+    }
+
+    try {
+        const result = await analyzeTaskRisk(validatedFields.data);
+        return { message: "Risk analysis complete.", data: result };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred during risk analysis.";
+        return { message: "Failed to analyze risk.", error: errorMessage };
     }
 }

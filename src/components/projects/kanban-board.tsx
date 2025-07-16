@@ -52,7 +52,7 @@ export const initialColumns: Column[] = [
     id: "in-progress",
     title: "Em Andamento",
     tasks: [
-      { id: "task-5", title: "Desenvolver o website do projeto", description: "Implementar a página de doações.", priority: "high", tags: ["Tech", "Website"], subtasks: [
+      { id: "task-5", title: "Desenvolver o website do projeto", description: "Implementar a página de doações. Depende da definição do gateway de pagamento.", priority: "high", tags: ["Tech", "Website"], subtasks: [
         {id: 'sub-3', title: "Criar layout no Figma", completed: true},
         {id: 'sub-4', title: "Desenvolver front-end", completed: true},
         {id: 'sub-5', title: "Conectar com gateway de pagamento", completed: false},
@@ -77,6 +77,9 @@ export const initialColumns: Column[] = [
     tasks: [],
   }
 ];
+
+export type TaskWithColumn = Task & { columnId: ColumnId };
+
 
 const priorityClasses = {
   urgent: "bg-red-600 border-red-600 text-white",
