@@ -2,7 +2,7 @@
 import { AccountStatus } from "@/components/dashboard/account-status";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package, Clapperboard } from "lucide-react";
+import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package, Clapperboard, Handshake } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -26,6 +26,13 @@ export default function DashboardPage() {
             title="Gerenciar Projetos"
             description="Acesse seus quadros Kanban e cronogramas Gantt."
             buttonText="Ver Projetos"
+        />
+         <ActionCard
+            href="/dashboard/crm"
+            icon={Handshake}
+            title="Gestão de Relacionamento"
+            description="Gerencie doadores, voluntários e parceiros."
+            buttonText="Acessar CRM"
         />
         <ActionCard
             href="/dashboard/hr"

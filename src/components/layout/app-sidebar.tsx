@@ -21,6 +21,7 @@ import {
   Truck,
   Package,
   Clapperboard,
+  Handshake,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,6 +29,7 @@ import { usePathname } from "next/navigation";
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
+  { href: "/dashboard/crm", label: "CRM", icon: Handshake },
   { href: "/dashboard/hr", label: "AnnIRH", icon: Users },
   { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
   { href: "/dashboard/assets", label: "Ativos", icon: Package },
@@ -44,7 +46,9 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    // This will also match parent routes
+    if (item.href === '/dashboard') {
+      return pathname === item.href;
+    }
     return pathname.startsWith(href);
   };
 
@@ -64,19 +68,18 @@ export function AppSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={isActive(item.href)}
-                  tooltip={{
-                    children: item.label,
-                    side: "right",
-                  }}
-                >
-                  <Link href={item.href}>
+                <Link href={item.href} passHref>
+                  <SidebarMenuButton
+                    isActive={isActive(item.href)}
+                    tooltip={{
+                      children: item.label,
+                      side: "right",
+                    }}
+                  >
                     <item.icon />
                     <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
+                  </SidebarMenuButton>
+                </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
