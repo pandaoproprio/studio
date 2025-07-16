@@ -20,8 +20,9 @@ import { summarizePost } from "@/ai/flows/summarize-post";
 import type { SummarizePostOutput } from "@/ai/schemas/summarize-post-schemas";
 import {
   describeColaboradorProfile,
-  DescribeColaboradorProfileInput,
-  DescribeColaboradorProfileOutput
+  DescribeColaboradorProfileInputSchema,
+  type DescribeColaboradorProfileInput,
+  type DescribeColaboradorProfileOutput
 } from "@/ai/flows/describe-profile";
 import { z } from "zod";
 
@@ -172,8 +173,17 @@ type DescribeColaboradorState = {
 };
 
 export async function describeColaboradorAction(input: DescribeColaboradorProfileInput): Promise<DescribeColaboradorState> {
+    const validatedFields = DescribeColaboradorProfileInputSchema.safeParse(input);
+
+    if (!validatedFields.success) {
+        return {
+            message: "Validation failed.",
+            error: JSON.stringify(validatedFields.error.flatten().fieldErrors),
+        };
+    }
+
     try {
-        const result = await describeColaboradorProfile(input);
+        const result = await describeColaboradorProfile(validatedFields.data);
         return { message: "Profile described.", data: result };
     } catch(e) {
         console.error(e);

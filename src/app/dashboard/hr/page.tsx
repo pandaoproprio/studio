@@ -13,7 +13,6 @@ import { MoreHorizontal, PlusCircle, Upload, Filter, Bot } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -30,7 +29,7 @@ const employees = [
     email: "carlos.andrade@example.com",
     avatar: "https://placehold.co/100x100.png",
     role: "Gerente de Projetos",
-    description: "Responsável pelo planejamento e execução dos projetos sociais, liderando equipes multidisciplinares.",
+    description: "Responsável pelo planejamento e execução dos projetos sociais, liderando equipes multidisciplinares e garantindo a entrega dos objetivos dentro do prazo e orçamento.",
     status: "Ativo",
     vacation: "15/01/2025 - 30/01/2025",
   },
@@ -40,7 +39,7 @@ const employees = [
     email: "beatriz.costa@example.com",
     avatar: "https://placehold.co/100x100.png",
     role: "Coordenadora de Voluntários",
-    description: "Engaja, recruta e coordena a base de voluntários da organização, garantindo seu bem-estar e alocação eficaz.",
+    description: "Engaja, recruta e coordena a base de voluntários da organização, garantindo seu bem-estar, treinamento e alocação eficaz nos projetos.",
     status: "Ativo",
     vacation: "N/A",
   },
@@ -50,7 +49,7 @@ const employees = [
     email: "mariana.ferreira@example.com",
     avatar: "https://placehold.co/100x100.png",
     role: "Assistente Social",
-    description: "Atua na linha de frente, prestando suporte direto aos beneficiários dos projetos e suas famílias.",
+    description: "Atua na linha de frente, prestando suporte direto aos beneficiários dos projetos e suas famílias, realizando acompanhamento e encaminhamentos.",
     status: "Licença",
     vacation: "N/A",
   },
@@ -60,7 +59,7 @@ const employees = [
     email: "ricardo.souza@example.com",
     avatar: "https://placehold.co/100x100.png",
     role: "Analista Financeiro",
-    description: "Cuida da saúde financeira da organização, incluindo orçamentos, relatórios e prestação de contas.",
+    description: "Cuida da saúde financeira da organização, incluindo orçamentos, relatórios de prestação de contas, controle de fluxo de caixa e conformidade fiscal.",
     status: "Ativo",
     vacation: "01/03/2025 - 15/03/2025",
   },
@@ -70,7 +69,7 @@ const employees = [
     email: "fernanda.lima@example.com",
     avatar: "https://placehold.co/100x100.png",
     role: "Psicóloga",
-    description: "Oferece suporte psicossocial para a equipe interna e para os beneficiários dos programas.",
+    description: "Oferece suporte psicossocial para a equipe interna e para os beneficiários dos programas, conduzindo sessões e desenvolvendo programas de bem-estar.",
     status: "Férias",
     vacation: "20/12/2024 - 10/01/2025",
   },
@@ -228,12 +227,15 @@ export default function HrPage() {
       }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {isLoadingProfile ? "Analisando Perfil..." : `Perfil Comportamental de ${profileData?.employeeName}`}
+            <AlertDialogTitle className="font-headline">
+              {isLoadingProfile && "Analisando Perfil..."}
+              {error && "Erro na Análise"}
+              {profileData && `Perfil Comportamental de ${profileData.employeeName}`}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {isLoadingProfile && "Aguarde enquanto a IA gera a análise."}
-              {error && `Erro: ${error}`}
+              {isLoadingProfile && "Aguarde enquanto a IA gera a análise com base no cargo e responsabilidades."}
+              {error && `Ocorreu um erro: ${error}`}
+              {profileData && "Esta é uma análise gerada por IA com base nas informações fornecidas."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex justify-center items-center min-h-[150px]">
@@ -241,7 +243,7 @@ export default function HrPage() {
               <PuffLoader color="hsl(var(--primary))" />
             ) : profileData ? (
               <p className="text-sm text-foreground whitespace-pre-wrap">{profileData.profile}</p>
-            ) : null}
+            ) : error ? null : null}
           </div>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => {

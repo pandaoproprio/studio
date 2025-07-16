@@ -30,12 +30,12 @@ const describeProfilePrompt = ai.definePrompt({
   name: 'describeProfilePrompt',
   input: {schema: DescribeColaboradorProfileInputSchema},
   output: {schema: DescribeColaboradorProfileOutputSchema},
-  prompt: `Você é um especialista em RH e psicologia organizacional. Sua tarefa é analisar o cargo e a descrição de um colaborador para traçar um perfil comportamental conciso e profissional. Destaque 3 a 5 características principais.
+  prompt: `Você é um especialista em RH e psicologia organizacional. Sua tarefa é analisar o cargo e a descrição de um colaborador para traçar um perfil comportamental conciso e profissional. Destaque 3 a 5 características principais com base no contexto fornecido.
 
-  Cargo: {{{role}}}
-  Descrição: {{{description}}}
+  **Cargo:** {{{role}}}
+  **Descrição de Responsabilidades:** {{{description}}}
 
-  Com base nisso, descreva o provável perfil comportamental deste colaborador.
+  Com base nessas informações, descreva o provável perfil comportamental deste colaborador. A análise deve ser objetiva e focada nas competências e estilo de trabalho inferidos.
   `,
   config: {
     temperature: 0.7,
