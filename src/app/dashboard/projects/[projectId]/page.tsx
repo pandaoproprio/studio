@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, GanttChartSquare, KanbanSquare, ArrowLeft, ShieldAlert, Loader2 } from "lucide-react";
 import { ProjectSwitcher } from "@/components/projects/project-switcher";
 import Link from "next/link";
+import { useParams } from 'next/navigation';
 import { projectRiskAnalysisAction } from "@/lib/actions";
 import { type AnalyzeTaskRiskOutput } from "@/ai/flows/project-risk-analysis";
 import {
@@ -27,7 +28,10 @@ import { initialColumns } from "@/components/projects/kanban-board";
 type View = "kanban" | "gantt";
 type RiskAnalysisResult = { task: TaskWithColumn, analysis: AnalyzeTaskRiskOutput };
 
-export default function ProjectBoardPage({ params }: { params: { projectId: string } }) {
+export default function ProjectBoardPage() {
+  const params = useParams<{ projectId: string }>();
+  const projectId = params.projectId;
+
   const [view, setView] = useState<View>("kanban");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [riskResult, setRiskResult] = useState<RiskAnalysisResult | null>(null);
@@ -108,7 +112,7 @@ export default function ProjectBoardPage({ params }: { params: { projectId: stri
               <div>
                 <ProjectSwitcher />
                 <p className="text-muted-foreground">
-                    Projeto: {params.projectId}
+                    Projeto: {projectId}
                 </p>
               </div>
           </div>
