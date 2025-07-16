@@ -46,9 +46,11 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    if (item.href === '/dashboard') {
-      return pathname === item.href;
+    // Correctly handle the dashboard route check.
+    if (href === '/dashboard') {
+      return pathname === href;
     }
+    // For other routes, check if the path starts with the href.
     return pathname.startsWith(href);
   };
 
