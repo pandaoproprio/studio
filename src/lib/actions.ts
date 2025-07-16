@@ -11,7 +11,8 @@ import {
   AccountStatusSummaryInput,
   AccountStatusSummaryOutput,
 } from "@/ai/flows/account-status-summary";
-import { summarizePost, SummarizePostInput, SummarizePostOutput } from "@/ai/flows/summarize-post";
+import { summarizePost } from "@/ai/flows/summarize-post";
+import type { SummarizePostOutput } from "@/ai/schemas/summarize-post-schemas";
 import { z } from "zod";
 
 const impactReportSchema = z.object({

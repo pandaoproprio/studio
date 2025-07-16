@@ -5,20 +5,15 @@
  * @fileOverview A flow that summarizes a post.
  *
  * - summarizePost - A function that returns the summary of a post.
- * - SummarizePostInput - The input type for the summarizePost function.
- * - SummarizePostOutput - The return type for the summarizePost function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-export const SummarizePostInputSchema = z.string();
-export type SummarizePostInput = z.infer<typeof SummarizePostInputSchema>;
-
-export const SummarizePostOutputSchema = z.object({
-  summary: z.string().describe('The concise summary of the post.'),
-});
-export type SummarizePostOutput = z.infer<typeof SummarizePostOutputSchema>;
+import {
+  SummarizePostInputSchema,
+  SummarizePostOutputSchema,
+  type SummarizePostInput,
+  type SummarizePostOutput
+} from '@/ai/schemas/summarize-post-schemas';
 
 export async function summarizePost(postContent: SummarizePostInput): Promise<SummarizePostOutput> {
   return summarizePostFlow(postContent);
