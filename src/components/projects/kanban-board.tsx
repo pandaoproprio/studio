@@ -1,6 +1,7 @@
 // src/components/projects/kanban-board.tsx
 "use client";
 
+import * as React from 'react';
 import { useState } from "react";
 import { Column, ColumnId, Task, Subtask } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
