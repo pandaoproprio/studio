@@ -10,14 +10,14 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarMenuSub,
-  SidebarMenuSubButton
+  SidebarMenuSubButton,
+  SidebarMenuSubItem
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
   KanbanSquare,
   Users,
   CreditCard,
-  FileText,
   Bot,
   Leaf,
   Truck,
