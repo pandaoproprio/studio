@@ -1,15 +1,16 @@
+
 'use server';
 
 /**
  * @fileOverview An AI flow to generate a video story from a text input.
  *
  * - generateVideoStory - A function that handles the video generation process.
- * - GenerateVideoStoryOutput - The return type for the generateVideoStory function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import wav from 'wav';
+import { GenerateVideoStoryOutputSchema, type GenerateVideoStoryOutput } from '@/ai/schemas/generate-video-story-schemas';
 
 const SceneSchema = z.object({
   text: z.string().describe('The narration text for this scene.'),
@@ -36,19 +37,6 @@ const generateScriptPrompt = ai.definePrompt({
         temperature: 0.8,
     }
 });
-
-export const GenerateVideoStoryOutputSchema = z.object({
-  title: z.string(),
-  audioUri: z.string().describe("A data URI for the generated audio narration. Expected format: 'data:audio/wav;base64,<encoded_data>'"),
-  scenes: z.array(
-    z.object({
-      text: z.string(),
-      imageUrl: z.string().describe("A data URI for the generated image. Expected format: 'data:image/png;base64,<encoded_data>'"),
-    })
-  ),
-});
-export type GenerateVideoStoryOutput = z.infer<typeof GenerateVideoStoryOutputSchema>;
-
 
 async function toWav(
     pcmData: Buffer,

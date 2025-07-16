@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Wand2, Film, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import type { GenerateVideoStoryOutput } from "@/ai/flows/generate-video-story";
+import type { GenerateVideoStoryOutput } from "@/ai/schemas/generate-video-story-schemas";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Image from "next/image";
 
@@ -62,7 +62,7 @@ export default function VideoGeneratorPage() {
             <CardTitle className="font-headline">Fonte da História</CardTitle>
             <CardDescription>
               Insira o texto base para a IA criar o roteiro, as imagens e a narração.
-            </Description>
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleFormAction} className="space-y-6">

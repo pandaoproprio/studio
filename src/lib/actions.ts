@@ -26,8 +26,8 @@ import {
 import { DescribeColaboradorProfileInputSchema } from "@/ai/schemas/describe-profile-schemas";
 import { 
     generateVideoStory,
-    type GenerateVideoStoryOutput
 } from "@/ai/flows/generate-video-story";
+import { type GenerateVideoStoryOutput } from "@/ai/schemas/generate-video-story-schemas";
 import {
     diagnoseRelationship,
     type DiagnoseRelationshipInput,
