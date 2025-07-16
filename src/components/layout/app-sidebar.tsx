@@ -27,7 +27,9 @@ import {
   DoorOpen,
   UserCog,
   FileSignature,
-  Film
+  Film,
+  Building,
+  FileText
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,24 +39,45 @@ import { ChevronDown } from "lucide-react";
 
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
-  { href: "/dashboard/crm", label: "CRM", icon: Handshake },
-  { href: "/dashboard/hr", label: "RH", icon: Users },
-  { href: "/dashboard/users", label: "Gerenciar Usuários", icon: UserCog },
-  { href: "/dashboard/rooms", label: "Salas", icon: DoorOpen },
-  { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
-  { href: "/dashboard/assets", label: "Ativos", icon: Package },
-  { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
+  { 
+      id: "management",
+      label: "Gestão", 
+      icon: Building,
+      subItems: [
+        { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
+        { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
+        { href: "/dashboard/assets", label: "Ativos", icon: Package },
+        { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
+        { href: "/dashboard/rooms", label: "Salas", icon: DoorOpen },
+      ]
+  },
+   { 
+      id: "relationships",
+      label: "Relacionamentos", 
+      icon: Handshake,
+      subItems: [
+        { href: "/dashboard/crm", label: "CRM", icon: Handshake },
+        { href: "/dashboard/hr", label: "RH", icon: Users },
+      ]
+  },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },
-  { href: "/dashboard/billing", label: "Assinatura", icon: CreditCard },
   { 
     id: "reports",
     label: "Relatórios IA", 
     icon: Bot,
     subItems: [
-        { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto"},
-        { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso"},
+        { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto", icon: FileText},
+        { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso", icon: FileText},
         { href: "/dashboard/video-generator", label: "Gerador de Vídeo", icon: Film },
+    ]
+  },
+  { 
+    id: "settings",
+    label: "Administração", 
+    icon: UserCog,
+    subItems: [
+       { href: "/dashboard/users", label: "Gerenciar Usuários", icon: UserCog },
+       { href: "/dashboard/billing", label: "Assinatura", icon: CreditCard },
     ]
   },
 ];
@@ -68,8 +91,12 @@ export function AppSidebar() {
     }
     return pathname.startsWith(href);
   };
+
+  const isSectionActive = (item: any) => {
+    if (!item.subItems) return false;
+    return item.subItems.some((subItem: any) => pathname.startsWith(subItem.href));
+  }
   
-  const isReportsSectionActive = pathname.startsWith('/dashboard/reports') || pathname.startsWith('/dashboard/video-generator');
 
   return (
     <Sidebar variant="sidebar" side="left" collapsible="icon">
@@ -87,12 +114,12 @@ export function AppSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
              item.subItems ? (
-                <Collapsible key={item.id} asChild defaultOpen={isReportsSectionActive}>
+                <Collapsible key={item.id} asChild defaultOpen={isSectionActive(item)}>
                     <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                             <SidebarMenuButton
                                 className="justify-between"
-                                isActive={isReportsSectionActive}
+                                isActive={isSectionActive(item)}
                                 tooltip={{
                                     children: item.label,
                                     side: "right",
