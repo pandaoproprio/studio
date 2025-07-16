@@ -46,7 +46,7 @@ export default function BillingPage() {
                 </CardContent>
                 <CardFooter className="flex gap-2">
                     <Button>Mudar Plano</Button>
-                    <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50">Cancelar Assinatura</Button>
+                    <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-red-50">Cancelar Assinatura</Button>
                 </CardFooter>
             </Card>
 
@@ -71,7 +71,7 @@ export default function BillingPage() {
                                     <TableCell className="font-medium">{invoice.id}</TableCell>
                                     <TableCell>{invoice.date}</TableCell>
                                     <TableCell>{invoice.amount}</TableCell>
-                                    <TableCell><Badge className="bg-green-100 text-green-800">Pago</Badge></TableCell>
+                                    <TableCell><Badge className="bg-green-100 text-green-800 hover:bg-green-200">Pago</Badge></TableCell>
                                     <TableCell><Button variant="outline" size="sm">Download</Button></TableCell>
                                 </TableRow>
                             ))}
