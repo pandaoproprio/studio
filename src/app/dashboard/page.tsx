@@ -1,5 +1,5 @@
 
-import { AccountStatus } from "@/components/dashboard/account-status";
+import { KeyMetrics } from "@/components/dashboard/key-metrics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, KanbanSquare, Users, FileText, Truck, Package, Clapperboard, Handshake, DoorOpen } from "lucide-react";
@@ -17,7 +17,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <AccountStatus />
+      <KeyMetrics />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <ActionCard
