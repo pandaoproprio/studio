@@ -149,7 +149,7 @@ export function AppSidebar() {
                     </SidebarMenuItem>
               </Collapsible>
              ) : (
-                <SidebarMenuItem key={item.href}>
+                <SidebarMenuItem key={item.href!}>
                     <Link href={item.href!}>
                     <SidebarMenuButton
                         isActive={isActive(item.href!)}

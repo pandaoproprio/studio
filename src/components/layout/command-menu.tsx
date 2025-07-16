@@ -76,6 +76,11 @@ export function CommandMenu() {
           label: 'Ir para Fornecedores',
           action: () => router.push('/dashboard/suppliers'),
         },
+        {
+          icon: DoorOpen,
+          label: 'Ir para Salas',
+          action: () => router.push('/dashboard/rooms'),
+        }
       ],
     },
     {
