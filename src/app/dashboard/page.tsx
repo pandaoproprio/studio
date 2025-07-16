@@ -39,7 +39,7 @@ export default function DashboardPage() {
             icon={Users}
             title="Gestão de Pessoas"
             description="Administre colaboradores, férias e avaliações."
-            buttonText="Acessar AnnIRH"
+            buttonText="Acessar RH"
         />
         <ActionCard
             href="/dashboard/rooms"

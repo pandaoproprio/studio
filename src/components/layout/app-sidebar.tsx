@@ -31,7 +31,7 @@ const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/projects", label: "Tarefas", icon: KanbanSquare },
   { href: "/dashboard/crm", label: "CRM", icon: Handshake },
-  { href: "/dashboard/hr", label: "AnnIRH", icon: Users },
+  { href: "/dashboard/hr", label: "RH", icon: Users },
   { href: "/dashboard/rooms", label: "Salas", icon: DoorOpen },
   { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
   { href: "/dashboard/assets", label: "Ativos", icon: Package },

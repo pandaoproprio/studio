@@ -54,7 +54,7 @@ export default function HrPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold font-headline tracking-tight">AnnIRH – Gestão de Pessoas</h1>
+        <h1 className="text-3xl font-bold font-headline tracking-tight">RH – Gestão de Pessoas</h1>
         <p className="text-muted-foreground">
           Gerencie as informações e o ciclo de vida dos colaboradores.
         </p>
