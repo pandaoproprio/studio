@@ -8,7 +8,9 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter
+  SidebarFooter,
+  SidebarMenuSub,
+  SidebarMenuSubButton
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -27,6 +29,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
+
 
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -39,9 +44,13 @@ const menuItems = [
   { href: "/dashboard/assets", label: "Ativos", icon: Package },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },
   { href: "/dashboard/billing", label: "Assinatura", icon: CreditCard },
-  { href: "/dashboard/reports", label: "Relatórios IA", icon: Bot,
+  { 
+    id: "reports",
+    label: "Relatórios IA", 
+    icon: Bot,
     subItems: [
         { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto"},
+        { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso"},
     ]
   },
 ];
@@ -50,13 +59,13 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    // Correctly handle the dashboard route check.
     if (href === '/dashboard') {
       return pathname === href;
     }
-    // For other routes, check if the path starts with the href.
     return pathname.startsWith(href);
   };
+  
+  const isReportsSectionActive = pathname.startsWith('/dashboard/reports');
 
   return (
     <Sidebar variant="sidebar" side="left" collapsible="icon">
@@ -73,20 +82,56 @@ export function AppSidebar() {
       <SidebarContent className="p-2">
         <SidebarMenu>
           {menuItems.map((item) => (
-             <SidebarMenuItem key={item.href}>
-                <Link href={item.href}>
-                  <SidebarMenuButton
-                    isActive={isActive(item.href)}
-                    tooltip={{
-                      children: item.label,
-                      side: "right",
-                    }}
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </Link>
-            </SidebarMenuItem>
+             item.subItems ? (
+                <Collapsible key={item.id} asChild defaultOpen={isReportsSectionActive}>
+                    <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
+                                className="justify-between"
+                                isActive={isReportsSectionActive}
+                                tooltip={{
+                                    children: item.label,
+                                    side: "right",
+                                }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <item.icon />
+                                    <span>{item.label}</span>
+                                </div>
+                                <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
+                            </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent asChild>
+                            <SidebarMenuSub>
+                                {item.subItems.map(subItem => (
+                                <SidebarMenuSubItem key={subItem.href}>
+                                    <Link href={subItem.href}>
+                                    <SidebarMenuSubButton isActive={isActive(subItem.href)}>
+                                        {subItem.label}
+                                    </SidebarMenuSubButton>
+                                    </Link>
+                                </SidebarMenuSubItem>
+                                ))}
+                            </SidebarMenuSub>
+                        </CollapsibleContent>
+                    </SidebarMenuItem>
+              </Collapsible>
+             ) : (
+                <SidebarMenuItem key={item.href}>
+                    <Link href={item.href!}>
+                    <SidebarMenuButton
+                        isActive={isActive(item.href!)}
+                        tooltip={{
+                        children: item.label,
+                        side: "right",
+                        }}
+                    >
+                        <item.icon />
+                        <span>{item.label}</span>
+                    </SidebarMenuButton>
+                    </Link>
+                </SidebarMenuItem>
+             )
           ))}
         </SidebarMenu>
       </SidebarContent>

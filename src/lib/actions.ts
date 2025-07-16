@@ -7,6 +7,11 @@ import {
   GenerateImpactReportOutput,
 } from "@/ai/flows/generate-impact-report";
 import {
+  generateProgressReport,
+  GenerateProgressReportInput,
+  GenerateProgressReportOutput,
+} from "@/ai/flows/generate-progress-report";
+import {
   getAccountStatusSummary,
   AccountStatusSummaryInput,
   AccountStatusSummaryOutput,
@@ -61,6 +66,67 @@ export async function generateImpactReportAction(
     return { message: "An unexpected error occurred." };
   }
 }
+
+const progressReportSchema = z.object({
+    projectId: z.string().min(1, "Por favor, selecione um projeto."),
+    projectName: z.string(),
+    tasksTodo: z.string().transform(val => JSON.parse(val)),
+    tasksInProgress: z.string().transform(val => JSON.parse(val)),
+    tasksDone: z.string().transform(val => JSON.parse(val)),
+});
+
+type ProgressReportState = {
+    message: string;
+    data?: GenerateProgressReportOutput;
+    errors?: {
+        projectId?: string[];
+        projectData?: string[];
+    };
+};
+
+export async function generateProgressReportAction(
+    prevState: ProgressReportState,
+    formData: FormData
+): Promise<ProgressReportState> {
+    const rawData = {
+        projectId: formData.get("projectId"),
+        projectName: formData.get("projectName"),
+        tasksTodo: formData.get("tasksTodo"),
+        tasksInProgress: formData.get("tasksInProgress"),
+        tasksDone: formData.get("tasksDone"),
+    };
+
+    if (!rawData.projectName) {
+         return {
+            message: "Por favor, selecione um projeto para carregar os dados.",
+            errors: { projectId: ["Selecione um projeto válido."] }
+         }
+    }
+
+    const validatedFields = progressReportSchema.safeParse(rawData);
+    
+    if (!validatedFields.success) {
+        return {
+            message: "Falha na validação. Certifique-se de que um projeto está selecionado.",
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    try {
+        const input: GenerateProgressReportInput = {
+            projectName: validatedFields.data.projectName,
+            tasksTodo: validatedFields.data.tasksTodo,
+            tasksInProgress: validatedFields.data.tasksInProgress,
+            tasksDone: validatedFields.data.tasksDone,
+        };
+        const result = await generateProgressReport(input);
+        return { message: "Relatório de progresso gerado com sucesso.", data: result };
+    } catch (error) {
+        console.error(error);
+        return { message: "Ocorreu um erro inesperado ao gerar o relatório." };
+    }
+}
+
 
 type AccountStatusState = {
     message: string;
