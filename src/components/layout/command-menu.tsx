@@ -1,4 +1,3 @@
-
 // src/components/layout/command-menu.tsx
 "use client";
 
@@ -31,7 +30,8 @@ import {
   Building,
   FileText,
   PlusCircle,
-  Settings
+  Settings,
+  HeartPulse
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -88,6 +88,31 @@ export function CommandMenu() {
           action: () => router.push('/dashboard/assets'),
         }
       ],
+    },
+    {
+        group: 'Relatórios IA',
+        items: [
+            {
+                icon: FileText,
+                label: 'Gerador de Relatório de Impacto',
+                action: () => router.push('/dashboard/reports/impact-generator'),
+            },
+            {
+                icon: FileText,
+                label: 'Gerador de Relatório de Progresso',
+                action: () => router.push('/dashboard/reports/progress-generator'),
+            },
+            {
+                icon: Film,
+                label: 'Gerador de Vídeo',
+                action: () => router.push('/dashboard/video-generator'),
+            },
+            {
+                icon: HeartPulse,
+                label: 'Diagnóstico Organizacional',
+                action: () => router.push('/dashboard/reports/organizational-diagnosis'),
+            }
+        ]
     },
     {
       group: 'Ações',

@@ -41,6 +41,11 @@ import {
 } from "@/ai/flows/project-risk-analysis";
 import { AnalyzeTaskRiskInputSchema } from "@/ai/schemas/project-risk-analysis-schemas";
 import { getDailyTip, type DailyTipOutput } from "@/ai/flows/get-daily-tip";
+import {
+    organizationalDiagnosis,
+    type OrganizationalDiagnosisOutput,
+} from "@/ai/flows/organizational-diagnosis";
+import { OrganizationalDiagnosisInputSchema } from "@/ai/schemas/organizational-diagnosis-schemas";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -306,5 +311,52 @@ export async function getDailyTipAction(): Promise<DailyTipState> {
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
         return { message: "Failed to load tip.", error: errorMessage};
+    }
+}
+
+type OrganizationalDiagnosisState = {
+    message: string;
+    data?: OrganizationalDiagnosisOutput | null;
+    errors?: any;
+  };
+
+export async function organizationalDiagnosisAction(
+    prevState: OrganizationalDiagnosisState,
+    formData: FormData
+): Promise<OrganizationalDiagnosisState> {
+    const rawData = {
+        financials: {
+            annualRevenue: Number(formData.get("financials.annualRevenue")),
+            annualExpenses: Number(formData.get("financials.annualExpenses")),
+            fundingDiversityScore: Number(formData.get("financials.fundingDiversityScore")),
+            emergencyFundInMonths: Number(formData.get("financials.emergencyFundInMonths")),
+        },
+        projects: {
+            successRatePercentage: Number(formData.get("projects.successRatePercentage")),
+            onBudgetPercentage: 70, // Hardcoded for now as it's not in the form
+            beneficiarySatisfactionScore: Number(formData.get("projects.beneficiarySatisfactionScore")),
+        },
+        team: {
+            employeeRetentionRatePercentage: Number(formData.get("team.employeeRetentionRatePercentage")),
+            teamSatisfactionScore: Number(formData.get("team.teamSatisfactionScore")),
+        }
+    };
+
+    const validatedFields = OrganizationalDiagnosisInputSchema.safeParse(rawData);
+
+    if (!validatedFields.success) {
+        return {
+            message: "A validação falhou. Verifique os campos.",
+            data: null,
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    try {
+        const result = await organizationalDiagnosis(validatedFields.data);
+        return { message: "Diagnóstico gerado com sucesso.", data: result, errors: {} };
+    } catch (error) {
+        console.error(error);
+        return { message: "Ocorreu um erro inesperado ao gerar o diagnóstico.", data: null };
     }
 }

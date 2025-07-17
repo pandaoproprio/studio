@@ -1,3 +1,5 @@
+'use server';
+
 import { config } from 'dotenv';
 config();
 
@@ -10,3 +12,4 @@ import '@/ai/flows/generate-video-story.ts';
 import '@/ai/flows/diagnose-relationship.ts';
 import '@/ai/flows/project-risk-analysis.ts';
 import '@/ai/flows/get-daily-tip.ts';
+import '@/ai/flows/organizational-diagnosis.ts';

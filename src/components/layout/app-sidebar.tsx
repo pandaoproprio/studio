@@ -1,4 +1,4 @@
-
+// src/components/layout/app-sidebar.tsx
 "use client";
 
 import {
@@ -29,7 +29,8 @@ import {
   FileSignature,
   Film,
   Building,
-  FileText
+  FileText,
+  HeartPulse
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -69,6 +70,7 @@ const menuItems = [
         { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto", icon: FileText},
         { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso", icon: FileText},
         { href: "/dashboard/video-generator", label: "Gerador de Vídeo", icon: Film },
+        { href: "/dashboard/reports/organizational-diagnosis", label: "Diagnóstico Organizacional", icon: HeartPulse },
     ]
   },
   { 
