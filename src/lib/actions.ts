@@ -88,9 +88,9 @@ export async function generateImpactReportAction(
 const progressReportSchema = z.object({
     projectId: z.string().min(1, "Por favor, selecione um projeto."),
     projectName: z.string(),
-    tasksTodo: z.string().transform(val => JSON.parse(val)),
-    tasksInProgress: z.string().transform(val => JSON.parse(val)),
-    tasksDone: z.string().transform(val => JSON.parse(val)),
+    tasksTodo: z.string().transform(val => JSON.parse(val) as string[]),
+    tasksInProgress: z.string().transform(val => JSON.parse(val) as string[]),
+    tasksDone: z.string().transform(val => JSON.parse(val) as string[]),
 });
 
 type ProgressReportState = {
@@ -114,7 +114,7 @@ export async function generateProgressReportAction(
         tasksDone: formData.get("tasksDone"),
     };
 
-    if (!rawData.projectName) {
+    if (!rawData.projectName || !rawData.projectId) {
          return {
             message: "Por favor, selecione um projeto para carregar os dados.",
             errors: { projectId: ["Selecione um projeto válido."] }

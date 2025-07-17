@@ -65,7 +65,17 @@ export default function ProgressGeneratorPage() {
 
   const projectDataString = useMemo(() => {
     if (!projectData) return "Selecione um projeto para ver seus dados.";
-    return `Projeto: ${projectData.projectName}\n\nA Fazer:\n- ${projectData.tasksTodo.join('\n- ')}\n\nEm Andamento:\n- ${projectData.tasksInProgress.join('\n- ')}\n\nConcluído:\n- ${projectData.tasksDone.join('\n- ')}`;
+    const { projectName, tasksTodo, tasksInProgress, tasksDone } = projectData;
+    return `Projeto: ${projectName}
+
+A Fazer:
+${tasksTodo.length > 0 ? `- ${tasksTodo.join('\n- ')}` : "Nenhuma tarefa."}
+
+Em Andamento:
+${tasksInProgress.length > 0 ? `- ${tasksInProgress.join('\n- ')}` : "Nenhuma tarefa."}
+
+Concluído:
+${tasksDone.length > 0 ? `- ${tasksDone.join('\n- ')}` : "Nenhuma tarefa."}`;
   }, [projectData]);
 
   return (
@@ -115,11 +125,8 @@ export default function ProgressGeneratorPage() {
                   value={projectDataString}
                   readOnly
                   rows={12}
-                  className="bg-muted text-muted-foreground text-xs"
+                  className="bg-muted text-muted-foreground text-xs whitespace-pre-wrap"
                 />
-                {state.errors?.projectData && (
-                    <p className="text-sm text-destructive">{state.errors.projectData[0]}</p>
-                 )}
               </div>
 
               {/* Hidden fields to pass data to the action */}
@@ -145,7 +152,7 @@ export default function ProgressGeneratorPage() {
           <CardContent className="flex-1">
               <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
               {state.data ? (
-                  <pre className="whitespace-pre-wrap font-body text-sm">{state.data.report}</pre>
+                  <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report.replace(/\n/g, '<br />') }} />
               ) : (
                   <div className="flex h-full items-center justify-center text-center text-muted-foreground">
                       <p>Aguardando geração do relatório...</p>
