@@ -1,9 +1,11 @@
+
 "use client"
 
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { ChevronRight, PanelLeft } from "lucide-react"
+import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -682,27 +684,80 @@ const SidebarMenuSkeleton = React.forwardRef<
 })
 SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
 
-const SidebarMenuSub = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
+const SidebarMenuSub = PopoverPrimitive.Root
+const SidebarMenuSubTrigger = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger> & {
+    isActive?: boolean
+    tooltip?: React.ComponentProps<typeof TooltipContent>
+  }
+>(({ isActive, tooltip, ...props }, ref) => {
+  const { isMobile, state } = useSidebar()
+  const trigger = (
+    <PopoverPrimitive.Trigger
+      ref={ref}
+      asChild
+      data-state={isActive ? "active" : "inactive"}
+      {...props}
+    />
+  )
+
+  if (!tooltip) return trigger
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        align="center"
+        hidden={state !== "collapsed" || isMobile}
+        {...tooltip}
+      />
+    </Tooltip>
+  )
+})
+SidebarMenuSubTrigger.displayName = PopoverPrimitive.Trigger.displayName
+
+const SidebarMenuSubContent = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
 >(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    data-sidebar="menu-sub"
-    className={cn(
-      "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
-      "group-data-[collapsible=icon]:hidden",
-      className
-    )}
-    {...props}
-  />
+  <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Content
+      ref={ref}
+      side="right"
+      align="start"
+      sideOffset={12}
+      className={cn(
+        "z-50 min-w-48 rounded-md border bg-sidebar p-1 text-sidebar-foreground shadow-md",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "group-data-[collapsible=icon]:hidden",
+        className
+      )}
+      {...props}
+    />
+  </PopoverPrimitive.Portal>
 ))
-SidebarMenuSub.displayName = "SidebarMenuSub"
+SidebarMenuSubContent.displayName = PopoverPrimitive.Content.displayName
 
 const SidebarMenuSubItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ ...props }, ref) => <li ref={ref} {...props} />)
+  HTMLDivElement,
+  React.ComponentProps<"div"> & { asChild?: boolean; isActive?: boolean }
+>(({ className, asChild, isActive, ...props }, ref) => {
+  const Comp = asChild ? Slot : "div"
+  return (
+    <Comp
+      ref={ref}
+      data-active={isActive}
+      className={cn(
+        "relative flex cursor-pointer select-none items-center gap-2 rounded-md p-2 text-sm outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+        "[&>svg]:size-4 [&>svg]:shrink-0",
+        className
+      )}
+      {...props}
+    />
+  )
+})
 SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
 
 const SidebarMenuSubButton = React.forwardRef<
@@ -755,6 +810,8 @@ export {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarMenuSubTrigger,
+  SidebarMenuSubContent,
   SidebarProvider,
   SidebarRail,
   SidebarSeparator,

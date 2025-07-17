@@ -11,7 +11,9 @@ import {
   SidebarFooter,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem
+  SidebarMenuSubItem,
+  SidebarMenuSubContent,
+  SidebarMenuSubTrigger
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -39,8 +41,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
 
 
 const menuItems = [
@@ -111,70 +111,69 @@ export function AppSidebar() {
     }
     return pathname.startsWith(href);
   };
-
-  const isSectionActive = (item: any): boolean => {
-    if (!item.subItems) return false;
-    return item.subItems.some((subItem: any) => 
-        subItem.href ? isActive(subItem.href) : isSectionActive(subItem)
-    );
-  }
   
-  const renderMenuItems = (items: any[], isSubMenu = false) => {
-    const MenuSubComponent = isSubMenu ? SidebarMenuSub : SidebarMenu;
-    const MenuItemComponent = isSubMenu ? SidebarMenuSubItem : SidebarMenuItem;
-    const MenuButtonComponent = isSubMenu ? SidebarMenuSubButton : SidebarMenuButton;
-
-    return (
-        <MenuSubComponent>
-          {items.map((item) => {
-             if (item.subItems) {
-                return (
-                    <MenuItemComponent key={item.id || item.label}>
-                         <Collapsible defaultOpen={isSectionActive(item)}>
-                            <CollapsibleTrigger asChild>
-                                <MenuButtonComponent
-                                    className="justify-between w-full"
-                                    isActive={isSectionActive(item)}
-                                    tooltip={{
-                                        children: item.label,
-                                        side: "right",
-                                    }}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <item.icon />
-                                        <span>{item.label}</span>
-                                    </div>
-                                    <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
-                                </MenuButtonComponent>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                                {renderMenuItems(item.subItems, true)}
-                            </CollapsibleContent>
-                      </Collapsible>
-                    </MenuItemComponent>
-                )
-             }
-             return (
-                <MenuItemComponent key={item.href}>
-                    <MenuButtonComponent
-                        asChild
-                        isActive={isActive(item.href)}
-                        tooltip={{
-                        children: item.label,
-                        side: "right",
-                        }}
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </MenuButtonComponent>
-                </MenuItemComponent>
-             )
-          })}
-        </MenuSubComponent>
-    )
-  }
+  const renderMenuItems = (items: any[]) => {
+    return items.map((item) => {
+      if (item.subItems) {
+        return (
+          <SidebarMenuItem key={item.id || item.label}>
+            <SidebarMenuSub>
+                <SidebarMenuSubTrigger 
+                    isActive={item.subItems.some((si: any) => si.href && isActive(si.href))}
+                    tooltip={{ children: item.label, side: "right" }}
+                >
+                    <item.icon />
+                    <span>{item.label}</span>
+                </SidebarMenuSubTrigger>
+                <SidebarMenuSubContent>
+                    {item.subItems.map((subItem: any) => {
+                        if (subItem.subItems) { // For nested submenus
+                           return (
+                             <SidebarMenuSub key={subItem.label}>
+                                <SidebarMenuSubTrigger isActive={subItem.subItems.some((ssi: any) => ssi.href && isActive(ssi.href))}>
+                                    <subItem.icon />
+                                    <span>{subItem.label}</span>
+                                </SidebarMenuSubTrigger>
+                                <SidebarMenuSubContent>
+                                    {subItem.subItems.map((ssi: any) => (
+                                         <SidebarMenuSubItem key={ssi.href} asChild isActive={isActive(ssi.href)}>
+                                            <Link href={ssi.href}><ssi.icon />{ssi.label}</Link>
+                                         </SidebarMenuSubItem>
+                                    ))}
+                                </SidebarMenuSubContent>
+                            </SidebarMenuSub>
+                           )
+                        }
+                        return (
+                            <SidebarMenuSubItem key={subItem.href} asChild isActive={isActive(subItem.href)}>
+                                <Link href={subItem.href}><subItem.icon />{subItem.label}</Link>
+                            </SidebarMenuSubItem>
+                        )
+                    })}
+                </SidebarMenuSubContent>
+            </SidebarMenuSub>
+          </SidebarMenuItem>
+        );
+      }
+      return (
+        <SidebarMenuItem key={item.href}>
+          <SidebarMenuButton
+            asChild
+            isActive={isActive(item.href)}
+            tooltip={{
+              children: item.label,
+              side: "right",
+            }}
+          >
+            <Link href={item.href}>
+              <item.icon />
+              <span>{item.label}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      );
+    });
+  };
 
 
   return (
@@ -190,7 +189,9 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">
-        {renderMenuItems(menuItems)}
+        <SidebarMenu>
+            {renderMenuItems(menuItems)}
+        </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>
