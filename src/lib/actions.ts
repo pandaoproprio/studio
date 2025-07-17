@@ -227,7 +227,8 @@ export async function generateVideoStoryAction(text: string): Promise<GenerateVi
         return { message: "Video generated", data: result };
     } catch(e) {
         console.error(e);
-        return { message: "Failed to generate video.", error: "An unexpected error occurred."};
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to generate video.", error: errorMessage};
     }
 }
 
