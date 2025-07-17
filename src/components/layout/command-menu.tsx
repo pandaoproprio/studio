@@ -2,7 +2,7 @@
 // src/components/layout/command-menu.tsx
 "use client";
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useCommandMenu } from '@/hooks/use-command-menu';
 import {
