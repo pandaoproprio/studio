@@ -1,12 +1,27 @@
 // src/app/dashboard/financial/page.tsx
+"use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Download } from "lucide-react";
 import { FinancialOverview } from "@/components/dashboard/financial-overview";
 import { CashflowChart } from "@/components/dashboard/cashflow-chart";
 import { TransactionsTable } from "@/components/dashboard/transactions-table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { TransactionForm } from "@/components/financial/transaction-form";
+import { Transaction } from "@/lib/types";
 
 export default function FinancialPage() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleAddTransaction = (newTransaction: Transaction) => {
+    // In a real app, this would be an API call.
+    // Here we're just updating local state.
+    setTransactions(prev => [newTransaction, ...prev]);
+    setIsDialogOpen(false);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -23,10 +38,20 @@ export default function FinancialPage() {
             <Download className="mr-2 h-4 w-4" />
             Exportar Relatório
           </Button>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Nova Transação
-          </Button>
+           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Nova Transação
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Registrar Nova Transação</DialogTitle>
+              </DialogHeader>
+              <TransactionForm onSubmit={handleAddTransaction} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       
@@ -37,7 +62,8 @@ export default function FinancialPage() {
             <CashflowChart />
         </div>
         <div className="lg:col-span-2">
-            <TransactionsTable />
+            {/* Pass transactions state to the table */}
+            <TransactionsTable recentTransactions={transactions} />
         </div>
       </div>
     </div>

@@ -20,3 +20,16 @@ export interface Column {
   title: string;
   tasks: Task[];
 }
+
+export type TransactionType = "Receita" | "Despesa";
+export type TransactionStatus = "Concluído" | "Pendente" | "Cancelado";
+
+export interface Transaction {
+    id: string;
+    type: TransactionType;
+    description: string;
+    amount: number;
+    date: Date;
+    category: string;
+    status: TransactionStatus;
+}

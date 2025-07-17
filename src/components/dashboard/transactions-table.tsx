@@ -7,16 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { Transaction, TransactionStatus, TransactionType } from "@/lib/types";
+import { format } from 'date-fns';
 
-type TransactionStatus = "Concluído" | "Pendente" | "Cancelado";
-type TransactionType = "Receita" | "Despesa";
-
-const transactions = [
-  { id: "TXN-001", type: "Receita", description: "Doação - Empresa Parceira S.A.", date: "28/07/2024", amount: "+ R$ 5.000,00", status: "Concluído" },
-  { id: "TXN-002", type: "Despesa", description: "Pagamento - Gráfica Impressão Rápida", date: "27/07/2024", amount: "- R$ 850,00", status: "Concluído" },
-  { id: "TXN-003", type: "Despesa", description: "Aluguel - Sede", date: "25/07/2024", amount: "- R$ 5.000,00", status: "Concluído" },
-  { id: "TXN-004", type: "Receita", description: "Venda de Ingressos - Festa Julina", date: "22/07/2024", amount: "+ R$ 1.230,00", status: "Pendente" },
-  { id: "TXN-005", type: "Despesa", description: "Compra de Material de Escritório", date: "20/07/2024", amount: "- R$ 320,00", status: "Concluído" },
+const initialTransactions: Transaction[] = [
+  { id: "TXN-001", type: "Receita", description: "Doação - Empresa Parceira S.A.", date: new Date("2024-07-28"), amount: 5000, status: "Concluído", category: "Doação" },
+  { id: "TXN-002", type: "Despesa", description: "Pagamento - Gráfica Impressão Rápida", date: new Date("2024-07-27"), amount: 850, status: "Concluído", category: "Fornecedores" },
+  { id: "TXN-003", type: "Despesa", description: "Aluguel - Sede", date: new Date("2024-07-25"), amount: 5000, status: "Concluído", category: "Infraestrutura" },
+  { id: "TXN-004", type: "Receita", description: "Venda de Ingressos - Festa Julina", date: new Date("2024-07-22"), amount: 1230, status: "Pendente", category: "Eventos" },
+  { id: "TXN-005", type: "Despesa", description: "Compra de Material de Escritório", date: new Date("2024-07-20"), amount: 320, status: "Concluído", category: "Material de Escritório" },
 ];
 
 const getStatusBadgeClass = (status: TransactionStatus) => {
@@ -32,14 +31,20 @@ const getAmountClass = (type: TransactionType) => {
     return type === "Receita" ? "text-green-600" : "text-red-600";
 }
 
-export function TransactionsTable() {
+interface TransactionsTableProps {
+    recentTransactions: Transaction[];
+}
+
+export function TransactionsTable({ recentTransactions }: TransactionsTableProps) {
+    const allTransactions = [...recentTransactions, ...initialTransactions].slice(0, 5);
+
     return (
         <Card className="h-full">
             <CardHeader className="flex flex-row items-center">
                 <div className="grid gap-2">
                     <CardTitle className="font-headline">Últimas Transações</CardTitle>
                     <CardDescription>
-                        As 5 transações mais recentes da sua organização.
+                        As transações mais recentes da sua organização.
                     </CardDescription>
                 </div>
                 <Button asChild size="sm" className="ml-auto gap-1">
@@ -58,14 +63,16 @@ export function TransactionsTable() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                         {transactions.map((transaction) => (
+                         {allTransactions.map((transaction) => (
                             <TableRow key={transaction.id}>
                                 <TableCell>
                                     <div className="font-medium">{transaction.description}</div>
-                                    <div className="text-sm text-muted-foreground">{transaction.date}</div>
+                                    <div className="text-sm text-muted-foreground">
+                                        {format(transaction.date, 'dd/MM/yyyy')} - <span className="capitalize">{transaction.category}</span>
+                                    </div>
                                 </TableCell>
                                 <TableCell className={`text-right font-semibold ${getAmountClass(transaction.type as TransactionType)}`}>
-                                    {transaction.amount}
+                                    {transaction.type === 'Receita' ? '+' : '-'} {transaction.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </TableCell>
                             </TableRow>
                          ))}
