@@ -98,7 +98,7 @@ const progressReportSchema = z.object({
 
 type ProgressReportState = {
     message: string;
-    data?: GenerateProgressReportOutput;
+    data?: GenerateProgressReportOutput | null;
     errors?: {
         projectId?: string[];
     };
@@ -122,6 +122,7 @@ export async function generateProgressReportAction(
     if (!rawData.projectName || !rawData.projectId) {
          return {
             message: "Por favor, selecione um projeto para carregar os dados.",
+            data: null,
             errors: { projectId: ["Selecione um projeto válido."] }
          }
     }
@@ -131,25 +132,22 @@ export async function generateProgressReportAction(
     if (!validatedFields.success) {
         return {
             message: "Falha na validação. Certifique-se de que um projeto está selecionado.",
+            data: null,
             errors: validatedFields.error.flatten().fieldErrors,
         };
     }
 
     try {
         const input: GenerateProgressReportInput = {
-            projectName: validatedFields.data.projectName,
-            tasksTodo: validatedFields.data.tasksTodo,
-            tasksInProgress: validatedFields.data.tasksInProgress,
-            tasksDone: validatedFields.data.tasksDone,
-            targetAudience: validatedFields.data.targetAudience,
-            tone: validatedFields.data.tone,
-            additionalContext: validatedFields.data.additionalContext,
+            ...validatedFields.data,
+            additionalContext: validatedFields.data.additionalContext || "",
         };
         const result = await generateProgressReport(input);
-        return { message: "Relatório de progresso gerado com sucesso.", data: result };
+        const processedReport = result.report.replace(/```html\n?|```/g, '');
+        return { message: "Relatório de progresso gerado com sucesso.", data: { report: processedReport } };
     } catch (error) {
         console.error(error);
-        return { message: "Ocorreu um erro inesperado ao gerar o relatório." };
+        return { message: "Ocorreu um erro inesperado ao gerar o relatório.", data: null };
     }
 }
 

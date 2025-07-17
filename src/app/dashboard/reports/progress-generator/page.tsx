@@ -1,8 +1,8 @@
 // src/app/dashboard/reports/progress-generator/page.tsx
 "use client";
 
-import { useState, useMemo } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState, useMemo, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { generateProgressReportAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +22,8 @@ const projects = [
 
 const initialState = {
   message: "",
+  data: null,
+  errors: undefined,
 };
 
 function SubmitButton() {
@@ -44,7 +46,7 @@ function SubmitButton() {
 }
 
 export default function ProgressGeneratorPage() {
-  const [state, formAction] = useFormState(generateProgressReportAction, initialState);
+  const [state, formAction] = useActionState(generateProgressReportAction, initialState);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const projectData = useMemo(() => {
@@ -164,7 +166,7 @@ export default function ProgressGeneratorPage() {
           <CardContent className="flex-1">
               <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
               {state.data ? (
-                  <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report.replace(/```html\n?|```/g, '').replace(/\n/g, '<br />') }} />
+                  <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report }} />
               ) : (
                   <div className="flex h-full items-center justify-center text-center text-muted-foreground">
                       <p>Aguardando geração do relatório...</p>
