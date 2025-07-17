@@ -51,6 +51,12 @@ import {
     type CorporateRiskAnalysisOutput
 } from "@/ai/flows/corporate-risk-analysis";
 import { CorporateRiskAnalysisInputSchema } from "@/ai/schemas/corporate-risk-analysis-schemas";
+import {
+    academicResearchAssistant,
+    type AcademicResearchAssistantOutput
+} from "@/ai/flows/academic-research-assistant";
+import { AcademicResearchAssistantInputSchema } from "@/ai/schemas/academic-research-assistant-schemas";
+
 
 import { z } from "zod";
 
@@ -396,5 +402,38 @@ export async function corporateRiskAnalysisAction(
     } catch (error) {
         console.error(error);
         return { message: "Ocorreu um erro inesperado ao gerar a análise de risco.", data: null };
+    }
+}
+
+type AcademicResearchAssistantState = {
+    message: string;
+    data?: AcademicResearchAssistantOutput | null;
+    errors?: any;
+};
+
+export async function academicResearchAssistantAction(
+    prevState: AcademicResearchAssistantState,
+    formData: FormData
+): Promise<AcademicResearchAssistantState> {
+    const validatedFields = AcademicResearchAssistantInputSchema.safeParse({
+        topic: formData.get("topic"),
+        researchType: formData.get("researchType"),
+        targetAudience: formData.get("targetAudience"),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            message: "A validação falhou. Verifique os campos.",
+            data: null,
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    try {
+        const result = await academicResearchAssistant(validatedFields.data);
+        return { message: "Plano de pesquisa gerado com sucesso.", data: result, errors: {} };
+    } catch (error) {
+        console.error(error);
+        return { message: "Ocorreu um erro inesperado ao gerar o plano de pesquisa.", data: null };
     }
 }

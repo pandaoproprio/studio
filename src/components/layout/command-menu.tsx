@@ -32,7 +32,8 @@ import {
   PlusCircle,
   Settings,
   HeartPulse,
-  TrendingDown
+  TrendingDown,
+  BookMarked
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -117,6 +118,11 @@ export function CommandMenu() {
                 icon: TrendingDown,
                 label: 'Análise de Risco Corporativo',
                 action: () => router.push('/dashboard/reports/corporate-risk-analysis'),
+            },
+            {
+                icon: BookMarked,
+                label: 'Assistente de Pesquisa Acadêmica',
+                action: () => router.push('/dashboard/reports/academic-research-assistant'),
             }
         ]
     },

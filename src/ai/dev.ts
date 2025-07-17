@@ -14,3 +14,4 @@ import '@/ai/flows/project-risk-analysis.ts';
 import '@/ai/flows/get-daily-tip.ts';
 import '@/ai/flows/organizational-diagnosis.ts';
 import '@/ai/flows/corporate-risk-analysis.ts';
+import '@/ai/flows/academic-research-assistant.ts';
