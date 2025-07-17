@@ -122,8 +122,12 @@ export function AppSidebar() {
                     isActive={item.subItems.some((si: any) => si.href && isActive(si.href))}
                     tooltip={{ children: item.label, side: "right" }}
                 >
-                    <item.icon />
-                    <span>{item.label}</span>
+                  <SidebarMenuButton asChild isActive={isActive(item.href)}>
+                    <>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </>
+                  </SidebarMenuButton>
                 </SidebarMenuSubTrigger>
                 <SidebarMenuSubContent>
                     {item.subItems.map((subItem: any) => {
@@ -131,8 +135,12 @@ export function AppSidebar() {
                            return (
                              <SidebarMenuSub key={subItem.label}>
                                 <SidebarMenuSubTrigger isActive={subItem.subItems.some((ssi: any) => ssi.href && isActive(ssi.href))}>
-                                    <subItem.icon />
-                                    <span>{subItem.label}</span>
+                                   <SidebarMenuButton asChild isActive={isActive(subItem.href)}>
+                                    <>
+                                      <subItem.icon />
+                                      <span>{subItem.label}</span>
+                                    </>
+                                  </SidebarMenuButton>
                                 </SidebarMenuSubTrigger>
                                 <SidebarMenuSubContent>
                                     {subItem.subItems.map((ssi: any) => (

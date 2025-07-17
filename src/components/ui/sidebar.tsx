@@ -685,24 +685,35 @@ const SidebarMenuSkeleton = React.forwardRef<
 SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
 
 const SidebarMenuSub = PopoverPrimitive.Root
+
 const SidebarMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger> & {
-    isActive?: boolean
-    tooltip?: React.ComponentProps<typeof TooltipContent>
+    isActive?: boolean;
+    tooltip?: React.ComponentProps<typeof TooltipContent>;
   }
->(({ isActive, tooltip, ...props }, ref) => {
-  const { isMobile, state } = useSidebar()
-  const trigger = (
-    <PopoverPrimitive.Trigger
+>(({ isActive, tooltip, children, ...props }, ref) => {
+  const { isMobile, state } = useSidebar();
+
+  const triggerContent = (
+    <SidebarMenuButton
       ref={ref}
       asChild
-      data-state={isActive ? "active" : "inactive"}
+      data-state={isActive ? 'active' : 'inactive'}
+      isActive={isActive}
       {...props}
-    />
-  )
+    >
+      {children}
+    </SidebarMenuButton>
+  );
 
-  if (!tooltip) return trigger
+  const trigger = (
+    <PopoverPrimitive.Trigger asChild>{triggerContent}</PopoverPrimitive.Trigger>
+  );
+  
+  if (!tooltip) {
+    return trigger;
+  }
 
   return (
     <Tooltip>
@@ -710,12 +721,12 @@ const SidebarMenuSubTrigger = React.forwardRef<
       <TooltipContent
         side="right"
         align="center"
-        hidden={state !== "collapsed" || isMobile}
+        hidden={state !== 'collapsed' || isMobile}
         {...tooltip}
       />
     </Tooltip>
-  )
-})
+  );
+});
 SidebarMenuSubTrigger.displayName = PopoverPrimitive.Trigger.displayName
 
 const SidebarMenuSubContent = React.forwardRef<
