@@ -8,6 +8,7 @@ import { QuickAccessCarousel } from "@/components/dashboard/quick-access-carouse
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lightbulb } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getDailyTipAction } from "@/lib/actions";
 
 
 export default function DashboardPage() {
@@ -25,18 +26,22 @@ export default function DashboardPage() {
       setGreeting("Boa noite");
     }
 
-    // Simulação de uma chamada de IA para uma dica.
-    // Em um cenário real, isso viria de um flow Genkit.
-    setTimeout(() => {
-      const tips = [
-        "Analise os riscos de tarefas no seu quadro Kanban para antecipar gargalos.",
-        "Use o gerador de relatórios de progresso para manter seus stakeholders informados.",
-        "Fortaleça o relacionamento com seus contatos usando o diagnóstico de IA no CRM.",
-        "Crie vídeos de impacto a partir de textos para engajar sua comunidade.",
-      ];
-      setTip(tips[Math.floor(Math.random() * tips.length)]);
-      setIsLoadingTip(false);
-    }, 1500);
+    const fetchTip = async () => {
+        try {
+            setIsLoadingTip(true);
+            const result = await getDailyTipAction();
+            if (result.data) {
+                setTip(result.data.tip);
+            } else {
+                setTip("Não foi possível carregar a dica de hoje. Tente novamente mais tarde.");
+            }
+        } catch (error) {
+            setTip("Ocorreu um erro ao buscar a dica do dia.");
+        } finally {
+            setIsLoadingTip(false);
+        }
+    }
+    fetchTip();
 
   }, []);
 

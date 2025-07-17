@@ -9,3 +9,4 @@ import '@/ai/flows/generate-progress-report.ts';
 import '@/ai/flows/generate-video-story.ts';
 import '@/ai/flows/diagnose-relationship.ts';
 import '@/ai/flows/project-risk-analysis.ts';
+import '@/ai/flows/get-daily-tip.ts';

@@ -40,6 +40,7 @@ import {
     type AnalyzeTaskRiskOutput,
 } from "@/ai/flows/project-risk-analysis";
 import { AnalyzeTaskRiskInputSchema } from "@/ai/schemas/project-risk-analysis-schemas";
+import { getDailyTip, type DailyTipOutput } from "@/ai/flows/get-daily-tip";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -280,5 +281,22 @@ export async function projectRiskAnalysisAction(input: AnalyzeTaskRiskInput): Pr
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred during risk analysis.";
         return { message: "Failed to analyze risk.", error: errorMessage };
+    }
+}
+
+type DailyTipState = {
+    message: string;
+    data?: DailyTipOutput;
+    error?: string;
+};
+
+export async function getDailyTipAction(): Promise<DailyTipState> {
+    try {
+        const result = await getDailyTip();
+        return { message: "Tip loaded.", data: result };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to load tip.", error: errorMessage};
     }
 }
