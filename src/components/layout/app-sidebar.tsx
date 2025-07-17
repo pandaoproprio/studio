@@ -57,7 +57,7 @@ const menuItems = [
           subItems: [
             { href: "/dashboard/financial", label: "Dashboard", icon: LayoutDashboard },
             { href: "/dashboard/financials/transactions", label: "Transações", icon: FileText },
-            { href: "/dashboard/financial/reimbursements", label: "Reembolsos", icon: FileCheck },
+            { href: "/dashboard/financial/reimbursements", label: "Gestão de Reembolsos", icon: FileCheck },
           ]
         },
         { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
@@ -147,10 +147,8 @@ export function AppSidebar() {
                                     <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
                                 </MenuButtonComponent>
                             </CollapsibleTrigger>
-                            <CollapsibleContent asChild>
-                                <SidebarMenuSub>
-                                    {renderMenuItems(item.subItems, true)}
-                                </SidebarMenuSub>
+                            <CollapsibleContent>
+                                {renderMenuItems(item.subItems, true)}
                             </CollapsibleContent>
                       </Collapsible>
                     </MenuItemComponent>
@@ -158,18 +156,19 @@ export function AppSidebar() {
              }
              return (
                 <MenuItemComponent key={item.href}>
-                    <Link href={item.href}>
                     <MenuButtonComponent
+                        asChild
                         isActive={isActive(item.href)}
                         tooltip={{
                         children: item.label,
                         side: "right",
                         }}
                     >
+                      <Link href={item.href}>
                         <item.icon />
                         <span>{item.label}</span>
+                      </Link>
                     </MenuButtonComponent>
-                    </Link>
                 </MenuItemComponent>
              )
           })}
