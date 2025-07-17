@@ -44,14 +44,14 @@ import { getDailyTip, type DailyTipOutput } from "@/ai/flows/get-daily-tip";
 import { z } from "zod";
 
 const impactReportSchema = z.object({
-  projectDescription: z.string().min(10, "Project description is too short."),
-  projectOutcomes: z.string().min(10, "Project outcomes are too short."),
-  desiredReportSections: z.string().min(3, "Please provide at least one section."),
+  projectDescription: z.string().min(20, "A descrição do projeto deve ter pelo menos 20 caracteres."),
+  projectOutcomes: z.string().min(20, "Os resultados do projeto devem ter pelo menos 20 caracteres."),
+  desiredReportSections: z.string().min(5, "Forneça pelo menos uma seção desejada para o relatório."),
 });
 
 type ImpactReportState = {
   message: string;
-  data?: GenerateImpactReportOutput;
+  data?: GenerateImpactReportOutput | null;
   errors?: {
     projectDescription?: string[];
     projectOutcomes?: string[];
@@ -71,17 +71,18 @@ export async function generateImpactReportAction(
 
   if (!validatedFields.success) {
     return {
-      message: "Validation failed.",
+      message: "A validação falhou. Verifique os campos.",
+      data: null,
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
   try {
     const result = await generateImpactReport(validatedFields.data);
-    return { message: "Report generated successfully.", data: result };
+    return { message: "Relatório gerado com sucesso.", data: result, errors: {} };
   } catch (error) {
     console.error(error);
-    return { message: "An unexpected error occurred." };
+    return { message: "Ocorreu um erro inesperado ao gerar o relatório.", data: null };
   }
 }
 

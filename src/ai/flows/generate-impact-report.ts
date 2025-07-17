@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -15,7 +16,7 @@ const GenerateImpactReportInputSchema = z.object({
   projectDescription: z
     .string()
     .describe('A description of the project for which to generate an impact report.'),
-  projectOutcomes: z.string().describe('A description of the project outcomes.'),
+  projectOutcomes: z.string().describe('A description of the project outcomes, including key metrics and qualitative results.'),
   desiredReportSections: z
     .string()
     .describe('A comma-separated list of report sections to include in the impact report.'),
@@ -23,7 +24,7 @@ const GenerateImpactReportInputSchema = z.object({
 export type GenerateImpactReportInput = z.infer<typeof GenerateImpactReportInputSchema>;
 
 const GenerateImpactReportOutputSchema = z.object({
-  report: z.string().describe('The generated impact report.'),
+  report: z.string().describe('The generated impact report, formatted as a simple HTML string.'),
 });
 export type GenerateImpactReportOutput = z.infer<typeof GenerateImpactReportOutputSchema>;
 
@@ -35,14 +36,24 @@ const prompt = ai.definePrompt({
   name: 'generateImpactReportPrompt',
   input: {schema: GenerateImpactReportInputSchema},
   output: {schema: GenerateImpactReportOutputSchema},
-  prompt: `You are an AI assistant that generates impact reports for social organizations.
+  prompt: `Você é um especialista em comunicação e relatórios de impacto para organizações do terceiro setor. Sua tarefa é gerar um relatório de impacto profissional e bem-estruturado com base nas informações fornecidas.
 
-  Given the project description, project outcomes, and desired report sections, generate a comprehensive impact report.
+O formato de saída deve ser um HTML simples e limpo, utilizando tags como <h2>, <h3>, <p>, <ul>, e <li>. Não inclua as tags <html>, <head>, ou <body>.
 
-  Project Description: {{{projectDescription}}}
-  Project Outcomes: {{{projectOutcomes}}}
-  Desired Report Sections: {{{desiredReportSections}}}
-  `,config: {
+**Informações do Projeto:**
+
+*   **Descrição do Projeto:** {{{projectDescription}}}
+*   **Resultados e Métricas Chave:** {{{projectOutcomes}}}
+*   **Seções Solicitadas para o Relatório:** {{{desiredReportSections}}}
+
+**Instruções:**
+1.  Comece com uma seção de título (<h2>) para o nome geral do relatório.
+2.  Crie cada uma das seções solicitadas usando títulos de nível 3 (<h3>).
+3.  Dentro de cada seção, desenvolva o conteúdo em parágrafos (<p>) ou listas (<ul>/<li>) de forma clara e concisa.
+4.  Incorpore os resultados e métricas chave de forma natural ao longo do texto.
+5.  Adote um tom inspirador, mas profissional.
+`,
+  config: {
     safetySettings: [
       {
         category: 'HARM_CATEGORY_HATE_SPEECH',
@@ -61,6 +72,7 @@ const prompt = ai.definePrompt({
         threshold: 'BLOCK_LOW_AND_ABOVE',
       },
     ],
+    temperature: 0.7,
   },
 });
 
@@ -72,6 +84,11 @@ const generateImpactReportFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error("A IA não conseguiu gerar o relatório.");
+    }
+    // Clean up potential markdown code fences from the output
+    const cleanReport = output.report.replace(/```html\n?|```/g, '').trim();
+    return { report: cleanReport };
   }
 );

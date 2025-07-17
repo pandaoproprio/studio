@@ -1,7 +1,11 @@
 
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { generateImpactReportAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +14,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Wand2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+
+const impactReportSchema = z.object({
+  projectDescription: z.string().min(20, "A descrição do projeto deve ter pelo menos 20 caracteres."),
+  projectOutcomes: z.string().min(20, "Os resultados do projeto devem ter pelo menos 20 caracteres."),
+  desiredReportSections: z.string().min(5, "Forneça pelo menos uma seção desejada para o relatório."),
+});
+
+type ImpactReportFormValues = z.infer<typeof impactReportSchema>;
 
 const initialState = {
   message: "",
+  data: null,
+  errors: undefined,
 };
 
 function SubmitButton() {
@@ -35,7 +51,16 @@ function SubmitButton() {
 }
 
 export function ImpactReportForm() {
-  const [state, formAction] = useFormState(generateImpactReportAction, initialState);
+  const [state, formAction] = useActionState(generateImpactReportAction, initialState);
+  
+  const form = useForm<ImpactReportFormValues>({
+    resolver: zodResolver(impactReportSchema),
+    defaultValues: {
+      projectDescription: "",
+      projectOutcomes: "",
+      desiredReportSections: "Sumário Executivo, Metodologia, Resultados Chave, Depoimentos, Próximos Passos",
+    },
+  });
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -43,75 +68,89 @@ export function ImpactReportForm() {
         <CardHeader>
           <CardTitle className="font-headline">Gerador de Relatório de Impacto</CardTitle>
           <CardDescription>
-            Descreva seu projeto e deixe a IA criar um relatório de impacto profissional.
+            Descreva seu projeto e deixe a IA criar um relatório de impacto profissional e bem-formatado.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={formAction} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="projectDescription">Descrição do Projeto</Label>
-              <Textarea
-                id="projectDescription"
+          <Form {...form}>
+            <form action={formAction} className="space-y-6">
+              <FormField
+                control={form.control}
                 name="projectDescription"
-                placeholder="Ex: Projeto de capacitação de jovens em tecnologia na comunidade X..."
-                rows={5}
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição do Projeto</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Ex: Projeto de capacitação de jovens em tecnologia na comunidade X, focado em desenvolvimento web e mobile..."
+                        rows={5}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {state.errors?.projectDescription && (
-                <p className="text-sm text-destructive">{state.errors.projectDescription[0]}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="projectOutcomes">Resultados do Projeto</Label>
-              <Textarea
-                id="projectOutcomes"
+              <FormField
+                control={form.control}
                 name="projectOutcomes"
-                placeholder="Ex: 50 jovens formados, 80% de empregabilidade, aumento de 30% na renda familiar..."
-                rows={5}
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Resultados e Métricas Chave</FormLabel>
+                     <FormControl>
+                        <Textarea
+                            placeholder="Ex: 50 jovens formados, 80% de empregabilidade, aumento de 30% na renda familiar, 10 apps desenvolvidos..."
+                            rows={5}
+                            {...field}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-               {state.errors?.projectOutcomes && (
-                <p className="text-sm text-destructive">{state.errors.projectOutcomes[0]}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="desiredReportSections">Seções Desejadas no Relatório</Label>
-              <Input
-                id="desiredReportSections"
+              <FormField
+                control={form.control}
                 name="desiredReportSections"
-                placeholder="Ex: Sumário Executivo, Metodologia, Resultados, Depoimentos"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Seções Desejadas (separadas por vírgula)</FormLabel>
+                    <FormControl>
+                        <Input
+                            placeholder="Ex: Sumário Executivo, Metodologia, Resultados, Depoimentos"
+                            {...field}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {state.errors?.desiredReportSections && (
-                <p className="text-sm text-destructive">{state.errors.desiredReportSections[0]}</p>
-              )}
-            </div>
-            <SubmitButton />
-          </form>
+              <SubmitButton />
+            </form>
+          </Form>
         </CardContent>
       </Card>
       
       <Card className="flex flex-col">
         <CardHeader>
           <CardTitle className="font-headline">Relatório Gerado</CardTitle>
-          <CardDescription>O resultado do seu relatório aparecerá aqui.</CardDescription>
+          <CardDescription>O resultado do seu relatório formatado em HTML aparecerá aqui.</CardDescription>
         </CardHeader>
         <CardContent className="flex-1">
-            <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
-            {state.data ? (
-                <pre className="whitespace-pre-wrap font-body text-sm">{state.data.report}</pre>
+          <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
+            {state?.data?.report ? (
+              <div dangerouslySetInnerHTML={{ __html: state.data.report }} />
             ) : (
-                <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                    <p>Aguardando geração do relatório...</p>
-                </div>
+              <div className="flex h-full items-center justify-center text-center text-muted-foreground">
+                <p>Aguardando geração do relatório...</p>
+              </div>
             )}
-            {state.message && !state.data && (
-                <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
-                    <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
-                    <AlertDescription>{state.message}</AlertDescription>
-                </Alert>
+            {state?.message && !state.data && (
+              <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
+                <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
+                <AlertDescription>{state.message}</AlertDescription>
+              </Alert>
             )}
-            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
