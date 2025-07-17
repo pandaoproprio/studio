@@ -29,8 +29,8 @@ type View = "kanban" | "gantt";
 type RiskAnalysisResult = { task: TaskWithColumn, analysis: AnalyzeTaskRiskOutput };
 
 export default function ProjectBoardPage() {
-  const params = useParams<{ projectId: string }>();
-  const projectId = params.projectId;
+  const params = useParams();
+  const projectId = params.projectId as string;
 
   const [view, setView] = useState<View>("kanban");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
