@@ -31,7 +31,8 @@ import {
   FileText,
   PlusCircle,
   Settings,
-  HeartPulse
+  HeartPulse,
+  TrendingDown
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -111,6 +112,11 @@ export function CommandMenu() {
                 icon: HeartPulse,
                 label: 'Diagnóstico Organizacional',
                 action: () => router.push('/dashboard/reports/organizational-diagnosis'),
+            },
+            {
+                icon: TrendingDown,
+                label: 'Análise de Risco Corporativo',
+                action: () => router.push('/dashboard/reports/corporate-risk-analysis'),
             }
         ]
     },

@@ -46,6 +46,12 @@ import {
     type OrganizationalDiagnosisOutput,
 } from "@/ai/flows/organizational-diagnosis";
 import { OrganizationalDiagnosisInputSchema } from "@/ai/schemas/organizational-diagnosis-schemas";
+import {
+    corporateRiskAnalysis,
+    type CorporateRiskAnalysisOutput
+} from "@/ai/flows/corporate-risk-analysis";
+import { CorporateRiskAnalysisInputSchema } from "@/ai/schemas/corporate-risk-analysis-schemas";
+
 import { z } from "zod";
 
 const impactReportSchema = z.object({
@@ -358,5 +364,37 @@ export async function organizationalDiagnosisAction(
     } catch (error) {
         console.error(error);
         return { message: "Ocorreu um erro inesperado ao gerar o diagnóstico.", data: null };
+    }
+}
+
+type CorporateRiskAnalysisState = {
+    message: string;
+    data?: CorporateRiskAnalysisOutput | null;
+    errors?: any;
+};
+
+export async function corporateRiskAnalysisAction(
+    prevState: CorporateRiskAnalysisState,
+    formData: FormData
+): Promise<CorporateRiskAnalysisState> {
+    const validatedFields = CorporateRiskAnalysisInputSchema.safeParse({
+        initiativeDescription: formData.get("initiativeDescription"),
+        context: formData.get("context"),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            message: "A validação falhou. Verifique os campos.",
+            data: null,
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    try {
+        const result = await corporateRiskAnalysis(validatedFields.data);
+        return { message: "Análise de risco gerada com sucesso.", data: result, errors: {} };
+    } catch (error) {
+        console.error(error);
+        return { message: "Ocorreu um erro inesperado ao gerar a análise de risco.", data: null };
     }
 }

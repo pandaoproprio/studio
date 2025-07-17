@@ -30,7 +30,8 @@ import {
   Film,
   Building,
   FileText,
-  HeartPulse
+  HeartPulse,
+  TrendingDown
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -71,6 +72,7 @@ const menuItems = [
         { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso", icon: FileText},
         { href: "/dashboard/video-generator", label: "Gerador de Vídeo", icon: Film },
         { href: "/dashboard/reports/organizational-diagnosis", label: "Diagnóstico Organizacional", icon: HeartPulse },
+        { href: "/dashboard/reports/corporate-risk-analysis", label: "Análise de Risco", icon: TrendingDown },
     ]
   },
   { 
