@@ -21,8 +21,8 @@ export interface Column {
   tasks: Task[];
 }
 
-export type TransactionType = "Receita" | "Despesa";
-export type TransactionStatus = "Concluído" | "Pendente" | "Cancelado";
+export type TransactionType = "Receita" | "Despesa" | "Reembolso";
+export type TransactionStatus = "Concluído" | "Pendente" | "Cancelado" | "Em Análise" | "Recusado";
 
 export interface Transaction {
     id: string;

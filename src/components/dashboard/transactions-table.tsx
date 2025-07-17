@@ -23,12 +23,19 @@ const getStatusBadgeClass = (status: TransactionStatus) => {
         case "Concluído": return "bg-green-100 text-green-800";
         case "Pendente": return "bg-yellow-100 text-yellow-800";
         case "Cancelado": return "bg-red-100 text-red-800";
+        case "Em Análise": return "bg-blue-100 text-blue-800";
+        case "Recusado": return "bg-orange-100 text-orange-800";
         default: return "bg-gray-100 text-gray-800";
     }
 }
 
 const getAmountClass = (type: TransactionType) => {
-    return type === "Receita" ? "text-green-600" : "text-red-600";
+    switch (type) {
+        case "Receita": return "text-green-600";
+        case "Despesa": return "text-red-600";
+        case "Reembolso": return "text-orange-600";
+        default: return "text-foreground";
+    }
 }
 
 interface TransactionsTableProps {

@@ -15,10 +15,11 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Transaction } from "@/lib/types";
+import { Transaction, TransactionStatus } from "@/lib/types";
+import { useEffect } from "react";
 
 const transactionSchema = z.object({
-  type: z.enum(["Receita", "Despesa"], { required_error: "Selecione o tipo de transação." }),
+  type: z.enum(["Receita", "Despesa", "Reembolso"], { required_error: "Selecione o tipo de transação." }),
   description: z.string().min(3, "A descrição deve ter pelo menos 3 caracteres."),
   amount: z.coerce.number().positive("O valor deve ser um número positivo."),
   date: z.date({ required_error: "Selecione uma data." }),
@@ -32,7 +33,8 @@ interface TransactionFormProps {
 }
 
 const revenueCategories = ["Doação", "Venda de Produtos", "Eventos", "Patrocínio"];
-const expenseCategories = ["Salários", "Aluguel", "Fornecedores", "Marketing", "Infraestrutura", "Material de Escritório"];
+const expenseCategories = ["Salários", "Aluguel", "Fornecedores", "Marketing", "Infraestrutura"];
+const reimbursementCategories = ["Viagem", "Alimentação", "Transporte", "Material de Escritório", "Outros"];
 
 export function TransactionForm({ onSubmit }: TransactionFormProps) {
   const form = useForm<TransactionFormValues>({
@@ -48,14 +50,28 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
   
   const transactionType = form.watch("type");
 
+  useEffect(() => {
+    form.resetField("category");
+  }, [transactionType, form]);
+
   const handleSubmit = (data: TransactionFormValues) => {
+    const status: TransactionStatus = data.type === 'Reembolso' ? "Em Análise" : "Concluído";
     const newTransaction: Transaction = {
         ...data,
         id: `txn-${Date.now()}`,
-        status: "Concluído", // Default status for new transactions
+        status,
     };
     onSubmit(newTransaction);
     form.reset();
+  }
+  
+  const getCategoriesForType = () => {
+    switch (transactionType) {
+        case "Receita": return revenueCategories;
+        case "Despesa": return expenseCategories;
+        case "Reembolso": return reimbursementCategories;
+        default: return [];
+    }
   }
 
   return (
@@ -71,19 +87,25 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  className="flex flex-col space-y-1"
+                  className="flex items-center space-x-4"
                 >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormItem className="flex items-center space-x-2 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Receita" />
                     </FormControl>
                     <FormLabel className="font-normal">Receita</FormLabel>
                   </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormItem className="flex items-center space-x-2 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Despesa" />
                     </FormControl>
                     <FormLabel className="font-normal">Despesa</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="Reembolso" />
+                    </FormControl>
+                    <FormLabel className="font-normal">Reembolso</FormLabel>
                   </FormItem>
                 </RadioGroup>
               </FormControl>
@@ -123,14 +145,14 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
           render={({ field }) => (
             <FormItem>
                 <FormLabel>Categoria</FormLabel>
-                 <Select onValueChange={field.onChange} defaultValue={field.value}>
+                 <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione uma categoria" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(transactionType === 'Receita' ? revenueCategories : expenseCategories).map(cat => (
+                      {getCategoriesForType().map(cat => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                       ))}
                     </SelectContent>
