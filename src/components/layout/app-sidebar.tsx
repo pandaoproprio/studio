@@ -130,30 +130,28 @@ export function AppSidebar() {
              if (item.subItems) {
                 return (
                     <MenuItemComponent key={item.id || item.label}>
-                         <Collapsible asChild defaultOpen={isSectionActive(item)}>
-                            <SidebarMenuItem>
-                                <CollapsibleTrigger asChild>
-                                    <MenuButtonComponent
-                                        className="justify-between"
-                                        isActive={isSectionActive(item)}
-                                        tooltip={{
-                                            children: item.label,
-                                            side: "right",
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <item.icon />
-                                            <span>{item.label}</span>
-                                        </div>
-                                        <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
-                                    </MenuButtonComponent>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent asChild>
-                                    <SidebarMenuSub>
-                                      {renderMenuItems(item.subItems, true)}
-                                    </SidebarMenuSub>
-                                </CollapsibleContent>
-                            </SidebarMenuItem>
+                         <Collapsible defaultOpen={isSectionActive(item)}>
+                            <CollapsibleTrigger asChild>
+                                <MenuButtonComponent
+                                    className="justify-between w-full"
+                                    isActive={isSectionActive(item)}
+                                    tooltip={{
+                                        children: item.label,
+                                        side: "right",
+                                    }}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <item.icon />
+                                        <span>{item.label}</span>
+                                    </div>
+                                    <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
+                                </MenuButtonComponent>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent asChild>
+                                <SidebarMenuSub>
+                                    {renderMenuItems(item.subItems, true)}
+                                </SidebarMenuSub>
+                            </CollapsibleContent>
                       </Collapsible>
                     </MenuItemComponent>
                 )
