@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAccountStatusSummaryAction } from "@/lib/actions";
 import { type AccountStatusSummaryOutput } from "@/ai/flows/account-status-summary";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface MetricCardProps {
   title: string;
@@ -33,6 +35,7 @@ function MetricCardSkeleton() {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                  <Skeleton className="h-4 w-32" />
+                 <Skeleton className="h-4 w-4" />
             </CardHeader>
             <CardContent>
                 <Skeleton className="h-8 w-24" />
@@ -50,6 +53,7 @@ export function KeyMetrics() {
     const fetchSummary = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         const result = await getAccountStatusSummaryAction();
         if (result.data) {
           setSummary(result.data);
@@ -77,7 +81,15 @@ export function KeyMetrics() {
   }
 
   if (error || !summary) {
-    return <div className="text-destructive">Erro ao carregar métricas. Tente novamente mais tarde.</div>
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Erro de Análise</AlertTitle>
+        <AlertDescription>
+          Não foi possível carregar os KPIs analíticos. Por favor, tente novamente mais tarde.
+        </AlertDescription>
+      </Alert>
+    )
   }
 
   return (

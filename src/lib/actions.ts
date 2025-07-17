@@ -99,7 +99,8 @@ export async function generateImpactReportAction(
     return { message: "Relatório gerado com sucesso.", data: result, errors: {} };
   } catch (error) {
     console.error(error);
-    return { message: "Ocorreu um erro inesperado ao gerar o relatório.", data: null };
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { message: `Erro ao gerar relatório: ${errorMessage}`, data: null };
   }
 }
 
@@ -165,7 +166,8 @@ export async function generateProgressReportAction(
         return { message: "Relatório de progresso gerado com sucesso.", data: { report: processedReport } };
     } catch (error) {
         console.error(error);
-        return { message: "Ocorreu um erro inesperado ao gerar o relatório.", data: null };
+        const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+        return { message: `Erro ao gerar relatório: ${errorMessage}`, data: null };
     }
 }
 
@@ -204,7 +206,8 @@ export async function summarizePostAction(postContent: string): Promise<Summariz
         return { message: "Summary loaded.", data: result };
     } catch(e) {
         console.error(e);
-        return { message: "Failed to load summary.", error: "An unexpected error occurred."};
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to load summary.", error: errorMessage};
     }
 }
 
@@ -252,7 +255,7 @@ export async function generateVideoStoryAction(text: string): Promise<GenerateVi
     } catch(e) {
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
-        return { message: "Failed to generate video.", error: errorMessage};
+        return { message: `Failed to generate video: ${errorMessage}`, error: errorMessage};
     }
 }
 
