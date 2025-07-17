@@ -35,7 +35,8 @@ import {
   TrendingDown,
   BookMarked,
   DollarSign,
-  Receipt
+  Receipt,
+  FileCheck
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -63,12 +64,22 @@ export function CommandMenu() {
         },
         {
           icon: DollarSign,
-          label: 'Ir para Financeiro',
+          label: 'Ir para Dashboard Financeiro',
           action: () => router.push('/dashboard/financial'),
+        },
+         {
+          icon: FileText,
+          label: 'Ir para Todas as Transações',
+          action: () => router.push('/dashboard/financials/transactions'),
+        },
+        {
+          icon: FileCheck,
+          label: 'Ir para Gestão de Reembolsos',
+          action: () => router.push('/dashboard/financial/reimbursements'),
         },
         {
           icon: Receipt,
-          label: 'Ir para Reembolsos',
+          label: 'Ir para Solicitar Reembolso',
           action: () => router.push('/dashboard/reimbursements'),
         },
         {
@@ -160,6 +171,11 @@ export function CommandMenu() {
           icon: PlusCircle,
           label: 'Solicitar Reembolso',
           action: () => router.push('/dashboard/reimbursements'), // Goes to the page where they can open the dialog
+        },
+         {
+          icon: PlusCircle,
+          label: 'Registrar Nova Transação',
+          action: () => router.push('/dashboard/financial'), // Goes to the page where they can open the dialog
         },
       ],
     },

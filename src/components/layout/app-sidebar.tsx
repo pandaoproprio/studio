@@ -34,7 +34,8 @@ import {
   TrendingDown,
   BookMarked,
   DollarSign,
-  Receipt
+  Receipt,
+  FileCheck
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -50,7 +51,15 @@ const menuItems = [
       icon: Building,
       subItems: [
         { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
-        { href: "/dashboard/financial", label: "Financeiro", icon: DollarSign },
+        { 
+          label: "Financeiro", 
+          icon: DollarSign,
+          subItems: [
+            { href: "/dashboard/financial", label: "Dashboard", icon: LayoutDashboard },
+            { href: "/dashboard/financials/transactions", label: "Transações", icon: FileText },
+            { href: "/dashboard/financial/reimbursements", label: "Reembolsos", icon: FileCheck },
+          ]
+        },
         { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
         { href: "/dashboard/assets", label: "Ativos", icon: Package },
         { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
@@ -64,7 +73,7 @@ const menuItems = [
       subItems: [
         { href: "/dashboard/crm", label: "CRM", icon: Handshake },
         { href: "/dashboard/hr", label: "RH", icon: Users },
-        { href: "/dashboard/reimbursements", label: "Reembolsos", icon: Receipt },
+        { href: "/dashboard/reimbursements", label: "Solicitar Reembolso", icon: Receipt },
       ]
   },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },
@@ -96,17 +105,80 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
+    if (!href) return false;
     if (href === '/dashboard') {
       return pathname === href;
     }
     return pathname.startsWith(href);
   };
 
-  const isSectionActive = (item: any) => {
+  const isSectionActive = (item: any): boolean => {
     if (!item.subItems) return false;
-    return item.subItems.some((subItem: any) => pathname.startsWith(subItem.href));
+    return item.subItems.some((subItem: any) => 
+        subItem.href ? isActive(subItem.href) : isSectionActive(subItem)
+    );
   }
   
+  const renderMenuItems = (items: any[], isSubMenu = false) => {
+    const MenuSubComponent = isSubMenu ? SidebarMenuSub : SidebarMenu;
+    const MenuItemComponent = isSubMenu ? SidebarMenuSubItem : SidebarMenuItem;
+    const MenuButtonComponent = isSubMenu ? SidebarMenuSubButton : SidebarMenuButton;
+
+    return (
+        <MenuSubComponent>
+          {items.map((item) => {
+             if (item.subItems) {
+                return (
+                    <MenuItemComponent key={item.id || item.label}>
+                         <Collapsible asChild defaultOpen={isSectionActive(item)}>
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                    <MenuButtonComponent
+                                        className="justify-between"
+                                        isActive={isSectionActive(item)}
+                                        tooltip={{
+                                            children: item.label,
+                                            side: "right",
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <item.icon />
+                                            <span>{item.label}</span>
+                                        </div>
+                                        <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
+                                    </MenuButtonComponent>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent asChild>
+                                    <SidebarMenuSub>
+                                      {renderMenuItems(item.subItems, true)}
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                      </Collapsible>
+                    </MenuItemComponent>
+                )
+             }
+             return (
+                <MenuItemComponent key={item.href}>
+                    <Link href={item.href}>
+                    <MenuButtonComponent
+                        isActive={isActive(item.href)}
+                        tooltip={{
+                        children: item.label,
+                        side: "right",
+                        }}
+                    >
+                        <item.icon />
+                        <span>{item.label}</span>
+                    </MenuButtonComponent>
+                    </Link>
+                </MenuItemComponent>
+             )
+          })}
+        </MenuSubComponent>
+    )
+  }
+
 
   return (
     <Sidebar variant="sidebar" side="left" collapsible="icon">
@@ -121,61 +193,7 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">
-        <SidebarMenu>
-          {menuItems.map((item) => (
-             item.subItems ? (
-                <Collapsible key={item.id} asChild defaultOpen={isSectionActive(item)}>
-                    <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                            <SidebarMenuButton
-                                className="justify-between"
-                                isActive={isSectionActive(item)}
-                                tooltip={{
-                                    children: item.label,
-                                    side: "right",
-                                }}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <item.icon />
-                                    <span>{item.label}</span>
-                                </div>
-                                <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
-                            </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent asChild>
-                            <SidebarMenuSub>
-                                {item.subItems.map(subItem => (
-                                <SidebarMenuSubItem key={subItem.href}>
-                                    <SidebarMenuSubButton asChild isActive={isActive(subItem.href)}>
-                                      <Link href={subItem.href}>
-                                        {subItem.icon && <subItem.icon />}
-                                        {subItem.label}
-                                      </Link>
-                                    </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                                ))}
-                            </SidebarMenuSub>
-                        </CollapsibleContent>
-                    </SidebarMenuItem>
-              </Collapsible>
-             ) : (
-                <SidebarMenuItem key={item.href!}>
-                    <Link href={item.href!}>
-                    <SidebarMenuButton
-                        isActive={isActive(item.href!)}
-                        tooltip={{
-                        children: item.label,
-                        side: "right",
-                        }}
-                    >
-                        <item.icon />
-                        <span>{item.label}</span>
-                    </SidebarMenuButton>
-                    </Link>
-                </SidebarMenuItem>
-             )
-          ))}
-        </SidebarMenu>
+        {renderMenuItems(menuItems)}
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>
