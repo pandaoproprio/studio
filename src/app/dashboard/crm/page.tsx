@@ -185,7 +185,7 @@ export default function CrmPage() {
     try {
         const result = await diagnoseRelationshipAction({
             contactName: selectedContact.name,
-            interactions: selectedContact.interactions,
+            interactions: selectedContact.interactions.map(i => ({ type: i.type, date: i.date, notes: i.notes })),
         });
         if (result.data) {
             setDiagnosis(result.data);
