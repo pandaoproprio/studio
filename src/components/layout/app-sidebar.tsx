@@ -122,12 +122,8 @@ export function AppSidebar() {
                     isActive={item.subItems.some((si: any) => si.href && isActive(si.href))}
                     tooltip={{ children: item.label, side: "right" }}
                 >
-                  <SidebarMenuButton asChild isActive={isActive(item.href)}>
-                    <>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </>
-                  </SidebarMenuButton>
+                    <item.icon />
+                    <span>{item.label}</span>
                 </SidebarMenuSubTrigger>
                 <SidebarMenuSubContent>
                     {item.subItems.map((subItem: any) => {

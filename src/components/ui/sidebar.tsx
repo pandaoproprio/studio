@@ -703,7 +703,7 @@ const SidebarMenuSubTrigger = React.forwardRef<
       isActive={isActive}
       {...props}
     >
-      {children}
+      <div>{children}</div>
     </SidebarMenuButton>
   );
 
