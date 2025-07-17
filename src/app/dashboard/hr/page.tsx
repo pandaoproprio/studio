@@ -5,22 +5,15 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontal, PlusCircle, Upload, Filter, Bot } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { MoreHorizontal, PlusCircle, Upload, Filter, Bot, Wand2, Loader2, User, FileText } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { describeColaboradorAction } from "@/lib/actions";
 import { PuffLoader } from "react-spinners";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const employees = [
   {
@@ -78,25 +71,39 @@ const employees = [
 type Employee = typeof employees[0];
 
 export default function HrPage() {
-  const [profileData, setProfileData] = useState<{ profile: string; employeeName: string } | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [profileAnalysis, setProfileAnalysis] = useState<string | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleDescribeProfile = async (employee: Employee) => {
+  const openViewDialog = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setProfileAnalysis(null);
+    setError(null);
+    setIsViewOpen(true);
+  };
+  
+  const handleCloseDialog = () => {
+    setIsViewOpen(false);
+    setSelectedEmployee(null);
+    setProfileAnalysis(null);
+  }
+
+  const handleDescribeProfile = async () => {
+    if (!selectedEmployee) return;
+
     setIsLoadingProfile(true);
     setError(null);
-    setProfileData(null);
+    setProfileAnalysis(null);
     try {
       const result = await describeColaboradorAction({
-        role: employee.role,
-        description: employee.description,
+        role: selectedEmployee.role,
+        description: selectedEmployee.description,
       });
 
       if (result.data) {
-        setProfileData({
-          profile: result.data.profile,
-          employeeName: employee.name,
-        });
+        setProfileAnalysis(result.data.profile);
       } else {
         setError(result.error || "Falha ao gerar o perfil.");
       }
@@ -159,7 +166,6 @@ export default function HrPage() {
                   <TableHead>Cargo</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Próximas Férias</TableHead>
-                  <TableHead>Ações de IA</TableHead>
                   <TableHead>
                     <span className="sr-only">Ações</span>
                   </TableHead>
@@ -188,12 +194,6 @@ export default function HrPage() {
                     </TableCell>
                     <TableCell>{employee.vacation}</TableCell>
                     <TableCell>
-                       <Button variant="outline" size="sm" onClick={() => handleDescribeProfile(employee)}>
-                          <Bot className="mr-2 h-4 w-4" />
-                          Descrever Perfil
-                       </Button>
-                    </TableCell>
-                    <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -203,8 +203,14 @@ export default function HrPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem>Ver Perfil</DropdownMenuItem>
-                          <DropdownMenuItem>Editar</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => openViewDialog(employee)}>
+                            <User className="mr-2 h-4 w-4" />
+                            Ver Perfil
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <FileText className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive">Desativar</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -218,42 +224,72 @@ export default function HrPage() {
         </Card>
       </div>
 
-      <AlertDialog open={isLoadingProfile || !!profileData || !!error} onOpenChange={(open) => {
-          if(!open) {
-            setIsLoadingProfile(false);
-            setProfileData(null);
-            setError(null);
-          }
-      }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-headline">
-              {isLoadingProfile && "Analisando Perfil..."}
-              {error && "Erro na Análise"}
-              {profileData && `Perfil Comportamental de ${profileData.employeeName}`}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {isLoadingProfile && "Aguarde enquanto a IA gera a análise com base no cargo e responsabilidades."}
-              {error && `Ocorreu um erro: ${error}`}
-              {profileData && "Esta é uma análise gerada por IA com base nas informações fornecidas."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex justify-center items-center min-h-[150px]">
-            {isLoadingProfile ? (
-              <PuffLoader color="hsl(var(--primary))" />
-            ) : profileData ? (
-              <p className="text-sm text-foreground whitespace-pre-wrap">{profileData.profile}</p>
-            ) : error ? null : null}
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => {
-                setIsLoadingProfile(false);
-                setProfileData(null);
-                setError(null);
-            }}>Fechar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {selectedEmployee && (
+        <Dialog open={isViewOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
+            <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                    <div className="flex items-start gap-4">
+                        <Avatar className="w-16 h-16">
+                            <AvatarImage src={selectedEmployee.avatar} alt={selectedEmployee.name} data-ai-hint="person portrait"/>
+                            <AvatarFallback>{selectedEmployee.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <DialogTitle className="text-2xl font-headline">{selectedEmployee.name}</DialogTitle>
+                            <DialogDescription>{selectedEmployee.role} • {selectedEmployee.email}</DialogDescription>
+                        </div>
+                    </div>
+                </DialogHeader>
+                <div className="space-y-6 py-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg font-headline">Descrição de Responsabilidades</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">{selectedEmployee.description}</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg font-headline">Análise de Perfil com IA</CardTitle>
+                            <CardDescription>Clique no botão para gerar uma análise comportamental com base no cargo e responsabilidades.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button variant="outline" onClick={handleDescribeProfile} disabled={isLoadingProfile} className="w-full">
+                                {isLoadingProfile ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Analisando...</>
+                                ) : (
+                                    <><Wand2 className="mr-2 h-4 w-4"/>Gerar Perfil Comportamental</>
+                                )}
+                            </Button>
+
+                            {isLoadingProfile && (
+                                <div className="flex justify-center items-center min-h-[100px]">
+                                    <PuffLoader color="hsl(var(--primary))" size={40} />
+                                </div>
+                            )}
+
+                            {error && (
+                                <Alert variant="destructive" className="mt-4">
+                                    <AlertTitle>Erro na Análise</AlertTitle>
+                                    <AlertDescription>{error}</AlertDescription>
+                                </Alert>
+                            )}
+
+                            {profileAnalysis && (
+                                <div className="mt-4 rounded-md border bg-secondary/50 p-4">
+                                    <p className="text-sm whitespace-pre-wrap">{profileAnalysis}</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+                 <DialogFooter>
+                    <Button variant="outline" onClick={handleCloseDialog}>Fechar</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }
