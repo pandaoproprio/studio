@@ -33,7 +33,8 @@ import {
   Settings,
   HeartPulse,
   TrendingDown,
-  BookMarked
+  BookMarked,
+  DollarSign
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -58,6 +59,11 @@ export function CommandMenu() {
           icon: KanbanSquare,
           label: 'Ir para Projetos',
           action: () => router.push('/dashboard/projects'),
+        },
+        {
+          icon: DollarSign,
+          label: 'Ir para Financeiro',
+          action: () => router.push('/dashboard/financial'),
         },
         {
           icon: Handshake,

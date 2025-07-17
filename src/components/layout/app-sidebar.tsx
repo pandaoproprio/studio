@@ -32,7 +32,8 @@ import {
   FileText,
   HeartPulse,
   TrendingDown,
-  BookMarked
+  BookMarked,
+  DollarSign
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -48,6 +49,7 @@ const menuItems = [
       icon: Building,
       subItems: [
         { href: "/dashboard/projects", label: "Projetos", icon: KanbanSquare },
+        { href: "/dashboard/financial", label: "Financeiro", icon: DollarSign },
         { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
         { href: "/dashboard/assets", label: "Ativos", icon: Package },
         { href: "/dashboard/suppliers", label: "Fornecedores", icon: Truck },
