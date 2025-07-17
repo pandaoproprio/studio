@@ -1,8 +1,6 @@
 
 // src/app/dashboard/hr/page.tsx
-"use client";
 
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,134 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontal, PlusCircle, Upload, Filter, Bot, Wand2, Loader2, User, FileText, File, CalendarOff, FileUp } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { describeColaboradorAction } from "@/lib/actions";
-import { PuffLoader } from "react-spinners";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MoreHorizontal, PlusCircle, Upload, Filter, User, FileText } from "lucide-react";
+import { getEmployees, getEmployeeById, type Employee } from "@/services/hr";
+import { EmployeeProfileDialog } from "@/components/hr/employee-profile-dialog";
 
-const employees = [
-  {
-    id: "emp-001",
-    name: "Carlos Andrade",
-    email: "carlos.andrade@example.com",
-    avatar: "https://placehold.co/100x100.png",
-    role: "Gerente de Projetos",
-    description: "Responsável pelo planejamento e execução dos projetos sociais, liderando equipes multidisciplinares e garantindo a entrega dos objetivos dentro do prazo e orçamento.",
-    status: "Ativo",
-    vacation: "15/01/2025 - 30/01/2025",
-    documents: [
-      { id: "doc-1", name: "Curriculum Vitae.pdf", type: "Currículo", size: "2.5MB", uploadDate: "10/01/2023" },
-      { id: "doc-2", name: "Contrato de Trabalho.pdf", type: "Contratual", size: "1.2MB", uploadDate: "15/01/2023" },
-    ],
-    leaves: [
-      { id: "leave-1", type: "Férias", startDate: "15/01/2024", endDate: "30/01/2024", status: "Aprovado" },
-    ]
-  },
-  {
-    id: "emp-002",
-    name: "Beatriz Costa",
-    email: "beatriz.costa@example.com",
-    avatar: "https://placehold.co/100x100.png",
-    role: "Coordenadora de Voluntários",
-    description: "Engaja, recruta e coordena a base de voluntários da organização, garantindo seu bem-estar, treinamento e alocação eficaz nos projetos.",
-    status: "Ativo",
-    vacation: "N/A",
-    documents: [
-        { id: "doc-3", name: "CV_Beatriz_Costa.pdf", type: "Currículo", size: "800KB", uploadDate: "05/03/2023" },
-    ],
-    leaves: []
-  },
-  {
-    id: "emp-003",
-    name: "Mariana Ferreira",
-    email: "mariana.ferreira@example.com",
-    avatar: "https://placehold.co/100x100.png",
-    role: "Assistente Social",
-    description: "Atua na linha de frente, prestando suporte direto aos beneficiários dos projetos e suas famílias, realizando acompanhamento e encaminhamentos.",
-    status: "Licença",
-    vacation: "N/A",
-    documents: [],
-    leaves: [
-        { id: "leave-2", type: "Licença Médica", startDate: "01/06/2024", endDate: "30/08/2024", status: "Aprovado" },
-    ]
-  },
-  {
-    id: "emp-004",
-    name: "Ricardo Souza",
-    email: "ricardo.souza@example.com",
-    avatar: "https://placehold.co/100x100.png",
-    role: "Analista Financeiro",
-    description: "Cuida da saúde financeira da organização, incluindo orçamentos, relatórios de prestação de contas, controle de fluxo de caixa e conformidade fiscal.",
-    status: "Ativo",
-    vacation: "01/03/2025 - 15/03/2025",
-    documents: [],
-    leaves: []
-  },
-  {
-    id: "emp-005",
-    name: "Fernanda Lima",
-    email: "fernanda.lima@example.com",
-    avatar: "https://placehold.co/100x100.png",
-    role: "Psicóloga",
-    description: "Oferece suporte psicossocial para a equipe interna e para os beneficiários dos programas, conduzindo sessões e desenvolvendo programas de bem-estar.",
-    status: "Férias",
-    vacation: "20/12/2024 - 10/01/2025",
-    documents: [],
-    leaves: [
-         { id: "leave-3", type: "Férias", startDate: "20/12/2024", endDate: "10/01/2025", status: "Agendado" },
-    ]
-  },
-];
-
-type Employee = typeof employees[0];
-
-export default function HrPage() {
-  const [isViewOpen, setIsViewOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [profileAnalysis, setProfileAnalysis] = useState<string | null>(null);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const openViewDialog = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setProfileAnalysis(null);
-    setError(null);
-    setIsViewOpen(true);
-  };
-  
-  const handleCloseDialog = () => {
-    setIsViewOpen(false);
-    setSelectedEmployee(null);
-    setProfileAnalysis(null);
-  }
-
-  const handleDescribeProfile = async () => {
-    if (!selectedEmployee) return;
-
-    setIsLoadingProfile(true);
-    setError(null);
-    setProfileAnalysis(null);
-    try {
-      const result = await describeColaboradorAction({
-        role: selectedEmployee.role,
-        description: selectedEmployee.description,
-      });
-
-      if (result.data) {
-        setProfileAnalysis(result.data.profile);
-      } else {
-        setError(result.error || "Falha ao gerar o perfil.");
-      }
-    } catch (e) {
-      setError("Ocorreu um erro inesperado.");
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
-
-  const getStatusBadgeClass = (status: string) => {
+const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "Ativo":
         return "bg-green-100 text-green-800";
@@ -148,19 +23,11 @@ export default function HrPage() {
       default:
         return "bg-gray-100 text-gray-800";
     }
-  };
+};
+
+export default async function HrPage() {
+  const employees = await getEmployees();
   
-  const getLeaveStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case "Aprovado":
-      case "Agendado":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-
   return (
     <>
       <div className="space-y-6">
@@ -237,10 +104,12 @@ export default function HrPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem onSelect={() => openViewDialog(employee)}>
-                            <User className="mr-2 h-4 w-4" />
-                            Ver Perfil
-                          </DropdownMenuItem>
+                          <EmployeeProfileDialog employeeId={employee.id}>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <User className="mr-2 h-4 w-4" />
+                                Ver Perfil
+                            </DropdownMenuItem>
+                          </EmployeeProfileDialog>
                           <DropdownMenuItem>
                             <FileText className="mr-2 h-4 w-4" />
                             Editar
@@ -257,159 +126,6 @@ export default function HrPage() {
           </CardContent>
         </Card>
       </div>
-
-      {selectedEmployee && (
-        <Dialog open={isViewOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
-            <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                    <div className="flex items-start gap-4">
-                        <Avatar className="w-16 h-16">
-                            <AvatarImage src={selectedEmployee.avatar} alt={selectedEmployee.name} data-ai-hint="person portrait"/>
-                            <AvatarFallback>{selectedEmployee.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <DialogTitle className="text-2xl font-headline">{selectedEmployee.name}</DialogTitle>
-                            <DialogDescription>{selectedEmployee.role} • {selectedEmployee.email}</DialogDescription>
-                        </div>
-                    </div>
-                </DialogHeader>
-                 <Tabs defaultValue="profile" className="w-full py-4">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="profile"><User className="mr-2 h-4 w-4"/> Perfil</TabsTrigger>
-                        <TabsTrigger value="documents"><File className="mr-2 h-4 w-4"/> Documentos</TabsTrigger>
-                        <TabsTrigger value="leaves"><CalendarOff className="mr-2 h-4 w-4"/> Férias e Ausências</TabsTrigger>
-                    </TabsList>
-                    <div className="mt-4 max-h-[50vh] overflow-y-auto pr-2">
-                        <TabsContent value="profile" className="space-y-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-headline">Descrição de Responsabilidades</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground">{selectedEmployee.description}</p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-headline">Análise de Perfil com IA</CardTitle>
-                                    <CardDescription>Clique no botão para gerar uma análise comportamental com base no cargo e responsabilidades.</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Button variant="outline" onClick={handleDescribeProfile} disabled={isLoadingProfile} className="w-full">
-                                        {isLoadingProfile ? (
-                                            <><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Analisando...</>
-                                        ) : (
-                                            <><Wand2 className="mr-2 h-4 w-4"/>Gerar Perfil Comportamental</>
-                                        )}
-                                    </Button>
-
-                                    {isLoadingProfile && (
-                                        <div className="flex justify-center items-center min-h-[100px]">
-                                            <PuffLoader color="hsl(var(--primary))" size={40} />
-                                        </div>
-                                    )}
-
-                                    {error && (
-                                        <Alert variant="destructive" className="mt-4">
-                                            <AlertTitle>Erro na Análise</AlertTitle>
-                                            <AlertDescription>{error}</AlertDescription>
-                                        </Alert>
-                                    )}
-
-                                    {profileAnalysis && (
-                                        <div className="mt-4 rounded-md border bg-secondary/50 p-4">
-                                            <p className="text-sm whitespace-pre-wrap">{profileAnalysis}</p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-                        <TabsContent value="documents">
-                            <Card>
-                                <CardHeader>
-                                    <div className="flex justify-between items-center">
-                                        <CardTitle className="text-lg font-headline">Documentos</CardTitle>
-                                        <Button variant="outline"><FileUp className="mr-2 h-4 w-4"/> Adicionar Documento</Button>
-                                    </div>
-                                    <CardDescription>Gerencie currículos, contratos e outros documentos.</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Nome do Arquivo</TableHead>
-                                                <TableHead>Tipo</TableHead>
-                                                <TableHead>Data de Upload</TableHead>
-                                                <TableHead>Tamanho</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {selectedEmployee.documents.map(doc => (
-                                                <TableRow key={doc.id}>
-                                                    <TableCell className="font-medium">{doc.name}</TableCell>
-                                                    <TableCell>{doc.type}</TableCell>
-                                                    <TableCell>{doc.uploadDate}</TableCell>
-                                                    <TableCell>{doc.size}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                            {selectedEmployee.documents.length === 0 && (
-                                                <TableRow>
-                                                    <TableCell colSpan={4} className="h-24 text-center">Nenhum documento encontrado.</TableCell>
-                                                </TableRow>
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-                        <TabsContent value="leaves">
-                             <Card>
-                                <CardHeader>
-                                    <div className="flex justify-between items-center">
-                                        <CardTitle className="text-lg font-headline">Histórico de Ausências</CardTitle>
-                                        <Button variant="outline"><PlusCircle className="mr-2 h-4 w-4"/> Registrar Nova Ausência</Button>
-                                    </div>
-                                    <CardDescription>Monitore férias, licenças e outros afastamentos.</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Tipo</TableHead>
-                                                <TableHead>Data de Início</TableHead>
-                                                <TableHead>Data de Fim</TableHead>
-                                                <TableHead>Status</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                             {selectedEmployee.leaves.map(leave => (
-                                                <TableRow key={leave.id}>
-                                                    <TableCell className="font-medium">{leave.type}</TableCell>
-                                                    <TableCell>{leave.startDate}</TableCell>
-                                                    <TableCell>{leave.endDate}</TableCell>
-                                                    <TableCell>
-                                                        <Badge className={getLeaveStatusBadgeClass(leave.status)}>{leave.status}</Badge>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                            {selectedEmployee.leaves.length === 0 && (
-                                                <TableRow>
-                                                    <TableCell colSpan={4} className="h-24 text-center">Nenhuma ausência registrada.</TableCell>
-                                                </TableRow>
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-                    </div>
-                </Tabs>
-                 <DialogFooter>
-                    <Button variant="outline" onClick={handleCloseDialog}>Fechar</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-      )}
     </>
   );
 }
