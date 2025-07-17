@@ -33,7 +33,8 @@ import {
   HeartPulse,
   TrendingDown,
   BookMarked,
-  DollarSign
+  DollarSign,
+  Receipt
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -63,6 +64,7 @@ const menuItems = [
       subItems: [
         { href: "/dashboard/crm", label: "CRM", icon: Handshake },
         { href: "/dashboard/hr", label: "RH", icon: Users },
+        { href: "/dashboard/reimbursements", label: "Reembolsos", icon: Receipt },
       ]
   },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },

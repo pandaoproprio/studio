@@ -34,7 +34,8 @@ import {
   HeartPulse,
   TrendingDown,
   BookMarked,
-  DollarSign
+  DollarSign,
+  Receipt
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -64,6 +65,11 @@ export function CommandMenu() {
           icon: DollarSign,
           label: 'Ir para Financeiro',
           action: () => router.push('/dashboard/financial'),
+        },
+        {
+          icon: Receipt,
+          label: 'Ir para Reembolsos',
+          action: () => router.push('/dashboard/reimbursements'),
         },
         {
           icon: Handshake,
@@ -149,6 +155,11 @@ export function CommandMenu() {
           icon: PlusCircle,
           label: 'Registrar Novo Contrato',
           action: () => router.push('/dashboard/contracts/new'), // Placeholder
+        },
+        {
+          icon: PlusCircle,
+          label: 'Solicitar Reembolso',
+          action: () => router.push('/dashboard/reimbursements'), // Goes to the page where they can open the dialog
         },
       ],
     },
