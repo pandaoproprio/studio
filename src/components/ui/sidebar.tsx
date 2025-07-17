@@ -551,11 +551,12 @@ const SidebarMenuButton = React.forwardRef<
       size = "default",
       tooltip,
       className,
+      children,
       ...props
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : "button"
+    const Comp = asChild ? Slot : "div"
     const { isMobile, state } = useSidebar()
 
     const button = (
@@ -566,7 +567,9 @@ const SidebarMenuButton = React.forwardRef<
         data-active={isActive}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
-      />
+      >
+        {children}
+      </Comp>
     )
 
     if (!tooltip) {
@@ -691,33 +694,30 @@ const SidebarMenuSubTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger> & {
     isActive?: boolean;
     tooltip?: React.ComponentProps<typeof TooltipContent>;
+    asChild?: boolean;
   }
->(({ isActive, tooltip, children, ...props }, ref) => {
+>(({ isActive, tooltip, children, asChild, ...props }, ref) => {
   const { isMobile, state } = useSidebar();
 
   const triggerContent = (
-    <SidebarMenuButton
-      ref={ref}
-      asChild
-      data-state={isActive ? 'active' : 'inactive'}
-      isActive={isActive}
-      {...props}
-    >
-      <div>{children}</div>
-    </SidebarMenuButton>
+    <PopoverPrimitive.Trigger ref={ref} asChild {...props}>
+        {children}
+    </PopoverPrimitive.Trigger>
   );
 
-  const trigger = (
-    <PopoverPrimitive.Trigger asChild>{triggerContent}</PopoverPrimitive.Trigger>
-  );
-  
   if (!tooltip) {
-    return trigger;
+    return triggerContent;
+  }
+  
+  if (typeof tooltip === "string") {
+    tooltip = {
+        children: tooltip,
+    };
   }
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+      <TooltipTrigger asChild>{triggerContent}</TooltipTrigger>
       <TooltipContent
         side="right"
         align="center"
