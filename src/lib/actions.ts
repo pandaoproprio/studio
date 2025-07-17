@@ -91,6 +91,9 @@ const progressReportSchema = z.object({
     tasksTodo: z.string().transform(val => JSON.parse(val) as string[]),
     tasksInProgress: z.string().transform(val => JSON.parse(val) as string[]),
     tasksDone: z.string().transform(val => JSON.parse(val) as string[]),
+    targetAudience: z.string(),
+    tone: z.string(),
+    additionalContext: z.string().optional(),
 });
 
 type ProgressReportState = {
@@ -98,7 +101,6 @@ type ProgressReportState = {
     data?: GenerateProgressReportOutput;
     errors?: {
         projectId?: string[];
-        projectData?: string[];
     };
 };
 
@@ -112,6 +114,9 @@ export async function generateProgressReportAction(
         tasksTodo: formData.get("tasksTodo"),
         tasksInProgress: formData.get("tasksInProgress"),
         tasksDone: formData.get("tasksDone"),
+        targetAudience: formData.get("targetAudience"),
+        tone: formData.get("tone"),
+        additionalContext: formData.get("additionalContext"),
     };
 
     if (!rawData.projectName || !rawData.projectId) {
@@ -136,6 +141,9 @@ export async function generateProgressReportAction(
             tasksTodo: validatedFields.data.tasksTodo,
             tasksInProgress: validatedFields.data.tasksInProgress,
             tasksDone: validatedFields.data.tasksDone,
+            targetAudience: validatedFields.data.targetAudience,
+            tone: validatedFields.data.tone,
+            additionalContext: validatedFields.data.additionalContext,
         };
         const result = await generateProgressReport(input);
         return { message: "Relatório de progresso gerado com sucesso.", data: result };

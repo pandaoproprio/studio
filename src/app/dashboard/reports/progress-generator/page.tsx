@@ -63,21 +63,6 @@ export default function ProgressGeneratorPage() {
     };
   }, [selectedProjectId]);
 
-  const projectDataString = useMemo(() => {
-    if (!projectData) return "Selecione um projeto para ver seus dados.";
-    const { projectName, tasksTodo, tasksInProgress, tasksDone } = projectData;
-    return `Projeto: ${projectName}
-
-A Fazer:
-${tasksTodo.length > 0 ? `- ${tasksTodo.join('\n- ')}` : "Nenhuma tarefa."}
-
-Em Andamento:
-${tasksInProgress.length > 0 ? `- ${tasksInProgress.join('\n- ')}` : "Nenhuma tarefa."}
-
-Concluído:
-${tasksDone.length > 0 ? `- ${tasksDone.join('\n- ')}` : "Nenhuma tarefa."}`;
-  }, [projectData]);
-
   return (
     <div className="space-y-6">
       <div>
@@ -85,15 +70,15 @@ ${tasksDone.length > 0 ? `- ${tasksDone.join('\n- ')}` : "Nenhuma tarefa."}`;
           Gerador de Relatório de Progresso com IA
         </h1>
         <p className="text-muted-foreground">
-          Selecione um projeto e deixe a IA analisar o quadro Kanban para criar um relatório de status.
+          Selecione um projeto, ajuste o contexto e deixe a IA criar um relatório de status personalizado.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">Dados do Projeto</CardTitle>
+            <CardTitle className="font-headline">Parâmetros do Relatório</CardTitle>
             <CardDescription>
-              Selecione um projeto para carregar os dados do Kanban.
+              Forneça o contexto para a IA gerar o relatório mais preciso e eficaz.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -116,16 +101,43 @@ ${tasksDone.length > 0 ? `- ${tasksDone.join('\n- ')}` : "Nenhuma tarefa."}`;
                     <p className="text-sm text-destructive">{state.errors.projectId[0]}</p>
                  )}
               </div>
-              
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="targetAudience">Público-Alvo</Label>
+                    <Select name="targetAudience" defaultValue="Stakeholders">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecione o público" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Stakeholders">Stakeholders</SelectItem>
+                            <SelectItem value="Equipe Interna">Equipe Interna</SelectItem>
+                            <SelectItem value="Doadores">Doadores</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="tone">Tom do Relatório</Label>
+                    <Select name="tone" defaultValue="Formal">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecione o tom" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Formal">Formal</SelectItem>
+                            <SelectItem value="Otimista">Otimista</SelectItem>
+                            <SelectItem value="Cauteloso">Cauteloso</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="projectData">Dados do Kanban (para a IA)</Label>
+                <Label htmlFor="additionalContext">Contexto Adicional (Opcional)</Label>
                 <Textarea
-                  id="projectData"
-                  name="projectData"
-                  value={projectDataString}
-                  readOnly
-                  rows={12}
-                  className="bg-muted text-muted-foreground text-xs whitespace-pre-wrap"
+                    id="additionalContext"
+                    name="additionalContext"
+                    placeholder="Forneça qualquer informação extra que a IA deva considerar, como moral da equipe, feedbacks de clientes, bloqueios externos, etc."
+                    rows={4}
                 />
               </div>
 
@@ -147,12 +159,12 @@ ${tasksDone.length > 0 ? `- ${tasksDone.join('\n- ')}` : "Nenhuma tarefa."}`;
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="font-headline">Relatório Gerado</CardTitle>
-            <CardDescription>O relatório de progresso gerado pela IA aparecerá aqui.</CardDescription>
+            <CardDescription>O relatório de progresso personalizado pela IA aparecerá aqui.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1">
               <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
               {state.data ? (
-                  <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report.replace(/\n/g, '<br />') }} />
+                  <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report.replace(/```html\n?|```/g, '').replace(/\n/g, '<br />') }} />
               ) : (
                   <div className="flex h-full items-center justify-center text-center text-muted-foreground">
                       <p>Aguardando geração do relatório...</p>
