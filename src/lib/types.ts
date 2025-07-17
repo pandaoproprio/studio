@@ -22,7 +22,7 @@ export interface Column {
 }
 
 export type TransactionType = "Receita" | "Despesa" | "Reembolso";
-export type TransactionStatus = "Concluído" | "Pendente" | "Cancelado" | "Em Análise" | "Recusado";
+export type TransactionStatus = "Concluído" | "Pendente" | "Cancelado" | "Em Análise" | "Recusado" | "Aprovado";
 
 export interface Transaction {
     id: string;
