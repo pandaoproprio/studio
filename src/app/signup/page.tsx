@@ -65,7 +65,11 @@ export default function SignupPage() {
         </Card>
       </div>
        <footer className="mt-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} AnnITech – IT Solutions. Todos os direitos reservados.
+        © {new Date().getFullYear()}{" "}
+        <a href="https://github.com/pandaoproprio/anniconecta" target="_blank" rel="noopener noreferrer" className="hover:underline">
+            AnnITech – IT Solutions
+        </a>
+        . Todos os direitos reservados.
       </footer>
     </div>
   );
