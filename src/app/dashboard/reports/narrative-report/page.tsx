@@ -2,14 +2,14 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useFieldArray, useFormContext, Controller } from "react-hook-form";
+import { useForm, useFieldArray, useFormContext, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 
 import { generateNarrativeReportAction } from "@/lib/actions";
-import { GenerateNarrativeReportInputSchema, type GenerateNarrativeReportInput } from "@/ai/schemas/generate-narrative-report-schemas";
+import { GenerateNarrativeReportInputSchema, type GenerateNarrativeReportInput, type GenerateNarrativeReportOutput } from "@/ai/schemas/generate-narrative-report-schemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +22,11 @@ import { Separator } from "@/components/ui/separator";
 import RichTextEditor from "@/components/reports/rich-text-editor";
 
 
-const initialState = {
+const initialState: {
+  message: string;
+  data?: GenerateNarrativeReportOutput | null;
+  errors?: any;
+} = {
   message: "",
   data: null,
   errors: undefined,
@@ -241,16 +245,8 @@ export default function NarrativeReportPage() {
     },
   });
 
-  const onSubmit = (data: GenerateNarrativeReportInput) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (typeof value === 'object' && value !== null) {
-            formData.append(key, JSON.stringify(value));
-        } else {
-            formData.append(key, String(value));
-        }
-    });
-    formAction(formData);
+  const onSubmit: SubmitHandler<GenerateNarrativeReportInput> = (data) => {
+    formAction(data);
   }
 
   const handlePrint = () => {

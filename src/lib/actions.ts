@@ -57,6 +57,18 @@ import {
     type AcademicResearchAssistantOutput
 } from "@/ai/flows/academic-research-assistant";
 import { AcademicResearchAssistantInputSchema } from "@/ai/schemas/academic-research-assistant-schemas";
+import {
+    a3ProblemSolving,
+    type A3ProblemSolvingOutput,
+    type A3ProblemSolvingInput,
+} from "@/ai/flows/a3-problem-solving";
+import { A3ProblemSolvingInputSchema } from "@/ai/schemas/a3-problem-solving-schemas";
+import {
+    generateNarrativeReport,
+    type GenerateNarrativeReportOutput,
+    type GenerateNarrativeReportInput,
+} from "@/ai/flows/generate-narrative-report";
+import { GenerateNarrativeReportInputSchema } from "@/ai/schemas/generate-narrative-report-schemas";
 
 import { z } from "zod";
 
@@ -337,10 +349,9 @@ type OrganizationalDiagnosisState = {
     message: string;
     data?: OrganizationalDiagnosisOutput | null;
     errors?: any;
-  };
+};
 
 export async function organizationalDiagnosisAction(
-    prevState: OrganizationalDiagnosisState,
     input: OrganizationalDiagnosisInput
 ): Promise<OrganizationalDiagnosisState> {
     const validatedFields = OrganizationalDiagnosisInputSchema.safeParse(input);
@@ -425,4 +436,67 @@ export async function academicResearchAssistantAction(
         console.error(error);
         return { message: "Ocorreu um erro inesperado ao gerar o plano de pesquisa.", data: null };
     }
+}
+
+type A3ProblemSolvingState = {
+  message: string;
+  data?: A3ProblemSolvingOutput | null;
+  errors?: any;
+};
+
+export async function a3ProblemSolvingAction(
+  prevState: A3ProblemSolvingState,
+  formData: FormData
+): Promise<A3ProblemSolvingState> {
+  const validatedFields = A3ProblemSolvingInputSchema.safeParse({
+    background: formData.get("background"),
+    currentState: formData.get("currentState"),
+    goals: formData.get("goals"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: "A validação falhou. Verifique os campos.",
+      data: null,
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const result = await a3ProblemSolving(validatedFields.data);
+    return { message: "Relatório A3 gerado com sucesso.", data: result, errors: {} };
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { message: `Erro ao gerar relatório A3: ${errorMessage}`, data: null };
+  }
+}
+
+type NarrativeReportState = {
+  message: string;
+  data?: GenerateNarrativeReportOutput | null;
+  errors?: any;
+};
+
+export async function generateNarrativeReportAction(
+    input: GenerateNarrativeReportInput,
+): Promise<NarrativeReportState> {
+  const validatedFields = GenerateNarrativeReportInputSchema.safeParse(input);
+
+  if (!validatedFields.success) {
+    return {
+      message: "A validação falhou. Verifique os campos.",
+      data: null,
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const result = await generateNarrativeReport(validatedFields.data);
+    return { message: "Relatório gerado com sucesso.", data: result, errors: {} };
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { message: `Erro ao gerar relatório: ${errorMessage}`, data: null };
+  }
 }
