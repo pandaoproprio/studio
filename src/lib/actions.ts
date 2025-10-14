@@ -27,7 +27,7 @@ import { DescribeColaboradorProfileInputSchema } from "@/ai/schemas/describe-pro
 import { 
     generateVideoStory,
 } from "@/ai/flows/generate-video-story";
-import { type GenerateVideoStoryOutput } from "@/ai/schemas/generate-video-story-schemas";
+import { type GenerateVideoStoryOutput, type GenerateVideoStoryInput, GenerateVideoStoryInputSchema } from "@/ai/schemas/generate-video-story-schemas";
 import {
     diagnoseRelationship,
     type DiagnoseRelationshipInput,
@@ -244,13 +244,17 @@ type GenerateVideoStoryState = {
     error?: string;
 };
 
-export async function generateVideoStoryAction(text: string): Promise<GenerateVideoStoryState> {
-    if (!text || text.trim().length < 20) {
-        return { message: "Text is too short for a video story.", error: "Text too short" };
+export async function generateVideoStoryAction(input: GenerateVideoStoryInput): Promise<GenerateVideoStoryState> {
+     const validatedFields = GenerateVideoStoryInputSchema.safeParse(input);
+
+    if (!validatedFields.success) {
+        const error = validatedFields.error.flatten().fieldErrors;
+        const errorMessage = error.storyText?.[0] || "Invalid input";
+        return { message: "Validation failed", error: errorMessage };
     }
 
     try {
-        const result = await generateVideoStory(text);
+        const result = await generateVideoStory(validatedFields.data);
         return { message: "Video generated", data: result };
     } catch(e) {
         console.error(e);

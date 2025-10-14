@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import wav from 'wav';
-import { GenerateVideoStoryOutputSchema, type GenerateVideoStoryOutput } from '@/ai/schemas/generate-video-story-schemas';
+import { GenerateVideoStoryInputSchema, GenerateVideoStoryOutputSchema, type GenerateVideoStoryInput, type GenerateVideoStoryOutput } from '@/ai/schemas/generate-video-story-schemas';
 
 const SceneSchema = z.object({
   text: z.string().describe('The narration text for this scene.'),
@@ -95,20 +95,33 @@ const generateNarrationFlow = ai.defineFlow(
     }
 );
 
+const GenerateImageInputSchema = z.object({
+    visualsDescription: z.string(),
+    referenceImageUrl: z.string().optional(),
+});
+
 const generateImageFlow = ai.defineFlow(
     {
         name: 'generateImageFlow',
-        inputSchema: z.string(),
+        inputSchema: GenerateImageInputSchema,
         outputSchema: z.string(),
     },
-    async (visualsDescription) => {
+    async ({ visualsDescription, referenceImageUrl }) => {
+        const prompt: any[] = [{ text: `Generate a compelling, photorealistic image based on this description: ${visualsDescription}` }];
+
+        if (referenceImageUrl) {
+            prompt.unshift({ media: { url: referenceImageUrl } });
+            prompt[1].text = `Using the reference image, modify it to match this new description: ${visualsDescription}`;
+        }
+        
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-preview-image-generation',
-            prompt: `Generate a compelling, photorealistic image based on this description: ${visualsDescription}`,
+            model: 'googleai/gemini-2.5-flash-image-preview',
+            prompt,
             config: {
               responseModalities: ['TEXT', 'IMAGE'],
             },
         });
+
         if (!media) {
             throw new Error('Image generation failed.');
         }
@@ -119,10 +132,10 @@ const generateImageFlow = ai.defineFlow(
 const generateVideoStoryFlow = ai.defineFlow(
   {
     name: 'generateVideoStoryFlow',
-    inputSchema: z.string(),
+    inputSchema: GenerateVideoStoryInputSchema,
     outputSchema: GenerateVideoStoryOutputSchema,
   },
-  async (storyText) => {
+  async ({ storyText, initialImageDataUri }) => {
     // 1. Generate the script
     const scriptResponse = await generateScriptPrompt(storyText);
     const script = scriptResponse.output;
@@ -130,21 +143,28 @@ const generateVideoStoryFlow = ai.defineFlow(
         throw new Error('Failed to generate script.');
     }
 
-    // 2. Generate images and audio for each scene in parallel
-    const sceneProcessingPromises = script.scenes.map(async (scene) => {
+    const processedScenes = [];
+    let previousImageUrl = initialImageDataUri;
+
+    // 2. Generate audio and images for each scene sequentially
+    for (const scene of script.scenes) {
         const [imageUrl, audioUri] = await Promise.all([
-            generateImageFlow(scene.visuals),
+            generateImageFlow({
+                visualsDescription: scene.visuals,
+                referenceImageUrl: previousImageUrl,
+            }),
             generateNarrationFlow(scene.text)
         ]);
-        return {
+
+        processedScenes.push({
             text: scene.text,
             imageUrl,
             audioUri,
-        };
-    });
-    
-    // 3. Await all promises
-    const processedScenes = await Promise.all(sceneProcessingPromises);
+        });
+
+        // Use the newly generated image as reference for the next scene
+        previousImageUrl = imageUrl;
+    }
 
     // 4. Combine results
     return {
@@ -155,6 +175,6 @@ const generateVideoStoryFlow = ai.defineFlow(
 );
 
 
-export async function generateVideoStory(text: string): Promise<GenerateVideoStoryOutput> {
-    return generateVideoStoryFlow(text);
+export async function generateVideoStory(input: GenerateVideoStoryInput): Promise<GenerateVideoStoryOutput> {
+    return generateVideoStoryFlow(input);
 }

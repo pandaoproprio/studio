@@ -3,6 +3,12 @@
  */
 import { z } from 'zod';
 
+export const GenerateVideoStoryInputSchema = z.object({
+  storyText: z.string().min(20, "O texto precisa ter pelo menos 20 caracteres."),
+  initialImageDataUri: z.string().optional().describe("An optional initial image for the story, as a data URI."),
+});
+export type GenerateVideoStoryInput = z.infer<typeof GenerateVideoStoryInputSchema>;
+
 export const GenerateVideoStoryOutputSchema = z.object({
   title: z.string(),
   scenes: z.array(
