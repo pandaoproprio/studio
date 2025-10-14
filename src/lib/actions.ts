@@ -48,11 +48,6 @@ import {
 } from "@/ai/flows/organizational-diagnosis";
 import { OrganizationalDiagnosisInputSchema } from "@/ai/schemas/organizational-diagnosis-schemas";
 import {
-    corporateRiskAnalysis,
-    type CorporateRiskAnalysisOutput
-} from "@/ai/flows/corporate-risk-analysis";
-import { CorporateRiskAnalysisInputSchema } from "@/ai/schemas/corporate-risk-analysis-schemas";
-import {
     academicResearchAssistant,
     type AcademicResearchAssistantOutput
 } from "@/ai/flows/academic-research-assistant";
@@ -352,9 +347,27 @@ type OrganizationalDiagnosisState = {
 };
 
 export async function organizationalDiagnosisAction(
-    input: OrganizationalDiagnosisInput
+    prevState: OrganizationalDiagnosisState,
+    formData: FormData
 ): Promise<OrganizationalDiagnosisState> {
-    const validatedFields = OrganizationalDiagnosisInputSchema.safeParse(input);
+    
+    const validatedFields = OrganizationalDiagnosisInputSchema.safeParse({
+        financials: {
+            annualRevenue: Number(formData.get("financials.annualRevenue")),
+            annualExpenses: Number(formData.get("financials.annualExpenses")),
+            fundingDiversityScore: Number(formData.get("financials.fundingDiversityScore")),
+            emergencyFundInMonths: Number(formData.get("financials.emergencyFundInMonths")),
+        },
+        projects: {
+            successRatePercentage: Number(formData.get("projects.successRatePercentage")),
+            onBudgetPercentage: Number(formData.get("projects.onBudgetPercentage")),
+            beneficiarySatisfactionScore: Number(formData.get("projects.beneficiarySatisfactionScore")),
+        },
+        team: {
+            employeeRetentionRatePercentage: Number(formData.get("team.employeeRetentionRatePercentage")),
+            teamSatisfactionScore: Number(formData.get("team.teamSatisfactionScore")),
+        }
+    });
 
     if (!validatedFields.success) {
         return {
@@ -373,37 +386,6 @@ export async function organizationalDiagnosisAction(
     }
 }
 
-type CorporateRiskAnalysisState = {
-    message: string;
-    data?: CorporateRiskAnalysisOutput | null;
-    errors?: any;
-};
-
-export async function corporateRiskAnalysisAction(
-    prevState: CorporateRiskAnalysisState,
-    formData: FormData
-): Promise<CorporateRiskAnalysisState> {
-    const validatedFields = CorporateRiskAnalysisInputSchema.safeParse({
-        initiativeDescription: formData.get("initiativeDescription"),
-        context: formData.get("context"),
-    });
-
-    if (!validatedFields.success) {
-        return {
-            message: "A validação falhou. Verifique os campos.",
-            data: null,
-            errors: validatedFields.error.flatten().fieldErrors,
-        };
-    }
-
-    try {
-        const result = await corporateRiskAnalysis(validatedFields.data);
-        return { message: "Análise de risco gerada com sucesso.", data: result, errors: {} };
-    } catch (error) {
-        console.error(error);
-        return { message: "Ocorreu um erro inesperado ao gerar a análise de risco.", data: null };
-    }
-}
 
 type AcademicResearchAssistantState = {
     message: string;

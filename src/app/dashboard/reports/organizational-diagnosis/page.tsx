@@ -74,7 +74,16 @@ export default function OrganizationalDiagnosisPage() {
   });
 
   const onSubmit: SubmitHandler<OrganizationalDiagnosisInput> = (data) => {
-    formAction(data);
+    // This is a workaround to pass structured data to a server action
+    // that primarily works with FormData. We serialize the object into
+    // individual fields that the action can then read.
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+        Object.entries(value).forEach(([subKey, subValue]) => {
+            formData.append(`${key}.${subKey}`, String(subValue));
+        });
+    });
+    formAction(formData);
   };
   
   const handlePrint = () => {
