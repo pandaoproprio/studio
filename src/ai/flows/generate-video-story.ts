@@ -115,8 +115,11 @@ const generateImageFlow = ai.defineFlow(
         }
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash',
+            model: 'googleai/gemini-2.5-flash-image-preview',
             prompt,
+            config: {
+                responseModalities: ['IMAGE'],
+            }
         });
 
         if (!media) {
@@ -142,26 +145,8 @@ const generateVideoStoryFlow = ai.defineFlow(
 
     // 2. Generate all audio narrations in parallel
     const audioPromises = script.scenes.map(scene => generateNarrationFlow(scene.text));
-
-    // 3. Generate all images in parallel, chaining the reference
-    const imagePromises: Promise<string>[] = [];
-    let currentReference = initialImageDataUri;
-
-    for (const scene of script.scenes) {
-        const imagePromise = generateImageFlow({
-            visualsDescription: scene.visuals,
-            referenceImageUrl: currentReference,
-        });
-        imagePromises.push(imagePromise);
-        // This is a bit of a trick: we pass the promise of an image URL as the reference for the next one.
-        // This won't actually work if the flow runner doesn't handle promises as inputs.
-        // A safer approach would be sequential generation. Let's stick to parallel for now to reduce latency.
-        // For a true chained context, a sequential 'for...of' loop is required.
-        // Let's compromise and run them in parallel but each will use the initial reference.
-    }
     
-    // To create a true visual evolution, generation must be sequential.
-    // Let's refactor to a sequential loop for images to ensure context is passed correctly.
+    // 3. Generate images sequentially to maintain visual context
     const generatedImageUrls: string[] = [];
     let lastImageUrl = initialImageDataUri;
     for (const scene of script.scenes) {
