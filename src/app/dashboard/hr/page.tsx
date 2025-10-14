@@ -1,16 +1,18 @@
-
 // src/app/dashboard/hr/page.tsx
+"use client";
 
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MoreHorizontal, PlusCircle, Upload, Filter, User, FileText } from "lucide-react";
-import { getEmployees, getEmployeeById, type Employee } from "@/services/hr";
+import { getEmployees, type Employee } from "@/services/hr";
 import { EmployeeProfileDialog } from "@/components/hr/employee-profile-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -25,8 +27,19 @@ const getStatusBadgeClass = (status: string) => {
     }
 };
 
-export default async function HrPage() {
-  const employees = await getEmployees();
+export default function HrPage() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchEmployees() {
+      setIsLoading(true);
+      const data = await getEmployees();
+      setEmployees(data);
+      setIsLoading(false);
+    }
+    fetchEmployees();
+  }, []);
   
   return (
     <>
@@ -73,54 +86,74 @@ export default async function HrPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {employees.map((employee) => (
-                  <TableRow key={employee.email}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={employee.avatar} alt={employee.name} data-ai-hint="person portrait"/>
-                          <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-semibold">{employee.name}</div>
-                          <div className="text-sm text-muted-foreground">{employee.email}</div>
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                           <Skeleton className="h-10 w-10 rounded-full" />
+                           <div className="space-y-2">
+                            <Skeleton className="h-4 w-[150px]" />
+                            <Skeleton className="h-4 w-[200px]" />
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{employee.role}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={getStatusBadgeClass(employee.status)}>
-                        {employee.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{employee.vacation}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <EmployeeProfileDialog employeeId={employee.id}>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <User className="mr-2 h-4 w-4" />
-                                Ver Perfil
+                      </TableCell>
+                      <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+                      <TableCell><Skeleton className="h-6 w-[70px] rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-8 rounded-md" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  employees.map((employee) => (
+                    <TableRow key={employee.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={employee.avatar} alt={employee.name} data-ai-hint="person portrait"/>
+                            <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-semibold">{employee.name}</div>
+                            <div className="text-sm text-muted-foreground">{employee.email}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{employee.role}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={getStatusBadgeClass(employee.status)}>
+                          {employee.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{employee.vacation}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                            <EmployeeProfileDialog employeeId={employee.id}>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <User className="mr-2 h-4 w-4" />
+                                  Ver Perfil
+                              </DropdownMenuItem>
+                            </EmployeeProfileDialog>
+                            <DropdownMenuItem>
+                              <FileText className="mr-2 h-4 w-4" />
+                              Editar
                             </DropdownMenuItem>
-                          </EmployeeProfileDialog>
-                          <DropdownMenuItem>
-                            <FileText className="mr-2 h-4 w-4" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">Desativar</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">Desativar</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>
