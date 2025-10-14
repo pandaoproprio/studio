@@ -17,3 +17,4 @@ import '@/ai/flows/academic-research-assistant.ts';
 import '@/ai/flows/a3-problem-solving.ts';
 import '@/ai/flows/generate-narrative-report.ts';
 import '@/ai/flows/generate-narrative-summary-flow.ts';
+import '@/ai/flows/generate-video-story.ts';
