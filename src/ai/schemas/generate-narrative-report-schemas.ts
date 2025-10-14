@@ -10,6 +10,7 @@ const ActionSchema = z.object({
     results: z.string().min(1, "Os resultados são obrigatórios."),
     challenges: z.string().min(1, "Os desafios são obrigatórios."),
     evaluation: z.string().min(1, "A avaliação é obrigatória."),
+    images: z.array(z.string()).optional(),
 });
 
 export const GenerateNarrativeReportInputSchema = z.object({

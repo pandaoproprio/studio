@@ -41,9 +41,15 @@ const prompt = ai.definePrompt({
         - Nome: {{this.name}}
         - Data e Local: {{this.dateAndLocation}}
         - Público: {{this.audience}}
-        - Resultados: {{this.results}}
-        - Desafios: {{this.challenges}}
-        - Avaliação: {{this.evaluation}}
+        - Resultados: {{{this.results}}}
+        - Desafios: {{{this.challenges}}}
+        - Avaliação: {{{this.evaluation}}}
+        {{#if this.images}}
+        - **Imagens:**
+            {{#each this.images}}
+            <img src="{{this}}" alt="Imagem da ação {{../name}}" style="max-width: 500px; margin-top: 10px; border-radius: 8px;" />
+            {{/each}}
+        {{/if}}
     {{/each}}
 
   - **Indicadores:**
@@ -62,7 +68,7 @@ const prompt = ai.definePrompt({
   3.  **Corpo do Relatório:**
       - **1. Áreas Temáticas:** Liste as áreas temáticas.
       - **1.1 Alterações no Projeto:** Apresente as respostas sobre as alterações de forma clara.
-      - **1.2 Ações Desenvolvidas no Período:** Para cada ação, crie um subtítulo (<h3>) e detalhe os pontos (resultados, desafios, avaliação) em parágrafos ou listas.
+      - **1.2 Ações Desenvolvidas no Período:** Para cada ação, crie um subtítulo (<h3>) e detalhe os pontos (resultados, desafios, avaliação) usando o conteúdo HTML fornecido. Se houver imagens, insira-as após a avaliação.
       - **2. Indicadores:** Apresente os indicadores de impacto de forma organizada.
       - **3. Observações:** Inclua a seção de observações, resumindo os pontos chave do mês, como dificuldades e aprendizados.
 
