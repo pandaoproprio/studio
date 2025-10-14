@@ -90,26 +90,26 @@ export function EmployeeProfileDialog({ employeeId, children }: EmployeeProfileD
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="max-w-4xl">
                  <DialogHeader>
-                    {isLoadingEmployee || !employee ? (
-                        <div className="flex items-start gap-4">
-                            <Skeleton className="w-16 h-16 rounded-full" />
-                            <div className="space-y-2">
-                                <Skeleton className="h-7 w-48" />
-                                <Skeleton className="h-5 w-64" />
-                            </div>
+                    <div className="flex items-start gap-4">
+                        <Avatar className="w-16 h-16">
+                            {isLoadingEmployee || !employee ? (
+                                <Skeleton className="w-16 h-16 rounded-full" />
+                            ) : (
+                                <>
+                                    <AvatarImage src={employee.avatar} alt={employee.name} data-ai-hint="person portrait"/>
+                                    <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
+                                </>
+                            )}
+                        </Avatar>
+                        <div>
+                            <DialogTitle className="text-2xl font-headline">
+                                {isLoadingEmployee || !employee ? <Skeleton className="h-7 w-48" /> : employee.name}
+                            </DialogTitle>
+                            <DialogDescription>
+                                {isLoadingEmployee || !employee ? <Skeleton className="h-5 w-64 mt-1" /> : `${employee.role} • ${employee.email}`}
+                            </DialogDescription>
                         </div>
-                    ) : (
-                        <div className="flex items-start gap-4">
-                            <Avatar className="w-16 h-16">
-                                <AvatarImage src={employee.avatar} alt={employee.name} data-ai-hint="person portrait"/>
-                                <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <DialogTitle className="text-2xl font-headline">{employee.name}</DialogTitle>
-                                <DialogDescription>{employee.role} • {employee.email}</DialogDescription>
-                            </div>
-                        </div>
-                    )}
+                    </div>
                 </DialogHeader>
                 <div className="py-4">
                     {isLoadingEmployee || !employee ? (
