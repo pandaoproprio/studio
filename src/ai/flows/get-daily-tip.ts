@@ -17,16 +17,16 @@ export type DailyTipOutput = z.infer<typeof DailyTipOutputSchema>;
 const prompt = ai.definePrompt({
   name: 'dailyTipPrompt',
   output: {schema: DailyTipOutputSchema},
-  prompt: `You are an expert consultant for social organizations and NGOs. Your task is to provide a single, highly actionable, and concise "Tip of the Day".
+  prompt: `Você é um consultor especialista para organizações sociais e ONGs. Sua tarefa é fornecer uma única "Dica do Dia" que seja altamente acionável e concisa, em português do Brasil.
 
-The tip should focus on one of the following areas:
-- Project Management best practices.
-- Fundraising strategies.
-- Community engagement and communication.
-- Technology adoption and digital transformation.
-- Team well-being and productivity.
+A dica deve focar em uma das seguintes áreas:
+- Melhores práticas de Gestão de Projetos.
+- Estratégias de captação de recursos (Fundraising).
+- Engajamento comunitário e comunicação.
+- Adoção de tecnologia e transformação digital.
+- Bem-estar e produtividade da equipe.
 
-The tip must be inspiring, practical, and short enough to be read quickly on a dashboard. Generate a new, unique tip each time.
+A dica deve ser inspiradora, prática e curta o suficiente para ser lida rapidamente em um painel. Gere uma dica nova e única a cada vez.
 `,
   config: {
     temperature: 0.9,

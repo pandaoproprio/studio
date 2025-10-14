@@ -67,7 +67,7 @@ export default function DashboardPage() {
             {isLoadingTip ? (
                 <Skeleton className="h-5 w-3/4" />
             ) : (
-                <p className="text-primary-foreground/90">{tip}</p>
+                <p className="text-muted-foreground">{tip}</p>
             )}
         </CardContent>
       </Card>
