@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Wand2, PlusCircle, Trash2, FileText, AlertCircle, ImageUp, X } from "lucide-react";
+import { Loader2, Wand2, PlusCircle, Trash2, FileText, AlertCircle, ImageUp, X, Printer } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import RichTextEditor from "@/components/reports/rich-text-editor";
 
@@ -218,7 +218,6 @@ function ActionsArray() {
 
 export default function NarrativeReportPage() {
   const [state, formAction] = useActionState(generateNarrativeReportAction, initialState);
-  const [isFormVisible, setIsFormVisible] = useState(true);
 
   const form = useForm<GenerateNarrativeReportInput>({
     resolver: zodResolver(GenerateNarrativeReportInputSchema),
@@ -243,7 +242,6 @@ export default function NarrativeReportPage() {
   });
 
   const onSubmit = (data: GenerateNarrativeReportInput) => {
-    // This function is just to trigger the action with validated data
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
         if (typeof value === 'object' && value !== null) {
@@ -253,211 +251,223 @@ export default function NarrativeReportPage() {
         }
     });
     formAction(formData);
-    setIsFormVisible(false);
   }
 
-  if (!isFormVisible && state.data) {
-     return (
-        <div className="space-y-6">
-             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold font-headline tracking-tight">
-                    Relatório Narrativo Gerado
-                    </h1>
-                    <p className="text-muted-foreground">
-                    Abaixo está o relatório gerado pela IA. Copie ou imprima conforme necessário.
-                    </p>
-                </div>
-                 <Button variant="outline" onClick={() => setIsFormVisible(true)}>Voltar ao Formulário</Button>
-            </div>
-             <Card className="flex flex-col">
-                <CardContent className="flex-1 p-6">
-                    <div 
-                        className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-6 overflow-y-auto"
-                        dangerouslySetInnerHTML={{ __html: state.data.report }} 
-                    />
-                </CardContent>
-            </Card>
-        </div>
-     )
+  const handlePrint = () => {
+    window.print();
   }
 
   return (
     <div className="space-y-6">
-       <div>
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-          Gerador de Relatório Narrativo
-        </h1>
-        <p className="text-muted-foreground">
-          Preencha os campos abaixo para que a IA possa construir um relatório de execução detalhado.
-        </p>
-      </div>
-        <Card>
-          <CardContent className="p-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+       <div className="flex items-center justify-between no-print">
+            <div>
+                <h1 className="text-3xl font-bold font-headline tracking-tight">
+                Gerador de Relatório Narrativo
+                </h1>
+                <p className="text-muted-foreground">
+                Preencha os campos abaixo para que a IA possa construir um relatório de execução detalhado.
+                </p>
+            </div>
+            {state.data && (
+                <Button onClick={handlePrint} variant="outline">
+                    <Printer className="mr-2 h-4 w-4" />
+                    Exportar para PDF
+                </Button>
+            )}
+        </div>
 
-                 <fieldset className="space-y-4">
-                     <h3 className="text-lg font-medium">Informações Gerais</h3>
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="projectName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nome do Projeto</FormLabel>
-                                    <FormControl><Input placeholder="Ex: Mutirão de Amor" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div className={state.data ? 'no-print' : ''}>
+                <Card>
+                    <CardContent className="p-6">
+                        <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+                            <fieldset className="space-y-4">
+                                <h3 className="text-lg font-medium">Informações Gerais</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="projectName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Nome do Projeto</FormLabel>
+                                                <FormControl><Input placeholder="Ex: Mutirão de Amor" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="coordinatorName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Nome do Coordenador</FormLabel>
+                                                <FormControl><Input placeholder="Ex: Raphael Araujo" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="monthYear"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Mês/Ano de Referência</FormLabel>
+                                                <FormControl><Input placeholder="Ex: Dezembro – 2023" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="thematicAreas"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Áreas Temáticas</FormLabel>
+                                            <FormControl><Textarea rows={2} {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </fieldset>
+
+                            <Separator />
+
+                            <fieldset className="space-y-4">
+                                <h3 className="text-lg font-medium">Alterações no Projeto</h3>
+                                <FormField
+                                    control={form.control}
+                                    name="projectChanges.scopeChange"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>A organização solicitou mudanças no escopo?</FormLabel>
+                                            <FormControl><Textarea rows={2} {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="projectChanges.objectivesChange"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>A organização solicitou mudanças nos objetivos?</FormLabel>
+                                            <FormControl><Textarea rows={2} {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="projectChanges.outsideScopeActions"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Foram realizadas ações diferentes das mencionadas no escopo?</FormLabel>
+                                            <FormControl><Textarea rows={2} {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </fieldset>
+                            
+                            <Separator />
+                            
+                            <ActionsArray />
+
+                            <Separator />
+
+                            <fieldset className="space-y-4">
+                                <h3 className="text-lg font-medium">Indicadores do Mês</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="indicators.directImpact"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Pessoas Impactadas Diretamente</FormLabel>
+                                                <FormControl><Input placeholder="Ex: 80 pessoas" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="indicators.indirectImpact"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Pessoas Impactadas Indiretamente</FormLabel>
+                                                <FormControl><Input placeholder="Ex: 600 pessoas" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="indicators.itemsDistributed"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Itens Distribuídos</FormLabel>
+                                                <FormControl><Input placeholder="Ex: 20 cestas básicas" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </fieldset>
+
+                            <Separator />
+                            
+                            <FormField
+                                control={form.control}
+                                name="observations"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Observações Gerais</FormLabel>
+                                        <FormControl><Textarea rows={4} placeholder="Descreva os principais aprendizados, desafios e observações gerais do mês." {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <SubmitButton />
+
+                            {state.message && !state.data && (
+                                <Alert variant={state.errors ? "destructive" : "default"}>
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
+                                    <AlertDescription>{state.message}</AlertDescription>
+                                </Alert>
                             )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="coordinatorName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nome do Coordenador</FormLabel>
-                                    <FormControl><Input placeholder="Ex: Raphael Araujo" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
+                        </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </div>
+            
+            <div className={state.data ? '' : 'hidden'}>
+                <Card className="flex flex-col printable-content">
+                    <CardHeader>
+                        <CardTitle className="font-headline">Relatório Gerado</CardTitle>
+                        <CardDescription>O resultado do seu relatório formatado aparecerá aqui.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                        <div 
+                            className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-6 overflow-y-auto"
+                        >
+                            {state.data ? (
+                                <div dangerouslySetInnerHTML={{ __html: state.data.report }} />
+                            ) : (
+                                <div className="flex h-full items-center justify-center text-center text-muted-foreground">
+                                    <p>Aguardando geração do relatório...</p>
+                                </div>
                             )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="monthYear"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Mês/Ano de Referência</FormLabel>
-                                    <FormControl><Input placeholder="Ex: Dezembro – 2023" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                     <FormField
-                        control={form.control}
-                        name="thematicAreas"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Áreas Temáticas</FormLabel>
-                                <FormControl><Textarea rows={2} {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </fieldset>
-
-                <Separator />
-
-                 <fieldset className="space-y-4">
-                     <h3 className="text-lg font-medium">Alterações no Projeto</h3>
-                     <FormField
-                        control={form.control}
-                        name="projectChanges.scopeChange"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>A organização solicitou mudanças no escopo?</FormLabel>
-                                <FormControl><Textarea rows={2} {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="projectChanges.objectivesChange"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>A organização solicitou mudanças nos objetivos?</FormLabel>
-                                <FormControl><Textarea rows={2} {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="projectChanges.outsideScopeActions"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Foram realizadas ações diferentes das mencionadas no escopo?</FormLabel>
-                                <FormControl><Textarea rows={2} {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </fieldset>
-                
-                <Separator />
-                
-                <ActionsArray />
-
-                <Separator />
-
-                <fieldset className="space-y-4">
-                    <h3 className="text-lg font-medium">Indicadores do Mês</h3>
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="indicators.directImpact"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Pessoas Impactadas Diretamente</FormLabel>
-                                    <FormControl><Input placeholder="Ex: 80 pessoas" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name="indicators.indirectImpact"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Pessoas Impactadas Indiretamente</FormLabel>
-                                    <FormControl><Input placeholder="Ex: 600 pessoas" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name="indicators.itemsDistributed"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Itens Distribuídos</FormLabel>
-                                    <FormControl><Input placeholder="Ex: 20 cestas básicas" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                </fieldset>
-
-                <Separator />
-                
-                <FormField
-                    control={form.control}
-                    name="observations"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Observações Gerais</FormLabel>
-                            <FormControl><Textarea rows={4} placeholder="Descreva os principais aprendizados, desafios e observações gerais do mês." {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <SubmitButton />
-
-                 {state.message && !state.data && (
-                    <Alert variant={state.errors ? "destructive" : "default"}>
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
-                        <AlertDescription>{state.message}</AlertDescription>
-                    </Alert>
-                )}
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
     </div>
   );
 }

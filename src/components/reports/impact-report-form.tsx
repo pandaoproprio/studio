@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useActionState } from "react";
+import { useActionState, forwardRef, useImperativeHandle } from "react";
 import { useFormStatus } from "react-dom";
 import { generateImpactReportAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ function SubmitButton() {
   );
 }
 
-export function ImpactReportForm() {
+export const ImpactReportForm = forwardRef((props, ref) => {
   const [state, formAction] = useActionState(generateImpactReportAction, initialState);
   
   const form = useForm<ImpactReportFormValues>({
@@ -62,9 +62,13 @@ export function ImpactReportForm() {
     },
   });
 
+  useImperativeHandle(ref, () => ({
+    getResult: () => state,
+  }));
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <Card>
+      <Card className="no-print">
         <CardHeader>
           <CardTitle className="font-headline">Gerador de Relatório de Impacto</CardTitle>
           <CardDescription>
@@ -130,29 +134,33 @@ export function ImpactReportForm() {
         </CardContent>
       </Card>
       
-      <Card className="flex flex-col">
-        <CardHeader>
-          <CardTitle className="font-headline">Relatório Gerado</CardTitle>
-          <CardDescription>O resultado do seu relatório formatado em HTML aparecerá aqui.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1">
-          <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
-            {state?.data?.report ? (
-              <div dangerouslySetInnerHTML={{ __html: state.data.report }} />
-            ) : (
-              <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                <p>Aguardando geração do relatório...</p>
-              </div>
-            )}
-            {state?.message && !state.data && (
-              <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
-                <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
-                <AlertDescription>{state.message}</AlertDescription>
-              </Alert>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="printable-content">
+        <Card className="flex flex-col h-full">
+            <CardHeader>
+            <CardTitle className="font-headline">Relatório Gerado</CardTitle>
+            <CardDescription>O resultado do seu relatório formatado em HTML aparecerá aqui.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1">
+            <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
+                {state?.data?.report ? (
+                <div dangerouslySetInnerHTML={{ __html: state.data.report }} />
+                ) : (
+                <div className="flex h-full items-center justify-center text-center text-muted-foreground">
+                    <p>Aguardando geração do relatório...</p>
+                </div>
+                )}
+                {state?.message && !state.data && (
+                <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
+                    <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
+                    <AlertDescription>{state.message}</AlertDescription>
+                </Alert>
+                )}
+            </div>
+            </CardContent>
+        </Card>
+      </div>
     </div>
   );
-}
+});
+
+ImpactReportForm.displayName = 'ImpactReportForm';

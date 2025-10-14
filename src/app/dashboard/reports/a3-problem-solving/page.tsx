@@ -1,6 +1,7 @@
 // src/app/dashboard/reports/a3-problem-solving/page.tsx
 "use client";
 
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState } from "react";
@@ -13,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Wand2, Search, Zap, ListChecks, Target, AlertCircle } from "lucide-react";
+import { Loader2, Wand2, Search, Zap, ListChecks, Target, AlertCircle, Printer } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 
@@ -48,6 +49,7 @@ function SubmitButton() {
 
 export default function A3ProblemSolvingPage() {
   const [state, formAction] = useActionState(a3ProblemSolvingAction, initialState);
+  const resultRef = useRef<HTMLDivElement>(null);
   
   const form = useForm<A3ProblemSolvingInput>({
     resolver: zodResolver(A3ProblemSolvingInputSchema),
@@ -57,20 +59,32 @@ export default function A3ProblemSolvingPage() {
       goals: "",
     },
   });
+  
+  const handlePrint = () => {
+    window.print();
+  }
 
   return (
     <div className="space-y-6">
-       <div>
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-          Assistente de Resolução de Problemas (A3)
-        </h1>
-        <p className="text-muted-foreground">
-          Use a metodologia A3 e a IA para analisar problemas complexos e criar planos de ação eficazes.
-        </p>
+       <div className="flex items-center justify-between no-print">
+        <div>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">
+            Assistente de Resolução de Problemas (A3)
+          </h1>
+          <p className="text-muted-foreground">
+            Use a metodologia A3 e a IA para analisar problemas complexos e criar planos de ação eficazes.
+          </p>
+        </div>
+        {state.data && (
+            <Button onClick={handlePrint} variant="outline">
+                <Printer className="mr-2 h-4 w-4" />
+                Exportar para PDF
+            </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <Card>
+        <Card className="no-print">
           <CardHeader>
             <CardTitle className="font-headline">Descrição do Problema</CardTitle>
             <CardDescription>
@@ -125,66 +139,68 @@ export default function A3ProblemSolvingPage() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="font-headline">Relatório A3 Gerado pela IA</CardTitle>
-            <CardDescription>A análise e o plano de ação da IA aparecerão aqui.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col items-center justify-center">
-            {state.data ? (
-                <div className="w-full space-y-4 overflow-y-auto max-h-[80vh] pr-2">
-                    <ResultCard icon={Search} title="4. Análise de Causa Raiz (5 Porquês)">
-                       <ul className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                            {state.data.rootCauseAnalysis.map((item, index) => <li key={index} className="pl-2">{item}</li>)}
-                       </ul>
-                    </ResultCard>
-
-                    <ResultCard icon={ListChecks} title="5. Plano de Ação">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>O Quê?</TableHead>
-                                    <TableHead>Quem?</TableHead>
-                                    <TableHead>Quando?</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {state.data.actionPlan.map((action, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell className="font-medium">{action.what}</TableCell>
-                                        <TableCell>{action.who}</TableCell>
-                                        <TableCell>{action.when}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </ResultCard>
-                     <ResultCard icon={Target} title="6. Resultados Esperados e Acompanhamento">
-                        <h4 className="font-semibold text-foreground">Resultados Esperados</h4>
-                        <p className="text-muted-foreground text-sm mb-4">{state.data.followUp.expectedResults}</p>
-                        <h4 className="font-semibold text-foreground">Métricas de Sucesso (KPIs)</h4>
-                        <ul className="list-disc pl-5 text-muted-foreground text-sm space-y-1 mb-4">
-                                {state.data.followUp.kpis.map((kpi, i) => <li key={i}>{kpi}</li>)}
+        <div ref={resultRef} className="printable-content">
+            <Card className="flex flex-col">
+            <CardHeader>
+                <CardTitle className="font-headline">Relatório A3 Gerado pela IA</CardTitle>
+                <CardDescription>A análise e o plano de ação da IA aparecerão aqui.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col items-center justify-center">
+                {state.data ? (
+                    <div className="w-full space-y-4 overflow-y-auto max-h-[80vh] pr-2">
+                        <ResultCard icon={Search} title="4. Análise de Causa Raiz (5 Porquês)">
+                        <ul className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                                {state.data.rootCauseAnalysis.map((item, index) => <li key={index} className="pl-2">{item}</li>)}
                         </ul>
-                        <h4 className="font-semibold text-foreground">Método de Acompanhamento</h4>
-                        <p className="text-muted-foreground text-sm">{state.data.followUp.monitoringMethod}</p>
-                    </ResultCard>
-                </div>
-            ) : (
-                 <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
-                    <Zap className="h-12 w-12 mb-4" />
-                    <p>Aguardando dados para iniciar a análise A3...</p>
-                 </div>
-            )}
-            {state.message && !state.data && (
-                <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
-                    <AlertDescription>{state.message}</AlertDescription>
-                </Alert>
-            )}
-          </CardContent>
-        </Card>
+                        </ResultCard>
+
+                        <ResultCard icon={ListChecks} title="5. Plano de Ação">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>O Quê?</TableHead>
+                                        <TableHead>Quem?</TableHead>
+                                        <TableHead>Quando?</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {state.data.actionPlan.map((action, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-medium">{action.what}</TableCell>
+                                            <TableCell>{action.who}</TableCell>
+                                            <TableCell>{action.when}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </ResultCard>
+                        <ResultCard icon={Target} title="6. Resultados Esperados e Acompanhamento">
+                            <h4 className="font-semibold text-foreground">Resultados Esperados</h4>
+                            <p className="text-muted-foreground text-sm mb-4">{state.data.followUp.expectedResults}</p>
+                            <h4 className="font-semibold text-foreground">Métricas de Sucesso (KPIs)</h4>
+                            <ul className="list-disc pl-5 text-muted-foreground text-sm space-y-1 mb-4">
+                                    {state.data.followUp.kpis.map((kpi, i) => <li key={i}>{kpi}</li>)}
+                            </ul>
+                            <h4 className="font-semibold text-foreground">Método de Acompanhamento</h4>
+                            <p className="text-muted-foreground text-sm">{state.data.followUp.monitoringMethod}</p>
+                        </ResultCard>
+                    </div>
+                ) : (
+                    <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+                        <Zap className="h-12 w-12 mb-4" />
+                        <p>Aguardando dados para iniciar a análise A3...</p>
+                    </div>
+                )}
+                {state.message && !state.data && (
+                    <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
+                        <AlertDescription>{state.message}</AlertDescription>
+                    </Alert>
+                )}
+            </CardContent>
+            </Card>
+        </div>
       </div>
     </div>
   );

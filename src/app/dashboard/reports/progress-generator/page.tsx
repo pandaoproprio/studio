@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Loader2, Wand2, Printer } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { initialColumns as kanbanData } from '@/components/projects/kanban-board';
 
@@ -65,18 +65,30 @@ export default function ProgressGeneratorPage() {
     };
   }, [selectedProjectId]);
 
+  const handlePrint = () => {
+    window.print();
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-          Gerador de Relatório de Progresso com IA
-        </h1>
-        <p className="text-muted-foreground">
-          Selecione um projeto, ajuste o contexto e deixe a IA criar um relatório de status personalizado.
-        </p>
+      <div className="flex items-center justify-between no-print">
+        <div>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">
+            Gerador de Relatório de Progresso com IA
+          </h1>
+          <p className="text-muted-foreground">
+            Selecione um projeto, ajuste o contexto e deixe a IA criar um relatório de status personalizado.
+          </p>
+        </div>
+         {state.data && (
+            <Button onClick={handlePrint} variant="outline">
+                <Printer className="mr-2 h-4 w-4" />
+                Exportar para PDF
+            </Button>
+        )}
       </div>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <Card>
+        <Card className="no-print">
           <CardHeader>
             <CardTitle className="font-headline">Parâmetros do Relatório</CardTitle>
             <CardDescription>
@@ -158,29 +170,31 @@ export default function ProgressGeneratorPage() {
           </CardContent>
         </Card>
         
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="font-headline">Relatório Gerado</CardTitle>
-            <CardDescription>O relatório de progresso personalizado pela IA aparecerá aqui.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1">
-              <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
-              {state.data ? (
-                  <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report }} />
-              ) : (
-                  <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                      <p>Aguardando geração do relatório...</p>
-                  </div>
-              )}
-              {state.message && !state.data && (
-                  <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
-                      <AlertTitle>{state.errors ? "Erro" : "Status"}</AlertTitle>
-                      <AlertDescription>{state.message}</AlertDescription>
-                  </Alert>
-              )}
-              </div>
-          </CardContent>
-        </Card>
+        <div className="printable-content">
+          <Card className="flex flex-col h-full">
+            <CardHeader>
+                <CardTitle className="font-headline">Relatório Gerado</CardTitle>
+                <CardDescription>O relatório de progresso personalizado pela IA aparecerá aqui.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1">
+                <div className="prose prose-sm max-w-none h-full rounded-lg border bg-secondary/50 p-4 overflow-y-auto">
+                {state.data ? (
+                    <div className="whitespace-pre-wrap font-body text-sm" dangerouslySetInnerHTML={{ __html: state.data.report }} />
+                ) : (
+                    <div className="flex h-full items-center justify-center text-center text-muted-foreground">
+                        <p>Aguardando geração do relatório...</p>
+                    </div>
+                )}
+                {state.message && !state.data && (
+                    <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
+                        <AlertTitle>{state.errors ? "Erro" : "Status"}</AlertTitle>
+                        <AlertDescription>{state.message}</AlertDescription>
+                    </Alert>
+                )}
+                </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

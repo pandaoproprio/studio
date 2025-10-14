@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Wand2, Lightbulb, TrendingUp, TrendingDown, Target } from "lucide-react";
+import { Loader2, Wand2, Lightbulb, TrendingUp, TrendingDown, Target, Printer } from "lucide-react";
 
 import { PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
@@ -72,20 +72,32 @@ export default function OrganizationalDiagnosisPage() {
       }
     },
   });
+  
+  const handlePrint = () => {
+    window.print();
+  }
 
   return (
     <div className="space-y-6">
-       <div>
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-          Diagnóstico Organizacional com IA
-        </h1>
-        <p className="text-muted-foreground">
-          Obtenha um panorama estratégico da saúde da sua organização.
-        </p>
+       <div className="flex items-center justify-between no-print">
+        <div>
+            <h1 className="text-3xl font-bold font-headline tracking-tight">
+            Diagnóstico Organizacional com IA
+            </h1>
+            <p className="text-muted-foreground">
+            Obtenha um panorama estratégico da saúde da sua organização.
+            </p>
+        </div>
+         {state.data && (
+            <Button onClick={handlePrint} variant="outline">
+                <Printer className="mr-2 h-4 w-4" />
+                Exportar para PDF
+            </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <Card>
+        <Card className="no-print">
           <CardHeader>
             <CardTitle className="font-headline">Métricas da Organização</CardTitle>
             <CardDescription>
@@ -218,51 +230,53 @@ export default function OrganizationalDiagnosisPage() {
         </Card>
 
         {/* Result Column */}
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="font-headline">Diagnóstico Estratégico</CardTitle>
-            <CardDescription>A análise da IA sobre a saúde da sua organização aparecerá aqui.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col items-center justify-center">
-            {state.data ? (
-                <div className="w-full space-y-6">
-                    <Card>
-                        <CardHeader className="text-center">
-                            <CardDescription>Saúde Organizacional Geral</CardDescription>
-                            <CardTitle className="text-5xl">{state.data.overallHealthScore}<span className="text-xl text-muted-foreground">/100</span></CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex justify-center">
-                            <ChartContainer config={{}} className="mx-auto aspect-square h-64">
-                                <RadarChart data={state.data.scoresByArea}>
-                                    <PolarGrid />
-                                    <PolarAngleAxis dataKey="area" />
-                                    <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                                    <Radar name="Score" dataKey="score" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
-                                </RadarChart>
-                            </ChartContainer>
-                        </CardContent>
-                    </Card>
+        <div className="printable-content">
+            <Card className="flex flex-col">
+            <CardHeader>
+                <CardTitle className="font-headline">Diagnóstico Estratégico</CardTitle>
+                <CardDescription>A análise da IA sobre a saúde da sua organização aparecerá aqui.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col items-center justify-center">
+                {state.data ? (
+                    <div className="w-full space-y-6">
+                        <Card>
+                            <CardHeader className="text-center">
+                                <CardDescription>Saúde Organizacional Geral</CardDescription>
+                                <CardTitle className="text-5xl">{state.data.overallHealthScore}<span className="text-xl text-muted-foreground">/100</span></CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex justify-center">
+                                <ChartContainer config={{}} className="mx-auto aspect-square h-64">
+                                    <RadarChart data={state.data.scoresByArea}>
+                                        <PolarGrid />
+                                        <PolarAngleAxis dataKey="area" />
+                                        <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                                        <Radar name="Score" dataKey="score" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
+                                    </RadarChart>
+                                </ChartContainer>
+                            </CardContent>
+                        </Card>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <InfoCard icon={TrendingUp} title="Pontos Fortes" items={state.data.strengths} />
-                        <InfoCard icon={TrendingDown} title="Pontos a Melhorar" items={state.data.weaknesses} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InfoCard icon={TrendingUp} title="Pontos Fortes" items={state.data.strengths} />
+                            <InfoCard icon={TrendingDown} title="Pontos a Melhorar" items={state.data.weaknesses} />
+                        </div>
+                        <InfoCard icon={Target} title="Recomendações Estratégicas" items={state.data.recommendations} />
+
                     </div>
-                     <InfoCard icon={Target} title="Recomendações Estratégicas" items={state.data.recommendations} />
-
-                </div>
-            ) : (
-                 <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                    <p>Aguardando análise da IA...</p>
-                 </div>
-            )}
-            {state.message && !state.data && (
-                <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
-                    <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
-                    <AlertDescription>{state.message}</AlertDescription>
-                </Alert>
-            )}
-          </CardContent>
-        </Card>
+                ) : (
+                    <div className="flex h-full items-center justify-center text-center text-muted-foreground">
+                        <p>Aguardando análise da IA...</p>
+                    </div>
+                )}
+                {state.message && !state.data && (
+                    <Alert variant={state.errors ? "destructive" : "default"} className="mt-4">
+                        <AlertTitle>{state.errors ? "Erro de Validação" : "Status"}</AlertTitle>
+                        <AlertDescription>{state.message}</AlertDescription>
+                    </Alert>
+                )}
+            </CardContent>
+            </Card>
+        </div>
       </div>
     </div>
   );

@@ -83,3 +83,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none;
+  }
+  .print-only {
+    display: block;
+  }
+  main {
+    padding: 0;
+  }
+  .printable-content {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .printable-content .grid, .printable-content .flex {
+    display: block;
+  }
+   .printable-content .card {
+    box-shadow: none;
+    border: none;
+    page-break-inside: avoid;
+  }
+}
