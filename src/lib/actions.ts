@@ -61,6 +61,11 @@ import {
     type A3ProblemSolvingOutput,
 } from "@/ai/flows/a3-problem-solving";
 import { A3ProblemSolvingInputSchema } from "@/ai/schemas/a3-problem-solving-schemas";
+import {
+    generateNarrativeReport,
+    type GenerateNarrativeReportOutput
+} from "@/ai/flows/generate-narrative-report";
+import { GenerateNarrativeReportInputSchema } from "@/ai/schemas/generate-narrative-report-schemas";
 
 
 import { z } from "zod";
@@ -481,5 +486,46 @@ export async function a3ProblemSolvingAction(
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
     return { message: `Erro ao gerar relatório A3: ${errorMessage}`, data: null };
+  }
+}
+
+type NarrativeReportState = {
+  message: string;
+  data?: GenerateNarrativeReportOutput | null;
+  errors?: any;
+};
+
+export async function generateNarrativeReportAction(
+  prevState: NarrativeReportState,
+  formData: FormData
+): Promise<NarrativeReportState> {
+    const rawData = {
+        projectName: formData.get("projectName"),
+        coordinatorName: formData.get("coordinatorName"),
+        monthYear: formData.get("monthYear"),
+        thematicAreas: formData.get("thematicAreas"),
+        projectChanges: JSON.parse(formData.get("projectChanges") as string),
+        actions: JSON.parse(formData.get("actions") as string),
+        indicators: JSON.parse(formData.get("indicators") as string),
+        observations: formData.get("observations"),
+    };
+
+    const validatedFields = GenerateNarrativeReportInputSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    return {
+      message: "A validação falhou. Verifique se todos os campos estão preenchidos corretamente.",
+      data: null,
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const result = await generateNarrativeReport(validatedFields.data);
+    return { message: "Relatório Narrativo gerado com sucesso.", data: result, errors: {} };
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { message: `Erro ao gerar relatório: ${errorMessage}`, data: null };
   }
 }

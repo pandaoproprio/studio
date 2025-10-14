@@ -118,6 +118,11 @@ export function CommandMenu() {
     {
         group: 'Relatórios IA',
         items: [
+             {
+                icon: FileText,
+                label: 'Gerador de Relatório Narrativo',
+                action: () => router.push('/dashboard/reports/narrative-report'),
+            },
             {
                 icon: FileText,
                 label: 'Gerador de Relatório de Impacto',

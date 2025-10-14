@@ -88,6 +88,7 @@ const menuItems = [
     label: "Relatórios IA", 
     icon: Bot,
     subItems: [
+        { href: "/dashboard/reports/narrative-report", label: "Gerador de Relatório Narrativo", icon: FileText},
         { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto", icon: FileText},
         { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso", icon: FileText},
         { href: "/dashboard/reports/a3-problem-solving", label: "Assistente A3", icon: Search},
