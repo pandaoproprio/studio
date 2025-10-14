@@ -37,6 +37,7 @@ import {
   DollarSign,
   Receipt,
   FileCheck,
+  Search,
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -127,6 +128,11 @@ export function CommandMenu() {
                 label: 'Gerador de Relatório de Progresso',
                 action: () => router.push('/dashboard/reports/progress-generator'),
             },
+             {
+                icon: FileText,
+                label: 'Gerador de Relatório Narrativo',
+                action: () => router.push('/dashboard/reports/narrative-report'),
+            },
             {
                 icon: Film,
                 label: 'Gerador de Vídeo',
@@ -146,6 +152,11 @@ export function CommandMenu() {
                 icon: BookMarked,
                 label: 'Assistente de Pesquisa Acadêmica',
                 action: () => router.push('/dashboard/reports/academic-research-assistant'),
+            },
+             {
+                icon: Search,
+                label: 'Resolução de Problemas (A3)',
+                action: () => router.push('/dashboard/reports/a3-problem-solving'),
             }
         ]
     },

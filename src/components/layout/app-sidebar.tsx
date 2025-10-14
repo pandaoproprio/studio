@@ -43,6 +43,7 @@ import {
   DollarSign,
   Receipt,
   FileCheck,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -89,10 +90,12 @@ const menuItems = [
     subItems: [
         { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto", icon: FileText},
         { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso", icon: FileText},
+        { href: "/dashboard/reports/narrative-report", label: "Gerador de Relatório Narrativo", icon: FileText},
         { href: "/dashboard/video-generator", label: "Gerador de Vídeo", icon: Film },
         { href: "/dashboard/reports/organizational-diagnosis", label: "Diagnóstico Organizacional", icon: HeartPulse },
         { href: "/dashboard/reports/corporate-risk-analysis", label: "Análise de Risco", icon: TrendingDown },
         { href: "/dashboard/reports/academic-research-assistant", label: "Assistente de Pesquisa", icon: BookMarked },
+        { href: "/dashboard/reports/a3-problem-solving", label: "Resolução de Problemas (A3)", icon: Search },
     ]
   },
   { 
