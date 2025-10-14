@@ -72,6 +72,10 @@ export default function OrganizationalDiagnosisPage() {
       }
     },
   });
+
+  const onSubmit: SubmitHandler<OrganizationalDiagnosisInput> = (data) => {
+    formAction(data);
+  };
   
   const handlePrint = () => {
     window.print();
@@ -106,7 +110,7 @@ export default function OrganizationalDiagnosisPage() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form action={formAction} className="space-y-8">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 
                 {/* Financials */}
                 <fieldset className="space-y-4">

@@ -44,6 +44,7 @@ import { getDailyTip, type DailyTipOutput } from "@/ai/flows/get-daily-tip";
 import {
     organizationalDiagnosis,
     type OrganizationalDiagnosisOutput,
+    type OrganizationalDiagnosisInput,
 } from "@/ai/flows/organizational-diagnosis";
 import { OrganizationalDiagnosisInputSchema } from "@/ai/schemas/organizational-diagnosis-schemas";
 import {
@@ -351,27 +352,9 @@ type OrganizationalDiagnosisState = {
 
 export async function organizationalDiagnosisAction(
     prevState: OrganizationalDiagnosisState,
-    formData: FormData
-): Promise<OrganizationalDiagnosisState> {
-    const rawData = {
-        financials: {
-            annualRevenue: Number(formData.get("financials.annualRevenue")),
-            annualExpenses: Number(formData.get("financials.annualExpenses")),
-            fundingDiversityScore: Number(formData.get("financials.fundingDiversityScore")),
-            emergencyFundInMonths: Number(formData.get("financials.emergencyFundInMonths")),
-        },
-        projects: {
-            successRatePercentage: Number(formData.get("projects.successRatePercentage")),
-            onBudgetPercentage: 70, // Hardcoded for now as it's not in the form
-            beneficiarySatisfactionScore: Number(formData.get("projects.beneficiarySatisfactionScore")),
-        },
-        team: {
-            employeeRetentionRatePercentage: Number(formData.get("team.employeeRetentionRatePercentage")),
-            teamSatisfactionScore: Number(formData.get("team.teamSatisfactionScore")),
-        }
-    };
-
-    const validatedFields = OrganizationalDiagnosisInputSchema.safeParse(rawData);
+    input: OrganizationalDiagnosisInput
+): Promise<OrganizDiagnosisState> {
+    const validatedFields = OrganizationalDiagnosisInputSchema.safeParse(input);
 
     if (!validatedFields.success) {
         return {
