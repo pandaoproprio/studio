@@ -2,6 +2,11 @@
 "use client";
 
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
@@ -13,7 +18,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarMenuSubContent,
-  SidebarMenuSubTrigger
+  SidebarMenuSubTrigger,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -37,7 +42,8 @@ import {
   BookMarked,
   DollarSign,
   Receipt,
-  FileCheck
+  FileCheck,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -84,6 +90,7 @@ const menuItems = [
     subItems: [
         { href: "/dashboard/reports/impact-generator", label: "Gerador de Impacto", icon: FileText},
         { href: "/dashboard/reports/progress-generator", label: "Gerador de Progresso", icon: FileText},
+        { href: "/dashboard/reports/a3-problem-solving", label: "Assistente A3", icon: Search},
         { href: "/dashboard/video-generator", label: "Gerador de Vídeo", icon: Film },
         { href: "/dashboard/reports/organizational-diagnosis", label: "Diagnóstico Organizacional", icon: HeartPulse },
         { href: "/dashboard/reports/corporate-risk-analysis", label: "Análise de Risco", icon: TrendingDown },
@@ -119,7 +126,7 @@ export function AppSidebar() {
           <SidebarMenuItem key={item.id || item.label}>
             <SidebarMenuSub>
                 <SidebarMenuSubTrigger 
-                    isActive={item.subItems.some((si: any) => si.href && isActive(si.href))}
+                    isActive={item.subItems.some((si: any) => si.href ? isActive(si.href) : si.subItems?.some((ssi:any) => isActive(ssi.href)))}
                     tooltip={{ children: item.label, side: "right" }}
                 >
                     <SidebarMenuButton>

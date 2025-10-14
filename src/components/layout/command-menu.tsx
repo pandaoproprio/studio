@@ -36,7 +36,8 @@ import {
   BookMarked,
   DollarSign,
   Receipt,
-  FileCheck
+  FileCheck,
+  Search
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -126,6 +127,11 @@ export function CommandMenu() {
                 icon: FileText,
                 label: 'Gerador de Relatório de Progresso',
                 action: () => router.push('/dashboard/reports/progress-generator'),
+            },
+             {
+                icon: Search,
+                label: 'Assistente de Resolução de Problemas A3',
+                action: () => router.push('/dashboard/reports/a3-problem-solving'),
             },
             {
                 icon: Film,
