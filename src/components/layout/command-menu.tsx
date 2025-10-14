@@ -37,7 +37,6 @@ import {
   DollarSign,
   Receipt,
   FileCheck,
-  Search
 } from 'lucide-react';
 
 export function CommandMenu() {
@@ -118,11 +117,6 @@ export function CommandMenu() {
     {
         group: 'Relatórios IA',
         items: [
-             {
-                icon: FileText,
-                label: 'Gerador de Relatório Narrativo',
-                action: () => router.push('/dashboard/reports/narrative-report'),
-            },
             {
                 icon: FileText,
                 label: 'Gerador de Relatório de Impacto',
@@ -132,11 +126,6 @@ export function CommandMenu() {
                 icon: FileText,
                 label: 'Gerador de Relatório de Progresso',
                 action: () => router.push('/dashboard/reports/progress-generator'),
-            },
-             {
-                icon: Search,
-                label: 'Assistente de Resolução de Problemas A3',
-                action: () => router.push('/dashboard/reports/a3-problem-solving'),
             },
             {
                 icon: Film,
