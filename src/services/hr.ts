@@ -1,6 +1,6 @@
 // src/services/hr.ts
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, getDoc, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, addDoc, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 
 export interface Leave {
   id: string;
@@ -30,6 +30,9 @@ export interface Employee {
   documents: Document[];
   leaves: Leave[];
 }
+
+export type NewEmployeeData = Omit<Employee, 'id' | 'avatar' | 'status' | 'vacation' | 'documents' | 'leaves'>;
+
 
 function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData): Employee {
     const data = doc.data()!;
@@ -78,6 +81,24 @@ export async function getEmployeeById(id: string): Promise<Employee | null> {
     } catch (error) {
         console.error("Error fetching employee by ID:", error);
         return null;
+    }
+}
+
+export async function addEmployee(employeeData: NewEmployeeData): Promise<Employee> {
+    try {
+        const newEmployee = {
+            ...employeeData,
+            avatar: "https://placehold.co/100x100.png",
+            status: 'Ativo' as const,
+            vacation: 'N/A',
+            documents: [],
+            leaves: []
+        };
+        const docRef = await addDoc(collection(db, 'employees'), newEmployee);
+        return { id: docRef.id, ...newEmployee };
+    } catch (error) {
+        console.error("Error adding employee:", error);
+        throw new Error("Não foi possível adicionar o colaborador.");
     }
 }
 

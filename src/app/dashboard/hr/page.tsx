@@ -12,7 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MoreHorizontal, PlusCircle, Upload, Filter, User, FileText } from "lucide-react";
 import { getEmployees, type Employee } from "@/services/hr";
 import { EmployeeProfileDialog } from "@/components/hr/employee-profile-dialog";
+import { AddEmployeeDialog } from "@/components/hr/add-employee-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -30,16 +32,35 @@ const getStatusBadgeClass = (status: string) => {
 export default function HrPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchEmployees() {
       setIsLoading(true);
-      const data = await getEmployees();
-      setEmployees(data);
-      setIsLoading(false);
+      try {
+        const data = await getEmployees();
+        setEmployees(data);
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar colaboradores",
+          description: "Não foi possível buscar os dados dos colaboradores.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchEmployees();
-  }, []);
+  }, [toast]);
+
+  const handleEmployeeAdded = (newEmployee: Employee) => {
+    setEmployees(prev => [newEmployee, ...prev]);
+    toast({
+      title: "Colaborador Adicionado",
+      description: `${newEmployee.name} foi adicionado(a) com sucesso.`
+    });
+  }
   
   return (
     <>
@@ -65,10 +86,12 @@ export default function HrPage() {
                   <Upload className="mr-2 h-4 w-4" />
                   Exportar
                 </Button>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Adicionar Colaborador
-                </Button>
+                <AddEmployeeDialog onEmployeeAdded={handleEmployeeAdded}>
+                  <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Adicionar Colaborador
+                  </Button>
+                </AddEmployeeDialog>
               </div>
             </div>
           </CardHeader>
