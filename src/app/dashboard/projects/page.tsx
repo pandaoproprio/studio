@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { KanbanSquare, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
+import { Progress } from "@/components/ui/progress";
 
 const projects = [
     {
@@ -76,6 +77,10 @@ export default function ProjectsListPage() {
               <CardDescription>{project.description}</CardDescription>
             </CardContent>
             <CardContent>
+                <div className="space-y-2 mb-4">
+                    <Progress value={project.progress} />
+                    <div className="text-xs text-muted-foreground">{project.status} - {project.progress}%</div>
+                </div>
                 <Link href={`/dashboard/projects/${project.id}`} passHref>
                     <Button className="w-full">Acessar Projeto</Button>
                 </Link>

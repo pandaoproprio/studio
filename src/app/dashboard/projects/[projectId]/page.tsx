@@ -1,192 +1,138 @@
 // src/app/dashboard/projects/[projectId]/page.tsx
+
 "use client";
 
-import { useState } from "react";
-import { KanbanBoard } from "@/components/projects/kanban/KanbanBoard";
-import { type TaskWithColumn } from "@/lib/types";
-import { GanttChart } from "@/components/projects/gantt-chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText, DollarSign, Upload, Users, Calendar, Activity } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Plus, GanttChartSquare, KanbanSquare, ArrowLeft, ShieldAlert, Loader2 } from "lucide-react";
-import { ProjectSwitcher } from "@/components/projects/project-switcher";
 import Link from "next/link";
 import { useParams } from 'next/navigation';
-import { projectRiskAnalysisAction } from "@/lib/actions";
-import { type AnalyzeTaskRiskOutput } from "@/ai/flows/project-risk-analysis";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import { initialColumns } from "@/components/projects/kanban/initial-data";
 
 
-type View = "kanban" | "gantt";
-type RiskAnalysisResult = { task: TaskWithColumn, analysis: AnalyzeTaskRiskOutput };
+// Mock data, to be replaced with real data
+const projectDetails = {
+    name: "Projeto Social Comunitário",
+    description: "Iniciativa para capacitação de jovens em tecnologia e habilidades para o mercado de trabalho na comunidade 'Esperança'. O projeto visa não apenas fornecer conhecimento técnico, mas também desenvolver competências socioemocionais, preparando os participantes para os desafios do futuro e promovendo a inclusão digital e social.",
+    progress: 75,
+    status: "Em Andamento",
+    startDate: "01/02/2024",
+    endDate: "01/08/2024",
+    budget: "R$ 25.000,00",
+    spent: "R$ 18.750,00",
+};
 
-export default function ProjectBoardPage() {
-  const params = useParams();
-  const projectId = params.projectId as string;
 
-  const [view, setView] = useState<View>("kanban");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [riskResult, setRiskResult] = useState<RiskAnalysisResult | null>(null);
-  const { toast } = useToast();
+const recentActivities = [
+    { id: 1, user: "Joana Silva", action: "moveu a tarefa 'Desenvolver front-end' para Concluído", time: "2 horas atrás" },
+    { id: 2, user: "Carlos Andrade", action: "adicionou um novo comentário na tarefa 'Conectar com gateway'", time: "ontem" },
+    { id: 3, user: "Beatriz Costa", action: "criou a tarefa 'Revisar documentação da API'", time: "2 dias atrás" },
+];
 
-  const handleRiskAnalysis = async () => {
-    setIsAnalyzing(true);
-    setRiskResult(null);
-
-    // In a real app, you'd fetch tasks from a DB. Here we simulate scanning them.
-    // We'll just pick one "at-risk" task for demonstration.
-    const taskToAnalyze = initialColumns
-      .find(c => c.id === 'in-progress')?.tasks
-      .find(t => t.id === 'task-5');
-
-    if (!taskToAnalyze) {
-      toast({
-        title: "Análise Concluída",
-        description: "Nenhuma tarefa de alto risco imediato foi encontrada.",
-      });
-      setIsAnalyzing(false);
-      return;
-    }
-
-    try {
-      const result = await projectRiskAnalysisAction({
-        taskTitle: taskToAnalyze.title,
-        taskDescription: taskToAnalyze.description,
-        taskPriority: taskToAnalyze.priority,
-        daysInCurrentStatus: 7, // Simulated value for demonstration
-      });
-
-      if (result.data && result.data.isAtRisk) {
-        setRiskResult({
-          task: { ...taskToAnalyze, columnId: 'in-progress' },
-          analysis: result.data,
-        });
-      } else if(result.error) {
-         toast({ variant: "destructive", title: "Erro na Análise", description: result.error });
-      } else {
-         toast({
-            title: "Análise Concluída",
-            description: "Nenhum risco crítico encontrado no momento.",
-         });
-      }
-    } catch (e) {
-      toast({ variant: "destructive", title: "Erro Inesperado", description: "Falha ao executar a análise de risco." });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-  
-  const handleRiskDialogAction = (action: 'move' | 'ignore' | 'view') => {
-    if (!riskResult) return;
+export default function ProjectDashboardPage() {
+    const params = useParams();
+    const projectId = params.projectId as string;
     
-    if (action === 'move') {
-        toast({
-            title: "Ação Registrada",
-            description: `A tarefa "${riskResult.task.title}" foi movida para 'Impedido'.`
-        });
-        // Here you would add the logic to actually move the task between columns.
-    }
-    setRiskResult(null);
-  }
+    return (
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {/* Coluna Principal */}
+                <div className="lg:col-span-2 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline text-2xl">{projectDetails.name}</CardTitle>
+                            <CardDescription>{projectDetails.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-sm text-muted-foreground">
+                                    <span>Progresso</span>
+                                    <span>{projectDetails.progress}%</span>
+                                </div>
+                                <Progress value={projectDetails.progress} />
+                                <div className="flex justify-between text-xs text-muted-foreground pt-1">
+                                    <span>Início: {projectDetails.startDate}</span>
+                                    <span>Término: {projectDetails.endDate}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline">Atividade Recente</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-4">
+                                {recentActivities.map(activity => (
+                                    <li key={activity.id} className="flex items-start gap-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+                                            <Activity className="h-4 w-4"/>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm"><span className="font-semibold">{activity.user}</span> {activity.action}.</p>
+                                            <p className="text-xs text-muted-foreground">{activity.time}</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
 
+                 {/* Coluna Lateral */}
+                <div className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline">Financeiro</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Orçamento</span>
+                                <span className="font-semibold">{projectDetails.budget}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Gasto</span>
+                                <span className="font-semibold">{projectDetails.spent}</span>
+                            </div>
+                             <div className="flex justify-between">
+                                <span className="text-muted-foreground">Disponível</span>
+                                <span className="font-semibold text-green-600">R$ 6.250,00</span>
+                            </div>
+                            <Button variant="outline" className="w-full" asChild>
+                                <Link href={`/dashboard/projects/${projectId}/financials`}>Ver Detalhes</Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
 
-  return (
-    <>
-      <div className="flex h-full flex-col space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-              <Button variant="outline" size="icon" asChild>
-                <Link href="/dashboard/projects">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="sr-only">Voltar para Projetos</span>
-                </Link>
-              </Button>
-              <div>
-                <ProjectSwitcher />
-                <p className="text-muted-foreground">
-                    Projeto: {projectId}
-                </p>
-              </div>
-          </div>
-          <div className="flex gap-2">
-              <Button
-                  variant="outline"
-                  onClick={handleRiskAnalysis}
-                  disabled={isAnalyzing}
-              >
-                  {isAnalyzing ? (
-                      <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Analisando... </>
-                  ) : (
-                      <> <ShieldAlert className="mr-2 h-4 w-4"/> Análise de Risco por IA </>
-                  )}
-              </Button>
-              <Button
-                  variant="outline"
-                  onClick={() => setView(view === "kanban" ? "gantt" : "kanban")}
-              >
-                  {view === "kanban" ? (
-                  <>
-                      <GanttChartSquare className="mr-2 h-4 w-4" />
-                      Ver Gantt
-                  </>
-                  ) : (
-                  <>
-                      <KanbanSquare className="mr-2 h-4 w-4" />
-                      Ver Kanban
-                  </>
-                  )}
-              </Button>
-              <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nova Tarefa
-              </Button>
-          </div>
-        </div>
-        <div className="flex-1">
-          {view === "kanban" ? <KanbanBoard /> : <GanttChart />}
-        </div>
-      </div>
-
-      {riskResult && (
-        <AlertDialog open={!!riskResult} onOpenChange={(open) => !open && setRiskResult(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <ShieldAlert className="h-6 w-6 text-destructive" />
-                Guardião do Projeto: Risco Identificado
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                A IA analisou a tarefa <strong>"{riskResult.task.title}"</strong> e a marcou como um risco potencial para o projeto.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="space-y-4 py-4 text-sm">
-                <p className="font-semibold">Justificativa da IA:</p>
-                <blockquote className="border-l-2 pl-4 italic text-muted-foreground">
-                   "{riskResult.analysis.reason}"
-                </blockquote>
-                <p>
-                    <span className="font-semibold">Confiança da Análise:</span> {(riskResult.analysis.confidenceScore * 100).toFixed(0)}%
-                </p>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline">Documentos</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="flex items-center justify-between text-sm border-b pb-2">
+                                <div className="flex items-center gap-2">
+                                    <FileText className="h-4 w-4 text-muted-foreground"/>
+                                    <span>escopo_do_projeto_v2.pdf</span>
+                                </div>
+                                <span className="text-muted-foreground">1.2MB</span>
+                            </div>
+                             <div className="flex items-center justify-between text-sm border-b pb-2">
+                                <div className="flex items-center gap-2">
+                                    <FileText className="h-4 w-4 text-muted-foreground"/>
+                                    <span>apresentacao_kickoff.pptx</span>
+                                </div>
+                                <span className="text-muted-foreground">4.5MB</span>
+                            </div>
+                            <Button variant="outline" className="w-full" asChild>
+                                <Link href={`/dashboard/projects/${projectId}/documents`}>
+                                    <Upload className="mr-2 h-4 w-4"/>
+                                    Adicionar/Ver Documentos
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => handleRiskDialogAction('ignore')}>Ignorar por agora</AlertDialogCancel>
-              <Button variant="secondary" onClick={() => handleRiskDialogAction('view')}>Ver Tarefa</Button>
-              <AlertDialogAction asChild>
-                <Button onClick={() => handleRiskDialogAction('move')}>Mover para Impedido</Button>
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-    </>
-  );
+        </div>
+    );
 }
