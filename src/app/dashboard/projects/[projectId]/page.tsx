@@ -2,7 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { KanbanBoard, type TaskWithColumn } from "@/components/projects/kanban-board";
+import { KanbanBoard } from "@/components/projects/kanban/KanbanBoard";
+import { type TaskWithColumn } from "@/lib/types";
 import { GanttChart } from "@/components/projects/gantt-chart";
 import { Button } from "@/components/ui/button";
 import { Plus, GanttChartSquare, KanbanSquare, ArrowLeft, ShieldAlert, Loader2 } from "lucide-react";
@@ -22,7 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { initialColumns } from "@/components/projects/kanban-board";
+import { initialColumns } from "@/components/projects/kanban/initial-data";
 
 
 type View = "kanban" | "gantt";
