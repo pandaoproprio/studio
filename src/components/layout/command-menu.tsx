@@ -73,14 +73,9 @@ export function CommandMenu() {
           action: () => router.push('/dashboard/financials/transactions'),
         },
         {
-          icon: FileCheck,
-          label: 'Ir para Gestão de Reembolsos',
-          action: () => router.push('/dashboard/financial/reimbursements'),
-        },
-        {
           icon: Receipt,
-          label: 'Ir para Solicitar Reembolso',
-          action: () => router.push('/dashboard/reimbursements'),
+          label: 'Ir para Reembolsos',
+          action: () => router.push('/dashboard/financial/reimbursements'),
         },
         {
           icon: Handshake,
@@ -175,7 +170,7 @@ export function CommandMenu() {
         {
           icon: PlusCircle,
           label: 'Solicitar Reembolso',
-          action: () => router.push('/dashboard/reimbursements'), // Goes to the page where they can open the dialog
+          action: () => router.push('/dashboard/financial/reimbursements'), // Goes to the page where they can open the dialog
         },
          {
           icon: PlusCircle,

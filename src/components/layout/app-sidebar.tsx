@@ -62,7 +62,7 @@ const menuItems = [
           subItems: [
             { href: "/dashboard/financial", label: "Dashboard", icon: LayoutDashboard },
             { href: "/dashboard/financials/transactions", label: "Transações", icon: FileText },
-            { href: "/dashboard/financial/reimbursements", label: "Gestão de Reembolsos", icon: FileCheck },
+            { href: "/dashboard/financial/reimbursements", label: "Reembolsos", icon: Receipt },
           ]
         },
         { href: "/dashboard/contracts", label: "Contratos", icon: FileSignature },
@@ -78,7 +78,6 @@ const menuItems = [
       subItems: [
         { href: "/dashboard/crm", label: "CRM", icon: Handshake },
         { href: "/dashboard/hr", label: "RH", icon: Users },
-        { href: "/dashboard/reimbursements", label: "Solicitar Reembolso", icon: Receipt },
       ]
   },
   { href: "/dashboard/feed", label: "Feed", icon: Clapperboard },
@@ -115,6 +114,14 @@ export function AppSidebar() {
     if (href === '/dashboard') {
       return pathname === href;
     }
+    // Match parent routes for sub-routes, except for financial which has its own dashboard
+    if (href.startsWith('/dashboard/financial') && href !== '/dashboard/financial') {
+        return pathname.startsWith(href);
+    }
+    if (href === '/dashboard/financial') {
+        return pathname === href;
+    }
+    
     return pathname.startsWith(href);
   };
   
