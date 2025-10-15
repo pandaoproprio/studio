@@ -43,8 +43,9 @@ export default function ProjectDetailLayout({
 
         <nav className="flex border-b">
             {navItems.map((item) => (
-            <Link key={item.href} href={item.href} legacyBehavior passHref>
-                <a
+            <Link
+                key={item.href}
+                href={item.href}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 text-sm font-medium",
                     pathname === item.href
@@ -54,7 +55,6 @@ export default function ProjectDetailLayout({
                 >
                 <item.icon className="h-4 w-4" />
                 {item.label}
-                </a>
             </Link>
             ))}
         </nav>
