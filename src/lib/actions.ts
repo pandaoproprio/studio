@@ -195,7 +195,7 @@ export async function getAccountStatusSummaryAction(): Promise<AccountStatusStat
     try {
         // In a real app, you would fetch this data from a database.
         const input: AccountStatusSummaryInput = { 
-            tenantId: 'tenant-123',
+            tenantId: 'anniconecta-01',
             numberOfUsers: 50,
             modulesUsed: ['Projects', 'AnnIRH', 'CRM'],
             currentYearSpend: 8500
