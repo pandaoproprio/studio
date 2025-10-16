@@ -103,6 +103,7 @@ export async function getContracts(): Promise<Contract[]> {
     return querySnapshot.docs.map(fromFirestore);
   } catch (error) {
     console.error("Error fetching contracts, will return fallback data:", error);
+    // As a fallback in case of firestore error, we can return the local data
     return initialContracts;
   }
 }
