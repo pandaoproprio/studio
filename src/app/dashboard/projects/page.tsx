@@ -1,13 +1,24 @@
 // src/app/dashboard/projects/page.tsx
+"use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { KanbanSquare, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
+import { AddProjectDialog } from "@/components/projects/add-project-dialog";
 
-const projects = [
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  progress: number;
+}
+
+const initialProjects: Project[] = [
     {
       id: "projeto-social",
       name: "Projeto Social Comunitário",
@@ -39,6 +50,18 @@ const projects = [
 ];
 
 export default function ProjectsListPage() {
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+
+  const handleProjectAdded = (newProjectData: Omit<Project, 'id' | 'status' | 'progress'>) => {
+    const newProject: Project = {
+      ...newProjectData,
+      id: newProjectData.name.toLowerCase().replace(/\s+/g, '-'),
+      status: 'Planejamento',
+      progress: 0,
+    };
+    setProjects(prev => [newProject, ...prev]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -55,10 +78,12 @@ export default function ProjectsListPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Buscar projeto..." className="w-64 pl-9" />
             </div>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Novo Projeto
-          </Button>
+            <AddProjectDialog onProjectAdded={handleProjectAdded}>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Novo Projeto
+              </Button>
+            </AddProjectDialog>
         </div>
       </div>
       
