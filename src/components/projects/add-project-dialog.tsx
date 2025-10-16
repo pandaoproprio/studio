@@ -25,13 +25,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { type Project } from "@/app/dashboard/projects/page";
 
 const projectSchema = z.object({
   name: z.string().min(3, "O nome do projeto deve ter pelo menos 3 caracteres."),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  category: z.enum(['Institucional', 'Social'], { required_error: "Selecione uma categoria." }),
+  subcategory: z.enum(['CEAP', 'Parceiros', 'Outros']).optional(),
+}).refine(data => data.category !== 'Social' || !!data.subcategory, {
+    message: "A subcategoria é obrigatória para projetos sociais.",
+    path: ["subcategory"],
 });
 
-type ProjectFormData = z.infer<typeof projectSchema>;
+type ProjectFormData = Omit<Project, 'id' | 'status' | 'progress'>;
 
 interface AddProjectDialogProps {
   children: React.ReactNode;
@@ -41,7 +48,7 @@ interface AddProjectDialogProps {
 export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const form = useForm<ProjectFormData>({
+  const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       name: "",
@@ -49,7 +56,9 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
     },
   });
 
-  const onSubmit = (data: ProjectFormData) => {
+  const category = form.watch("category");
+
+  const onSubmit = (data: z.infer<typeof projectSchema>) => {
     onProjectAdded(data);
     setIsOpen(false);
     form.reset();
@@ -97,6 +106,51 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
                 </FormItem>
               )}
             />
+             <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Categoria</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder="Selecione a categoria do projeto" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="Institucional">Institucional</SelectItem>
+                        <SelectItem value="Social">Social</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+             {category === 'Social' && (
+                <FormField
+                    control={form.control}
+                    name="subcategory"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Subcategoria (Social)</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                            <SelectValue placeholder="Selecione a subcategoria" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="CEAP">CEAP</SelectItem>
+                            <SelectItem value="Parceiros">Parceiros</SelectItem>
+                            <SelectItem value="Outros">Outros</SelectItem>
+                        </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+            )}
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
                 Cancelar
