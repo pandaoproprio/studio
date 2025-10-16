@@ -64,6 +64,12 @@ import {
     type GenerateNarrativeReportInput,
 } from "@/ai/flows/generate-narrative-report";
 import { GenerateNarrativeReportInputSchema } from "@/ai/schemas/generate-narrative-report-schemas";
+import {
+    analyzeContractRisk,
+    type AnalyzeContractRiskInput,
+    type AnalyzeContractRiskOutput,
+} from "@/ai/flows/contract-risk-analysis";
+import { AnalyzeContractRiskInputSchema } from "@/ai/schemas/contract-risk-analysis-schemas";
 
 import { z } from "zod";
 
@@ -487,4 +493,30 @@ export async function generateNarrativeReportAction(
     const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
     return { message: `Erro ao gerar relatório: ${errorMessage}`, data: null };
   }
+}
+
+type ContractRiskAnalysisState = {
+    message: string;
+    data?: AnalyzeContractRiskOutput;
+    error?: string;
+};
+
+export async function analyzeContractRiskAction(input: AnalyzeContractRiskInput): Promise<ContractRiskAnalysisState> {
+    const validatedFields = AnalyzeContractRiskInputSchema.safeParse(input);
+
+    if (!validatedFields.success) {
+        return {
+            message: "Validation failed.",
+            error: "Invalid input data provided for contract risk analysis.",
+        };
+    }
+
+    try {
+        const result = await analyzeContractRisk(validatedFields.data);
+        return { message: "Contract risk analysis complete.", data: result };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to analyze contract risk.", error: errorMessage };
+    }
 }
