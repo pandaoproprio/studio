@@ -192,7 +192,7 @@ function ActionsArray() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                                 {(control.getValues(`actions.${index}.images`) || []).map((imgSrc, imgIndex) => (
                                     <div key={imgIndex} className="relative group aspect-video">
-                                        <Image src={imgSrc} alt={`Preview ${imgIndex}`} layout="fill" className="object-cover rounded-md" />
+                                        <Image src={imgSrc} alt={`Preview ${imgIndex}`} fill className="object-cover rounded-md" />
                                         <Button
                                             type="button"
                                             variant="destructive"
