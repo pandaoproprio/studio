@@ -9,15 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { TransactionForm } from "@/components/financial/transaction-form";
 import { Transaction } from "@/lib/types";
 import { Download, Filter, PlusCircle } from "lucide-react";
-import { Input } from '@/components/ui/input';
 
 export default function AllTransactionsPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const handleAddTransaction = (newTransaction: Transaction) => {
-        // In a real app, this would be an API call.
-        // Here we're just updating local state.
         setTransactions(prev => [newTransaction, ...prev]);
         setIsDialogOpen(false);
     }

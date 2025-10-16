@@ -1,6 +1,7 @@
 // src/components/financial/transactions-table.tsx
 "use client"
 
+import { useState, useEffect } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Transaction, TransactionStatus, TransactionType } from "@/lib/types";
@@ -49,9 +50,16 @@ interface TransactionsTableProps {
 }
 
 export function TransactionsTable({ initialTransactions, showAll = false }: TransactionsTableProps) {
-    const transactionsToShow = [...initialTransactions, ...allInitialTransactions]
-                                .sort((a,b) => b.date.getTime() - a.date.getTime())
-                                .slice(0, showAll ? undefined : 5);
+    const [transactions, setTransactions] = useState([...allInitialTransactions]);
+
+    useEffect(() => {
+        setTransactions(prev => [...initialTransactions, ...prev]
+            .filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i) // Prevent duplicates
+            .sort((a,b) => b.date.getTime() - a.date.getTime())
+        )
+    }, [initialTransactions]);
+
+    const transactionsToShow = showAll ? transactions : transactions.slice(0, 5);
 
     return (
         <Table>
@@ -83,6 +91,11 @@ export function TransactionsTable({ initialTransactions, showAll = false }: Tran
                         </TableCell>
                     </TableRow>
                  ))}
+                 {transactionsToShow.length === 0 && (
+                    <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center">Nenhuma transação encontrada.</TableCell>
+                    </TableRow>
+                 )}
             </TableBody>
         </Table>
     )

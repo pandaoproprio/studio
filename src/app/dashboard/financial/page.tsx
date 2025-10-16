@@ -16,8 +16,6 @@ export default function FinancialPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleAddTransaction = (newTransaction: Transaction) => {
-    // In a real app, this would be an API call.
-    // Here we're just updating local state.
     setTransactions(prev => [newTransaction, ...prev]);
     setIsDialogOpen(false);
   }
@@ -62,7 +60,6 @@ export default function FinancialPage() {
             <CashflowChart />
         </div>
         <div className="lg:col-span-2">
-            {/* Pass transactions state to the table */}
             <TransactionsTable recentTransactions={transactions} />
         </div>
       </div>
