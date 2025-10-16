@@ -1,6 +1,6 @@
 // src/services/contracts.ts
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, writeBatch, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, writeBatch, type DocumentData, type QueryDocumentSnapshot, setDoc, getDoc } from 'firebase/firestore';
 
 export type ContractStatus = "Ativo" | "Expirado" | "Em Renovação" | "Rascunho";
 
@@ -97,25 +97,26 @@ export async function getContracts(): Promise<Contract[]> {
     if (querySnapshot.empty) {
         console.warn('No contracts found in Firestore. Seeding initial data for demonstration.');
         await seedInitialContracts();
-        return initialContracts;
+        const seededSnapshot = await getDocs(collection(db, 'contracts'));
+        return seededSnapshot.docs.map(fromFirestore);
     }
     return querySnapshot.docs.map(fromFirestore);
   } catch (error) {
-    console.error("Error fetching contracts, returning fallback data:", error);
-    // Em caso de erro (ex: regras de segurança, offline), retorna os dados de exemplo
-    await seedInitialContracts(); // Tenta popular o banco de dados para a próxima vez
+    console.error("Error fetching contracts, attempting to seed and return fallback data:", error);
+    await seedInitialContracts();
     return initialContracts;
   }
 }
 
 export async function addContract(contractData: NewContractData): Promise<Contract> {
     try {
+        const id = `CTR-${Date.now()}`;
         const submissionData = {
             ...contractData,
             status: 'Rascunho' as const,
         };
-        const docRef = await addDoc(collection(db, 'contracts'), submissionData);
-        return { id: docRef.id, ...submissionData };
+        await setDoc(doc(db, 'contracts', id), submissionData);
+        return { id, ...submissionData };
     } catch (error) {
         console.error("Error adding contract:", error);
         throw new Error("Não foi possível adicionar o contrato.");
@@ -126,15 +127,19 @@ export async function addContract(contractData: NewContractData): Promise<Contra
 async function seedInitialContracts() {
     console.log("Attempting to seed initial contracts...");
     const batch = writeBatch(db);
-    initialContracts.forEach((contract) => {
+    
+    for (const contract of initialContracts) {
         const docRef = doc(db, "contracts", contract.id);
-        const { id, ...data } = contract;
-        batch.set(docRef, data);
-    });
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+             const { id, ...data } = contract;
+             batch.set(docRef, data);
+        }
+    }
 
     try {
         await batch.commit();
-        console.log("Initial contract data seeded to Firestore.");
+        console.log("Initial contract data seeding process completed.");
     } catch (error) {
         console.error("Error seeding contract data:", error);
     }
