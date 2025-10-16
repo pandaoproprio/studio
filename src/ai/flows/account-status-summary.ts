@@ -5,7 +5,7 @@
  *
  * - getAccountStatusSummary - A function that returns the account status summary.
  * - AccountStatusSummaryInput - The input type for the getAccountStatusSummary function.
- * - AccountStatusSummaryOutput - The return type for the getAccountStatusSummary function.
+ * - AccountStatusSummaryOutput - The return type for the getAccount-status-summary function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -13,6 +13,9 @@ import {z} from 'zod';
 
 const AccountStatusSummaryInputSchema = z.object({
   tenantId: z.string().describe('The ID of the tenant to summarize.'),
+  numberOfUsers: z.number(),
+  modulesUsed: z.array(z.string()),
+  currentYearSpend: z.number(),
 });
 export type AccountStatusSummaryInput = z.infer<typeof AccountStatusSummaryInputSchema>;
 
@@ -30,25 +33,11 @@ export async function getAccountStatusSummary(input: AccountStatusSummaryInput):
   return accountStatusSummaryFlow(input);
 }
 
-// TODO: Fetch tenant data from Firestore or other data source using the tenantId
-// This is a placeholder implementation that returns dummy data
-const tenantData = {
-  id: "tenant-123",
-  users: Array(50).fill({}), // 50 users
-  modules: ['Projects', 'AnnIRH', 'CRM'],
-  currentYearSpend: 8500,
-};
-
 
 const accountStatusSummaryPrompt = ai.definePrompt({
   name: 'accountStatusSummaryPrompt',
   input: {
-    schema: z.object({
-        tenantId: z.string(),
-        numberOfUsers: z.number(),
-        modulesUsed: z.array(z.string()),
-        currentYearSpend: z.number(),
-    })
+    schema: AccountStatusSummaryInputSchema
   },
   output: {schema: AccountStatusSummaryOutputSchema},
   prompt: `Você é um analista de contas sênior para uma empresa de SaaS. Sua tarefa é analisar os dados de uso de um cliente (tenant) e gerar um resumo conciso.
@@ -75,14 +64,7 @@ const accountStatusSummaryFlow = ai.defineFlow(
     outputSchema: AccountStatusSummaryOutputSchema,
   },
   async (input) => {
-    // In a real app, you would fetch tenant data from a database.
-    // Here we are using dummy data defined above.
-    const {output} = await accountStatusSummaryPrompt({
-        tenantId: tenantData.id,
-        numberOfUsers: tenantData.users.length,
-        modulesUsed: tenantData.modules,
-        currentYearSpend: tenantData.currentYearSpend,
-    });
+    const {output} = await accountStatusSummaryPrompt(input);
     return output!;
   }
 );

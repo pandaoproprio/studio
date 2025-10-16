@@ -187,7 +187,13 @@ type AccountStatusState = {
 
 export async function getAccountStatusSummaryAction(): Promise<AccountStatusState> {
     try {
-        const input: AccountStatusSummaryInput = { tenantId: 'tenant-123' }; // Dummy tenant ID
+        // In a real app, you would fetch this data from a database.
+        const input: AccountStatusSummaryInput = { 
+            tenantId: 'tenant-123',
+            numberOfUsers: 50,
+            modulesUsed: ['Projects', 'AnnIRH', 'CRM'],
+            currentYearSpend: 8500
+        };
         const result = await getAccountStatusSummary(input);
         return { message: "Summary loaded.", data: result };
     } catch(e) {
