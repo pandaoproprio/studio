@@ -52,12 +52,12 @@ export async function getContracts(): Promise<Contract[]> {
 
 export async function addContract(contractData: NewContractData): Promise<Contract> {
     try {
-        const newContract = {
+        const submissionData = {
             ...contractData,
             status: 'Rascunho' as const,
         };
-        const docRef = await addDoc(collection(db, 'contracts'), newContract);
-        return { id: docRef.id, ...newContract };
+        const docRef = await addDoc(collection(db, 'contracts'), submissionData);
+        return { id: docRef.id, ...submissionData };
     } catch (error) {
         console.error("Error adding contract:", error);
         throw new Error("Não foi possível adicionar o contrato.");
@@ -66,7 +66,7 @@ export async function addContract(contractData: NewContractData): Promise<Contra
 
 // --- Seeding function for demonstration purposes ---
 async function seedInitialContracts() {
-    const initialContracts: Omit<Contract, 'id'>[] = [
+    const initialContracts: Contract[] = [
       {
         id: "CTR-001",
         title: "Contrato de Prestação de Serviços - Soluções Tech",
