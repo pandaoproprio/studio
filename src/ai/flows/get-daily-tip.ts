@@ -40,7 +40,10 @@ const getDailyTipFlow = ai.defineFlow(
   },
   async () => {
     const {output} = await prompt();
-    return output!;
+    if (!output) {
+      throw new Error('AI failed to generate a daily tip.');
+    }
+    return output;
   }
 );
 
