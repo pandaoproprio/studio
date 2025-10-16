@@ -186,6 +186,10 @@ async function seedInitialData() {
         batch.set(docRef, data);
     });
 
-    await batch.commit();
-    console.log("Initial employee data seeded to Firestore.");
+    try {
+        await batch.commit();
+        console.log("Initial employee data seeded to Firestore.");
+    } catch(e) {
+        console.error("Error seeding employees:", e)
+    }
 }

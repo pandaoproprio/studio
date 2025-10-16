@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontal, PlusCircle, Upload, Filter, User, FileText } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Upload, Filter, User, FileText, Trash2 } from "lucide-react";
 import { getEmployees, type Employee } from "@/services/hr";
 import { EmployeeProfileDialog } from "@/components/hr/employee-profile-dialog";
 import { AddEmployeeDialog } from "@/components/hr/add-employee-dialog";
@@ -169,7 +169,10 @@ export default function HrPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">Desativar</DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Desativar
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

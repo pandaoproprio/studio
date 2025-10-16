@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Wand2, Loader2, User, File, CalendarOff, FileUp, PlusCircle, Trash2 } from "lucide-react";
+import { Wand2, Loader2, User, File, CalendarOff, FileUp, PlusCircle } from "lucide-react";
 import { describeColaboradorAction } from "@/lib/actions";
 import { PuffLoader } from "react-spinners";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
