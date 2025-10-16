@@ -4,7 +4,7 @@
 import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LayoutDashboard, KanbanSquare, DollarSign, FileText } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, KanbanSquare, DollarSign, FileText, Image } from "lucide-react";
 import { ProjectSwitcher } from "@/components/projects/project-switcher";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ export default function ProjectDetailLayout({
     { href: `/dashboard/projects/${projectId}/board`, label: "Quadro", icon: KanbanSquare },
     { href: `/dashboard/projects/${projectId}/financials`, label: "Financeiro", icon: DollarSign },
     { href: `/dashboard/projects/${projectId}/documents`, label: "Documentos", icon: FileText },
+    { href: `/dashboard/projects/${projectId}/photos`, label: "Fotos", icon: Image },
   ];
 
   return (
