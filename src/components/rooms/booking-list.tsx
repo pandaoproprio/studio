@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Users, Video } from "lucide-react";
 import { type Booking, type Room } from "./data";
+import { Separator } from "@/components/ui/separator";
 
 interface BookingListProps {
     selectedDate: Date | undefined;
@@ -40,54 +41,58 @@ export function BookingList({ selectedDate, bookings, rooms, onStatusChange }: B
                 <CardTitle className="font-headline">Reservas do Dia</CardTitle>
                 <CardDescription>{formattedDate}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
                 {bookings.length > 0 ? (
-                    bookings.map(booking => {
-                        const room = rooms.find(r => r.id === booking.roomId);
-                        if (!room) return null;
-                        
-                        return (
-                             <div key={booking.id} className="flex gap-4 rounded-lg border p-4">
-                                <div className="text-center w-20 flex flex-col items-center">
-                                    <div className="h-8 w-8 rounded-full" style={{ backgroundColor: room.color }} />
-                                    <p className="font-bold text-lg mt-1">{format(booking.start, 'HH:mm')}</p>
-                                    <p className="text-sm text-muted-foreground">às {format(booking.end, 'HH:mm')}</p>
-                                </div>
-                                <div className="flex-1 space-y-1">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="font-semibold">{booking.title}</p>
-                                            <p className="text-sm text-muted-foreground">{room.name}</p>
+                    <div className="space-y-4">
+                        {bookings.map((booking, index) => {
+                            const room = rooms.find(r => r.id === booking.roomId);
+                            if (!room) return null;
+                            
+                            return (
+                                <div key={booking.id}>
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex flex-col items-center gap-1 pt-1">
+                                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: room.color }} />
+                                            <div className="h-full w-px bg-border" />
                                         </div>
-                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuItem onClick={() => onStatusChange(booking.id, 'Aprovado')}>Aprovar</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => onStatusChange(booking.id, 'Recusado')}>Recusar</DropdownMenuItem>
-                                                <DropdownMenuItem className="text-destructive">Cancelar Reserva</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <div className="flex-1 space-y-1">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="font-semibold">{booking.title}</p>
+                                                    <p className="text-sm text-muted-foreground">{room.name} • {format(booking.start, 'HH:mm')} - {format(booking.end, 'HH:mm')}</p>
+                                                </div>
+                                                 <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                            <MoreVertical className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuItem onClick={() => onStatusChange(booking.id, 'Aprovado')}>Aprovar</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => onStatusChange(booking.id, 'Recusado')}>Recusar</DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-destructive">Cancelar Reserva</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+                                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                                <span className="flex items-center gap-1.5"><Users className="h-4 w-4" /> {room?.capacity}</span>
+                                                {room?.hasVideo && <span className="flex items-center gap-1.5"><Video className="h-4 w-4" /> Vídeo</span>}
+                                            </div>
+                                             <div className="flex items-center gap-2 pt-2">
+                                                 <Avatar className="h-6 w-6">
+                                                    <AvatarImage src={booking.avatar} alt={booking.user} data-ai-hint="person portrait"/>
+                                                    <AvatarFallback>{booking.user.split(' ').map(n=>n[0]).join('')}</AvatarFallback>
+                                                </Avatar>
+                                                <span className="text-xs text-muted-foreground">Reservado por {booking.user}</span>
+                                                <Badge variant="outline" className={`ml-auto text-xs ${getStatusBadgeClass(booking.status)}`}>{booking.status}</Badge>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                        <span className="flex items-center gap-1"><Users className="h-4 w-4" /> {room?.capacity}</span>
-                                        {room?.hasVideo && <span className="flex items-center gap-1"><Video className="h-4 w-4" /> Vídeo</span>}
-                                    </div>
-                                    <div className="flex items-center gap-2 pt-2">
-                                         <Avatar className="h-6 w-6">
-                                            <AvatarImage src={booking.avatar} alt={booking.user} data-ai-hint="person portrait"/>
-                                            <AvatarFallback>{booking.user.split(' ').map(n=>n[0]).join('')}</AvatarFallback>
-                                        </Avatar>
-                                        <span className="text-xs text-muted-foreground">Reservado por {booking.user}</span>
-                                        <Badge variant="outline" className={`ml-auto ${getStatusBadgeClass(booking.status)}`}>{booking.status}</Badge>
-                                    </div>
+                                    {index < bookings.length - 1 && <Separator className="my-4" />}
                                 </div>
-                            </div>
-                        )
-                    })
+                            )
+                        })}
+                    </div>
                 ) : (
                     <div className="text-center py-12 text-muted-foreground">
                         <p>Nenhuma reserva para esta data.</p>
