@@ -1,7 +1,7 @@
 // src/app/dashboard/projects/[projectId]/layout.tsx
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, LayoutDashboard, KanbanSquare, DollarSign, FileText } from "lucide-react";
@@ -10,13 +10,12 @@ import { cn } from "@/lib/utils";
 
 export default function ProjectDetailLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: { projectId: string };
 }) {
   const pathname = usePathname();
-  const { projectId } = params;
+  const params = useParams();
+  const projectId = params.projectId as string;
 
   const navItems = [
     { href: `/dashboard/projects/${projectId}`, label: "Dashboard", icon: LayoutDashboard },
