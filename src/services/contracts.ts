@@ -102,8 +102,7 @@ export async function getContracts(): Promise<Contract[]> {
     }
     return querySnapshot.docs.map(fromFirestore);
   } catch (error) {
-    console.error("Error fetching contracts, attempting to seed and return fallback data:", error);
-    await seedInitialContracts();
+    console.error("Error fetching contracts, will return fallback data:", error);
     return initialContracts;
   }
 }
