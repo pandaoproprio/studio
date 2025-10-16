@@ -65,9 +65,6 @@ const accountStatusSummaryFlow = ai.defineFlow(
   },
   async (input) => {
     const {output} = await accountStatusSummaryPrompt(input);
-    if (!output) {
-      throw new Error("AI failed to generate a summary.");
-    }
-    return output;
+    return output!;
   }
 );
