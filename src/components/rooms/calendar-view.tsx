@@ -7,6 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { type Booking, type Room } from "./data";
 import { ptBR } from 'date-fns/locale';
 import { Badge } from "@/components/ui/badge";
+import { useMemo } from "react";
+import { format } from "date-fns";
 
 interface CalendarViewProps {
     selectedDate: Date | undefined;
@@ -16,47 +18,41 @@ interface CalendarViewProps {
 }
 
 export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: CalendarViewProps) {
-    const bookingsByDay = bookings.reduce((acc, booking) => {
-        const day = booking.start.toDateString();
-        if (!acc[day]) {
-            acc[day] = [];
-        }
-        acc[day].push(booking);
-        return acc;
-    }, {} as Record<string, Booking[]>);
+    const bookingsByDay = useMemo(() => {
+        return bookings.reduce((acc, booking) => {
+            const day = format(booking.start, 'yyyy-MM-dd');
+            if (!acc[day]) {
+                acc[day] = [];
+            }
+            acc[day].push(booking);
+            return acc;
+        }, {} as Record<string, Booking[]>);
+    }, [bookings]);
+
+    const bookedDays = Object.keys(bookingsByDay).map(dayStr => new Date(dayStr));
+
+    const modifiers = {
+        booked: bookedDays,
+    };
 
     const DayWithBookings = (props: DayContentProps) => {
-        const dayString = props.date.toDateString();
-        const dayBookings = bookingsByDay[dayString];
+        const dayKey = format(props.date, 'yyyy-MM-dd');
+        const dayBookings = bookingsByDay[dayKey];
+
+        const uniqueRoomColors = dayBookings 
+            ? [...new Set(dayBookings.map(b => rooms.find(r => r.id === b.roomId)?.color).filter(Boolean))]
+            : [];
 
         return (
-            <div className="relative h-full w-full">
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    {props.date.getDate()}
-                </span>
-                {dayBookings && dayBookings.length > 0 && (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 cursor-pointer">
-                            {dayBookings.slice(0, 3).map((booking, i) => {
-                                const room = rooms.find(r => r.id === booking.roomId);
-                                return <div key={i} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: room?.color || '#ccc' }} />;
-                            })}
-                        </div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-60 text-sm">
-                        <h4 className="font-semibold mb-2">Reservas do dia:</h4>
-                        <ul className="space-y-1">
-                            {dayBookings.map(b => (
-                                    <li key={b.id} className="flex items-center gap-2">
-                                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: rooms.find(r => r.id === b.roomId)?.color }}></div>
-                                    <span>{b.title}</span>
-                                    </li>
-                            ))}
-                        </ul>
-                    </PopoverContent>
-                </Popover>
-            )}
+            <div className="relative flex flex-col items-center justify-center h-full w-full">
+                <span>{format(props.date, 'd')}</span>
+                {dayBookings && (
+                    <div className="absolute bottom-1.5 flex gap-0.5">
+                        {uniqueRoomColors.slice(0, 4).map((color, i) => (
+                            <div key={i} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
+                        ))}
+                    </div>
+                )}
             </div>
         );
     }
@@ -68,7 +64,11 @@ export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: Ca
             onSelect={onDateChange}
             locale={ptBR}
             className="rounded-md border"
-            components={{
+            modifiers={modifiers}
+            modifiersClassNames={{
+                booked: 'booked-day',
+            }}
+             components={{
                 DayContent: DayWithBookings,
             }}
         />
