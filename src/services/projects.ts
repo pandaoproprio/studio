@@ -1,6 +1,7 @@
+
 // src/services/projects.ts
-import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, addDoc, type DocumentData, type QueryDocumentSnapshot, getDoc } from 'firebase/firestore';
+import { db, persistencePromise } from '@/lib/firebase';
+import { collection, getDocs, doc, addDoc, type DocumentData, type QueryDocumentSnapshot, getDoc, writeBatch } from 'firebase/firestore';
 
 export interface TeamMember {
   role: string;
@@ -23,61 +24,6 @@ export interface Project {
 
 export type NewProjectData = Omit<Project, 'id' | 'status' | 'progress'>;
 
-
-function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData): Project {
-    const data = doc.data()!;
-    return {
-        id: doc.id,
-        name: data.name,
-        description: data.description,
-        status: data.status,
-        progress: data.progress,
-        category: data.category,
-        subcategory: data.subcategory,
-        budget: data.budget,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        team: data.team || [],
-    };
-}
-
-
-export async function getProjects(): Promise<Project[]> {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'projects'));
-    if (querySnapshot.empty) {
-        console.warn('No projects found in Firestore. Seeding initial data for demonstration.');
-        await seedInitialProjects();
-        const seededSnapshot = await getDocs(collection(db, 'projects'));
-        return seededSnapshot.docs.map(fromFirestore);
-    }
-    return querySnapshot.docs.map(fromFirestore);
-  } catch (error) {
-    console.error("Error fetching projects, returning fallback data:", error);
-    // As a fallback in case of firestore error, we can use local data.
-    return initialProjects;
-  }
-}
-
-export async function addProject(projectData: NewProjectData): Promise<Project> {
-    try {
-        const newProject = {
-            ...projectData,
-            status: 'Planejamento',
-            progress: 0,
-            team: projectData.team || [],
-        };
-        const docRef = await addDoc(collection(db, 'projects'), newProject);
-        return { id: docRef.id, ...newProject };
-    } catch (error) {
-        console.error("Error adding project:", error);
-        throw new Error("Não foi possível adicionar o projeto.");
-    }
-}
-
-
-// --- Seeding function for demonstration purposes ---
-import { writeBatch } from 'firebase/firestore';
 
 const initialProjects: Project[] = [
     {
@@ -138,8 +84,63 @@ const initialProjects: Project[] = [
     }
 ];
 
+function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData): Project {
+    const data = doc.data()!;
+    return {
+        id: doc.id,
+        name: data.name,
+        description: data.description,
+        status: data.status,
+        progress: data.progress,
+        category: data.category,
+        subcategory: data.subcategory,
+        budget: data.budget,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        team: data.team || [],
+    };
+}
+
+export async function getProjects(): Promise<Project[]> {
+  await persistencePromise;
+  try {
+    const querySnapshot = await getDocs(collection(db, 'projects'));
+    if (querySnapshot.empty) {
+        console.warn('No projects found in Firestore. Seeding initial data for demonstration.');
+        await seedInitialProjects();
+        const seededSnapshot = await getDocs(collection(db, 'projects'));
+        return seededSnapshot.docs.map(fromFirestore);
+    }
+    return querySnapshot.docs.map(fromFirestore);
+  } catch (error) {
+    console.error("Error fetching projects, will return fallback data:", error);
+    // As a fallback in case of firestore error, we can return the local data
+    return initialProjects;
+  }
+}
+
+export async function addProject(projectData: NewProjectData): Promise<Project> {
+    await persistencePromise;
+    try {
+        const newProject = {
+            ...projectData,
+            status: 'Planejamento',
+            progress: 0,
+            team: projectData.team || [],
+        };
+        const docRef = await addDoc(collection(db, 'projects'), newProject);
+        return { id: docRef.id, ...newProject };
+    } catch (error) {
+        console.error("Error adding project:", error);
+        throw new Error("Não foi possível adicionar o projeto.");
+    }
+}
+
+
+// --- Seeding function for demonstration purposes ---
 async function seedInitialProjects() {
     console.log("Attempting to seed initial projects...");
+    await persistencePromise;
     const batch = writeBatch(db);
     
     for (const project of initialProjects) {

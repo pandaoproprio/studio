@@ -1,5 +1,6 @@
+
 // src/services/hr.ts
-import { db } from '@/lib/firebase';
+import { db, persistencePromise } from '@/lib/firebase';
 import { collection, getDocs, doc, getDoc, addDoc, type DocumentData, type QueryDocumentSnapshot, writeBatch } from 'firebase/firestore';
 
 export interface Leave {
@@ -52,6 +53,7 @@ function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData):
 
 
 export async function getEmployees(): Promise<Employee[]> {
+  await persistencePromise;
   try {
     const querySnapshot = await getDocs(collection(db, 'employees'));
     if (querySnapshot.empty) {
@@ -68,6 +70,7 @@ export async function getEmployees(): Promise<Employee[]> {
 }
 
 export async function getEmployeeById(id: string): Promise<Employee | null> {
+    await persistencePromise;
     try {
         const docRef = doc(db, 'employees', id);
         const docSnap = await getDoc(docRef);
@@ -85,6 +88,7 @@ export async function getEmployeeById(id: string): Promise<Employee | null> {
 }
 
 export async function addEmployee(employeeData: NewEmployeeData): Promise<Employee> {
+    await persistencePromise;
     try {
         const newEmployee = {
             ...employeeData,
@@ -105,6 +109,8 @@ export async function addEmployee(employeeData: NewEmployeeData): Promise<Employ
 
 // --- Seeding function for demonstration purposes ---
 async function seedInitialData() {
+    console.log("Attempting to seed initial employee data...");
+    await persistencePromise;
     const initialEmployees = [
       {
         id: "emp-001",
@@ -180,11 +186,14 @@ async function seedInitialData() {
     ];
 
     const batch = writeBatch(db);
-    initialEmployees.forEach((employee) => {
+    for (const employee of initialEmployees) {
         const docRef = doc(db, "employees", employee.id);
-        const { id, ...data } = employee;
-        batch.set(docRef, data);
-    });
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+            const { id, ...data } = employee;
+            batch.set(docRef, data);
+        }
+    }
 
     try {
         await batch.commit();
