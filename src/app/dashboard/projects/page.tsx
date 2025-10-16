@@ -1,7 +1,7 @@
 // src/app/dashboard/projects/page.tsx
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,57 +15,11 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
+import { getProjects, type Project } from "@/services/projects";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  progress: number;
-  category: 'Institucional' | 'Social';
-  subcategory?: 'CEAP' | 'Parceiros' | 'Outros';
-  budget?: number;
-  startDate?: string;
-  endDate?: string;
-}
-
-const initialProjects: Project[] = [
-    {
-      id: "projeto-social",
-      name: "Projeto Social Comunitário",
-      description: "Iniciativa para capacitação de jovens em tecnologia e habilidades para o mercado de trabalho.",
-      status: "Em Andamento",
-      progress: 75,
-      category: 'Social',
-      subcategory: 'CEAP',
-    },
-    {
-      id: "marketing",
-      name: "Campanha de Marketing Digital",
-      description: "Campanha para arrecadação de fundos e divulgação da marca da organização.",
-      status: "Em Andamento",
-      progress: 40,
-      category: 'Institucional',
-    },
-    {
-      id: "website",
-      name: "Desenvolvimento do Website",
-      description: "Criação do novo portal institucional com foco em usabilidade e doações.",
-      status: "Aguardando Revisão",
-      progress: 90,
-      category: 'Institucional',
-    },
-    {
-        id: "evento-beneficente",
-        name: "Evento Beneficente Anual",
-        description: "Organização da festa julina para arrecadação de fundos e engajamento da comunidade.",
-        status: "Planejamento",
-        progress: 15,
-        category: 'Social',
-        subcategory: 'Parceiros',
-    }
-];
 
 function ProjectCard({ project }: { project: Project }) {
     return (
@@ -94,18 +48,63 @@ function ProjectCard({ project }: { project: Project }) {
     );
 }
 
+function ProjectCardSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+            <Skeleton className="h-12 w-12 rounded-lg" />
+        </div>
+        <Skeleton className="h-6 w-3/4 pt-2" />
+      </CardHeader>
+      <CardContent className="flex-grow">
+        <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+        </div>
+      </CardContent>
+      <CardContent>
+        <div className="space-y-2 mb-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-2 w-1/2" />
+        </div>
+        <Skeleton className="h-10 w-full" />
+      </CardContent>
+    </Card>
+  )
+}
+
 
 export default function ProjectsListPage() {
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-  const handleProjectAdded = (newProjectData: Omit<Project, 'id' | 'status' | 'progress'>) => {
-    const newProject: Project = {
-      ...newProjectData,
-      id: newProjectData.name.toLowerCase().replace(/\s+/g, '-'),
-      status: 'Planejamento',
-      progress: 0,
-    };
+  useEffect(() => {
+    async function fetchProjects() {
+        setIsLoading(true);
+        try {
+            const data = await getProjects();
+            setProjects(data);
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Erro ao carregar projetos",
+                description: "Não foi possível buscar os dados dos projetos.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    fetchProjects();
+  }, [toast]);
+
+  const handleProjectAdded = (newProject: Project) => {
     setProjects(prev => [newProject, ...prev]);
+    toast({
+        title: "Projeto Adicionado",
+        description: `"${newProject.name}" foi criado com sucesso.`
+    })
   };
   
   const institutionalProjects = useMemo(() => projects.filter(p => p.category === 'Institucional'), [projects]);
@@ -115,6 +114,25 @@ export default function ProjectsListPage() {
   const socialProjectsParceiros = useMemo(() => socialProjects.filter(p => p.subcategory === 'Parceiros'), [socialProjects]);
   const socialProjectsOutros = useMemo(() => socialProjects.filter(p => p.subcategory === 'Outros'), [socialProjects]);
 
+  const renderProjectList = (projectList: Project[]) => {
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ProjectCardSkeleton />
+          <ProjectCardSkeleton />
+          <ProjectCardSkeleton />
+        </div>
+      );
+    }
+    if (projectList.length === 0) {
+      return <p className="text-center text-muted-foreground py-10">Nenhum projeto encontrado.</p>;
+    }
+    return (
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {projectList.map(p => <ProjectCard key={p.id} project={p} />)}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -147,44 +165,26 @@ export default function ProjectsListPage() {
                 <TabsTrigger value="social">Projetos Sociais</TabsTrigger>
             </TabsList>
             <TabsContent value="institutional" className="mt-6">
-                 {institutionalProjects.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {institutionalProjects.map(p => <ProjectCard key={p.id} project={p} />)}
-                    </div>
-                 ) : (
-                    <p className="text-center text-muted-foreground py-10">Nenhum projeto institucional encontrado.</p>
-                 )}
+                 {renderProjectList(institutionalProjects)}
             </TabsContent>
             <TabsContent value="social" className="mt-6">
                 <Accordion type="multiple" defaultValue={['ceap', 'parceiros', 'outros']} className="w-full space-y-4">
                     <AccordionItem value="ceap" className="border rounded-lg">
                         <AccordionTrigger className="px-4 text-lg font-headline">CEAP</AccordionTrigger>
                         <AccordionContent className="p-4">
-                            {socialProjectsCEAP.length > 0 ? (
-                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                   {socialProjectsCEAP.map(p => <ProjectCard key={p.id} project={p} />)}
-                               </div>
-                            ) : <p className="text-center text-muted-foreground py-6">Nenhum projeto do CEAP.</p>}
+                            {renderProjectList(socialProjectsCEAP)}
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="parceiros" className="border rounded-lg">
                         <AccordionTrigger className="px-4 text-lg font-headline">Parceiros</AccordionTrigger>
                         <AccordionContent className="p-4">
-                            {socialProjectsParceiros.length > 0 ? (
-                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                   {socialProjectsParceiros.map(p => <ProjectCard key={p.id} project={p} />)}
-                               </div>
-                            ) : <p className="text-center text-muted-foreground py-6">Nenhum projeto de Parceiros.</p>}
+                           {renderProjectList(socialProjectsParceiros)}
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="outros" className="border rounded-lg">
                         <AccordionTrigger className="px-4 text-lg font-headline">Outros</AccordionTrigger>
                         <AccordionContent className="p-4">
-                             {socialProjectsOutros.length > 0 ? (
-                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                   {socialProjectsOutros.map(p => <ProjectCard key={p.id} project={p} />)}
-                               </div>
-                            ) : <p className="text-center text-muted-foreground py-6">Nenhum outro projeto social.</p>}
+                             {renderProjectList(socialProjectsOutros)}
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>

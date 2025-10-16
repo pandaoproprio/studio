@@ -26,7 +26,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type Project } from "@/app/dashboard/projects/page";
+import { type Project, type NewProjectData, addProject } from "@/services/projects";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const projectSchema = z.object({
   name: z.string().min(3, "O nome do projeto deve ter pelo menos 3 caracteres."),
@@ -44,15 +46,16 @@ const projectSchema = z.object({
     path: ["endDate"],
 });
 
-type ProjectFormData = Omit<Project, 'id' | 'status' | 'progress'>;
 
 interface AddProjectDialogProps {
   children: React.ReactNode;
-  onProjectAdded: (data: ProjectFormData) => void;
+  onProjectAdded: (data: Project) => void;
 }
 
 export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
@@ -67,10 +70,22 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
 
   const category = form.watch("category");
 
-  const onSubmit = (data: z.infer<typeof projectSchema>) => {
-    onProjectAdded(data);
-    setIsOpen(false);
-    form.reset();
+  const onSubmit = async (data: NewProjectData) => {
+    setIsSubmitting(true);
+    try {
+        const newProject = await addProject(data);
+        onProjectAdded(newProject);
+        setIsOpen(false);
+        form.reset();
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Falha ao adicionar projeto",
+            description: error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
+        })
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -205,7 +220,10 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit">Salvar Projeto</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Salvar Projeto
+              </Button>
             </DialogFooter>
           </form>
         </Form>
