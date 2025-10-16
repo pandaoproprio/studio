@@ -17,9 +17,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MoreHorizontal, PlusCircle, Upload, Filter, Eye, Pencil, Trash2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
-const suppliers = [
+const initialSuppliers = [
   {
     name: "Grafica Impressão Rápida",
     contact: "contato@graficarapida.com",
@@ -72,14 +73,16 @@ const suppliers = [
   },
 ];
 
-type Supplier = typeof suppliers[0];
+type Supplier = typeof initialSuppliers[0];
 
 // Mock do usuário logado e sua role
 const loggedInUser = { role: "admin" }; // Pode ser 'user', 'admin', ou 'superadmin'
 
 export default function SuppliersPage() {
+  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   const canEditOrDelete = loggedInUser.role === 'admin' || loggedInUser.role === 'superadmin';
 
@@ -87,6 +90,24 @@ export default function SuppliersPage() {
     setSelectedSupplier(supplier);
     setIsViewOpen(true);
   }
+
+  const handleAddSupplier = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const newSupplier: Supplier = {
+      name: formData.get("name") as string,
+      contact: formData.get("contact") as string,
+      category: formData.get("category") as string,
+      cnpj: formData.get("cnpj") as string,
+      address: formData.get("address") as string,
+      phone: formData.get("phone") as string,
+      status: "Ativo", // Default status
+      avatar: "https://placehold.co/100x100.png"
+    };
+
+    setSuppliers(prev => [newSupplier, ...prev]);
+    setIsAddOpen(false);
+  };
 
   return (
     <>
@@ -113,10 +134,52 @@ export default function SuppliersPage() {
                   Exportar
                 </Button>
                 {canEditOrDelete && (
-                  <Button>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Novo Fornecedor
-                  </Button>
+                  <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Novo Fornecedor
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Adicionar Novo Fornecedor</DialogTitle>
+                        <DialogDescription>
+                          Preencha os detalhes do novo fornecedor.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleAddSupplier} className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Nome do Fornecedor</Label>
+                          <Input id="name" name="name" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="contact">Email de Contato</Label>
+                          <Input id="contact" name="contact" type="email" required />
+                        </div>
+                         <div className="space-y-2">
+                          <Label htmlFor="phone">Telefone</Label>
+                          <Input id="phone" name="phone" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="category">Categoria</Label>
+                          <Input id="category" name="category" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="cnpj">CNPJ</Label>
+                          <Input id="cnpj" name="cnpj" required />
+                        </div>
+                         <div className="space-y-2">
+                          <Label htmlFor="address">Endereço</Label>
+                          <Input id="address" name="address" required />
+                        </div>
+                        <DialogFooter>
+                          <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
+                          <Button type="submit">Adicionar Fornecedor</Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 )}
               </div>
             </div>
