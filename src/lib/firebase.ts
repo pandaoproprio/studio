@@ -1,4 +1,3 @@
-
 // src/lib/firebase.ts
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
@@ -7,12 +6,12 @@ import { getFirestore, initializeFirestore, enableIndexedDbPersistence, CACHE_SI
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBnNpg3SGf-lasm1dzX0NH8nSG1ylehmUc",
-  authDomain: "studio-2770845557-a7da9.firebaseapp.com",
-  projectId: "studio-2770845557-a7da9",
-  storageBucket: "studio-2770845557-a7da9.firebasestorage.app",
+  apiKey: "YOUR_API_KEY", // This will be replaced by the build system
+  authDomain: "anniconecta.firebaseapp.com",
+  projectId: "anniconecta",
+  storageBucket: "anniconecta.appspot.com",
   messagingSenderId: "532352991807",
-  appId: "1:532352991807:web:93e75bf1ebe176ec70ae8a"
+  appId: "1:532352991807:web:f5a1a1005a769837947116"
 };
 
 // Initialize Firebase
