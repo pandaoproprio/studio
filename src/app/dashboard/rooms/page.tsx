@@ -8,11 +8,20 @@ import { allRooms, initialBookings, type Booking } from '@/components/rooms/data
 import { CalendarView } from '@/components/rooms/calendar-view';
 import { BookingList } from '@/components/rooms/booking-list';
 import { NewBookingDialog } from '@/components/rooms/new-booking-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function RoomsPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isClient, setIsClient] = useState(false);
   const [isNewBookingOpen, setIsNewBookingOpen] = useState(false);
+
+  useEffect(() => {
+    // This ensures the component is only rendered on the client,
+    // which prevents hydration mismatches caused by new Date() in the data file.
+    setIsClient(true);
+    setBookings(initialBookings);
+  }, []);
 
   // Memoize filtered bookings for performance
   const dailyBookings = useMemo(() => {
@@ -39,6 +48,28 @@ export default function RoomsPage() {
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
   }
   
+  if (!isClient) {
+      return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                    <Skeleton className="h-8 w-64" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <Skeleton className="h-10 w-36" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                    <Skeleton className="h-[330px] w-full" />
+                </div>
+                <div className="lg:col-span-1">
+                    <Skeleton className="h-[400px] w-full" />
+                </div>
+            </div>
+        </div>
+      )
+  }
+
   return (
     <div className="space-y-6">
        <div className="flex items-center justify-between">
