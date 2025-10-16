@@ -1,6 +1,6 @@
 // src/services/projects.ts
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, addDoc, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, type DocumentData, type QueryDocumentSnapshot, getDoc } from 'firebase/firestore';
 
 export interface TeamMember {
   role: string;
