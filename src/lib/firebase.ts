@@ -15,11 +15,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+let app: FirebaseApp;
+if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+} else {
+    app = getApp();
+}
+
 const auth: Auth = getAuth(app);
 
 let db: Firestore;
-let persistencePromise: Promise<void | string>;
+let persistencePromise: Promise<void | string> | null = null;
 
 // Singleton pattern for Firestore and its persistence
 const getDb = (): Firestore => {
@@ -27,23 +33,25 @@ const getDb = (): Firestore => {
     db = initializeFirestore(app, {
       cacheSizeBytes: CACHE_SIZE_UNLIMITED,
     });
-    persistencePromise = enableIndexedDbPersistence(db)
-      .catch((err) => {
-        if (err.code === 'failed-precondition') {
-          console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
-        } else if (err.code === 'unimplemented') {
-          console.warn("The current browser does not support all of the features required to enable persistence.");
-        }
-        return err; // Return error to be handled by services
-      });
   }
   return db;
 };
 
 // Function to ensure persistence is awaited before operations
 const ensurePersistence = async () => {
-  getDb(); // Ensure db is initialized
-  await persistencePromise;
+    if (!persistencePromise) {
+        const firestoreDb = getDb();
+        persistencePromise = enableIndexedDbPersistence(firestoreDb)
+          .catch((err) => {
+            if (err.code === 'failed-precondition') {
+              console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
+            } else if (err.code === 'unimplemented') {
+              console.warn("The current browser does not support all of the features required to enable persistence.");
+            }
+            return err; // Return error to be handled by services
+          });
+    }
+    await persistencePromise;
 };
 
 
