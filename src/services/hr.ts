@@ -1,6 +1,6 @@
 // src/services/hr.ts
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, getDoc, addDoc, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, addDoc, type DocumentData, type QueryDocumentSnapshot, writeBatch } from 'firebase/firestore';
 
 export interface Leave {
   id: string;
@@ -63,7 +63,7 @@ export async function getEmployees(): Promise<Employee[]> {
     return querySnapshot.docs.map(fromFirestore);
   } catch (error) {
     console.error("Error fetching employees:", error);
-    return [];
+    throw new Error("Não foi possível buscar os colaboradores.");
   }
 }
 
@@ -104,8 +104,6 @@ export async function addEmployee(employeeData: NewEmployeeData): Promise<Employ
 
 
 // --- Seeding function for demonstration purposes ---
-import { writeBatch } from 'firebase/firestore';
-
 async function seedInitialData() {
     const initialEmployees = [
       {
