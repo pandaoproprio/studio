@@ -25,6 +25,9 @@ export interface Project {
   progress: number;
   category: 'Institucional' | 'Social';
   subcategory?: 'CEAP' | 'Parceiros' | 'Outros';
+  budget?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 const initialProjects: Project[] = [

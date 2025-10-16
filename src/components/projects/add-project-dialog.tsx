@@ -33,9 +33,15 @@ const projectSchema = z.object({
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   category: z.enum(['Institucional', 'Social'], { required_error: "Selecione uma categoria." }),
   subcategory: z.enum(['CEAP', 'Parceiros', 'Outros']).optional(),
+  budget: z.coerce.number().min(0, "O orçamento deve ser um valor positivo."),
+  startDate: z.string().refine(val => !isNaN(Date.parse(val)), { message: "Data de início inválida."}),
+  endDate: z.string().refine(val => !isNaN(Date.parse(val)), { message: "Data de fim inválida."}),
 }).refine(data => data.category !== 'Social' || !!data.subcategory, {
     message: "A subcategoria é obrigatória para projetos sociais.",
     path: ["subcategory"],
+}).refine(data => new Date(data.endDate) > new Date(data.startDate), {
+    message: "A data de fim deve ser posterior à data de início.",
+    path: ["endDate"],
 });
 
 type ProjectFormData = Omit<Project, 'id' | 'status' | 'progress'>;
@@ -53,6 +59,9 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
     defaultValues: {
       name: "",
       description: "",
+      budget: 0,
+      startDate: '',
+      endDate: '',
     },
   });
 
@@ -67,7 +76,7 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Criar Novo Projeto</DialogTitle>
           <DialogDescription>
@@ -75,7 +84,7 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
             <FormField
               control={form.control}
               name="name"
@@ -106,6 +115,47 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
                 </FormItem>
               )}
             />
+            <FormField
+                control={form.control}
+                name="budget"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Orçamento (R$)</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="25000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <div className="grid grid-cols-2 gap-4">
+               <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Data de Início</FormLabel>
+                            <FormControl>
+                                <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Data de Fim</FormLabel>
+                            <FormControl>
+                                <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
              <FormField
                 control={form.control}
                 name="category"
@@ -151,7 +201,7 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
                     )}
                 />
             )}
-            <DialogFooter>
+            <DialogFooter className="pt-4">
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
                 Cancelar
               </Button>
