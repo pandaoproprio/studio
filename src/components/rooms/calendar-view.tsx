@@ -1,7 +1,6 @@
 // src/components/rooms/calendar-view.tsx
 "use client";
 
-import { DayPicker } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 import { type Booking, type Room } from "./data";
 import { ptBR } from 'date-fns/locale';
@@ -28,26 +27,31 @@ export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: Ca
     }, [bookings]);
 
     const modifiers = useMemo(() => {
-        const bookedDays: Record<string, {
-            style: React.CSSProperties
-        }> = {};
-        
+        const bookedDays: Record<string, Date> = {};
         for(const day in bookingsByDay) {
+            bookedDays[day] = new Date(day);
+        }
+        return {
+            booked: Object.values(bookedDays),
+        };
+    }, [bookingsByDay]);
+
+    const modifierStyles = useMemo(() => {
+         const styles: Record<string, React.CSSProperties> = {};
+        for (const day in bookingsByDay) {
             const uniqueRoomColors = [...new Set(bookingsByDay[day].map(b => rooms.find(r => r.id === b.roomId)?.color).filter(Boolean))];
-            
-            bookedDays[day] = {
-                style: {
-                    background: `linear-gradient(to right, ${uniqueRoomColors.join(',')})`,
-                    backgroundClip: 'padding-box',
-                    borderBottom: '4px solid',
-                    borderColor: 'transparent',
-                    borderImageSlice: 1,
-                    borderImageSource: `linear-gradient(to right, ${uniqueRoomColors.join(',')})`,
-                }
+            if (uniqueRoomColors.length > 0) {
+                 styles[day] = {
+                    borderBottom: `4px solid ${uniqueRoomColors[0]}`,
+                 };
+                 if (uniqueRoomColors.length > 1) {
+                     styles[day].borderImage = `linear-gradient(to right, ${uniqueRoomColors.join(',')}) 1`;
+                 }
             }
         }
-
-        return bookedDays
+        return {
+            booked: styles
+        };
     }, [bookingsByDay, rooms]);
 
 
@@ -59,8 +63,10 @@ export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: Ca
             locale={ptBR}
             className="rounded-md border w-full h-auto"
             modifiers={modifiers}
+            modifierStyles={modifierStyles}
             classNames={{
-                day: 'h-14 w-14 text-lg',
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
+                day: 'h-14 w-14 text-lg rounded-md',
                 head_cell: 'w-14'
             }}
         />

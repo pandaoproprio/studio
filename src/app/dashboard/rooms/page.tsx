@@ -14,7 +14,6 @@ export default function RoomsPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const [isNewBookingOpen, setIsNewBookingOpen] = useState(false);
 
   useEffect(() => {
     // This ensures the component is only rendered on the client,
@@ -93,7 +92,7 @@ export default function RoomsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 flex">
+        <div className="lg:col-span-2">
             <CalendarView 
                 selectedDate={date} 
                 onDateChange={setDate} 
