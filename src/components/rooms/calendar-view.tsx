@@ -1,7 +1,7 @@
 // src/components/rooms/calendar-view.tsx
 "use client";
 
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, type CalendarProps } from "@/components/ui/calendar";
 import { type Booking, type Room } from "./data";
 import { ptBR } from 'date-fns/locale';
 import { useMemo } from "react";
@@ -14,46 +14,31 @@ interface CalendarViewProps {
     rooms: Room[];
 }
 
+// Componente para renderizar o conteúdo de cada dia
+function DayContent(props: { date: Date; bookings: Booking[]; rooms: Room[] }) {
+    const dayBookings = props.bookings.filter(
+        (booking) => format(booking.start, 'yyyy-MM-dd') === format(props.date, 'yyyy-MM-dd')
+    );
+    const uniqueRoomColors = [...new Set(dayBookings.map(b => props.rooms.find(r => r.id === b.roomId)?.color).filter(Boolean))];
+
+    return (
+        <div className="relative flex flex-col items-center justify-center h-full w-full">
+            <span>{props.date.getDate()}</span>
+            {uniqueRoomColors.length > 0 && (
+                <div className="absolute bottom-1 flex space-x-1">
+                    {uniqueRoomColors.map((color, index) => (
+                        <div key={index} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: CalendarViewProps) {
-    const bookingsByDay = useMemo(() => {
-        return bookings.reduce((acc, booking) => {
-            const day = format(booking.start, 'yyyy-MM-dd');
-            if (!acc[day]) {
-                acc[day] = [];
-            }
-            acc[day].push(booking);
-            return acc;
-        }, {} as Record<string, Booking[]>);
-    }, [bookings]);
-
-    const modifiers = useMemo(() => {
-        const bookedDays: Record<string, Date> = {};
-        for(const day in bookingsByDay) {
-            bookedDays[day] = new Date(day);
-        }
-        return {
-            booked: Object.values(bookedDays),
-        };
-    }, [bookingsByDay]);
-
-    const modifierStyles = useMemo(() => {
-         const styles: Record<string, React.CSSProperties> = {};
-        for (const day in bookingsByDay) {
-            const uniqueRoomColors = [...new Set(bookingsByDay[day].map(b => rooms.find(r => r.id === b.roomId)?.color).filter(Boolean))];
-            if (uniqueRoomColors.length > 0) {
-                 styles[day] = {
-                    borderBottom: `4px solid ${uniqueRoomColors[0]}`,
-                 };
-                 if (uniqueRoomColors.length > 1) {
-                     styles[day].borderImage = `linear-gradient(to right, ${uniqueRoomColors.join(',')}) 1`;
-                 }
-            }
-        }
-        return {
-            booked: styles
-        };
-    }, [bookingsByDay, rooms]);
-
+    const renderDay: CalendarProps['components'] = {
+        DayContent: ({ date }) => <DayContent date={date as Date} bookings={bookings} rooms={rooms} />
+    };
 
     return (
         <Calendar
@@ -62,13 +47,12 @@ export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: Ca
             onSelect={onDateChange}
             locale={ptBR}
             className="rounded-md border w-full h-auto"
-            modifiers={modifiers}
-            modifierStyles={modifierStyles}
             classNames={{
+                day: 'h-14 w-14 text-lg rounded-md p-0', // Aumenta o tamanho e remove o padding
+                head_cell: 'w-14',
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
-                day: 'h-14 w-14 text-lg rounded-md',
-                head_cell: 'w-14'
             }}
+            components={renderDay}
         />
     );
 }
