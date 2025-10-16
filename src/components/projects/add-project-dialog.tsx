@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,8 +27,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Project, type NewProjectData, addProject } from "@/services/projects";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusCircle, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const teamMemberSchema = z.object({
+    role: z.string().min(1, "O cargo é obrigatório."),
+    name: z.string().min(1, "O nome é obrigatório.")
+});
 
 const projectSchema = z.object({
   name: z.string().min(3, "O nome do projeto deve ter pelo menos 3 caracteres."),
@@ -38,6 +43,7 @@ const projectSchema = z.object({
   budget: z.coerce.number().min(0, "O orçamento deve ser um valor positivo."),
   startDate: z.string().refine(val => !isNaN(Date.parse(val)), { message: "Data de início inválida."}),
   endDate: z.string().refine(val => !isNaN(Date.parse(val)), { message: "Data de fim inválida."}),
+  team: z.array(teamMemberSchema).optional(),
 }).refine(data => data.category !== 'Social' || !!data.subcategory, {
     message: "A subcategoria é obrigatória para projetos sociais.",
     path: ["subcategory"],
@@ -65,7 +71,13 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
       budget: 0,
       startDate: '',
       endDate: '',
+      team: [{ role: "Product Owner", name: "" }],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "team",
   });
 
   const category = form.watch("category");
@@ -91,7 +103,7 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Criar Novo Projeto</DialogTitle>
           <DialogDescription>
@@ -99,7 +111,7 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
             <FormField
               control={form.control}
               name="name"
@@ -130,6 +142,55 @@ export function AddProjectDialog({ children, onProjectAdded }: AddProjectDialogP
                 </FormItem>
               )}
             />
+             <div className="space-y-4 rounded-md border p-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium">Equipe do Projeto</h3>
+                     <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => append({ role: "", name: "" })}
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Adicionar Membro
+                    </Button>
+                </div>
+                {fields.map((field, index) => (
+                    <div key={field.id} className="grid grid-cols-10 gap-2 items-end">
+                        <FormField
+                            control={form.control}
+                            name={`team.${index}.role`}
+                            render={({ field }) => (
+                                <FormItem className="col-span-4">
+                                    <FormLabel className={index !== 0 ? 'sr-only' : ''}>Cargo</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Ex: Scrum Master" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`team.${index}.name`}
+                            render={({ field }) => (
+                                <FormItem className="col-span-5">
+                                     <FormLabel className={index !== 0 ? 'sr-only' : ''}>Nome</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Ex: Carlos Andrade" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="col-span-1">
+                            <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+             </div>
             <FormField
                 control={form.control}
                 name="budget"

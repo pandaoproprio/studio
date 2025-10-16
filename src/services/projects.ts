@@ -2,6 +2,11 @@
 import { db } from '@/lib/firebase';
 import { collection, getDocs, doc, addDoc, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 
+export interface TeamMember {
+  role: string;
+  name: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -13,6 +18,7 @@ export interface Project {
   budget?: number;
   startDate?: string;
   endDate?: string;
+  team?: TeamMember[];
 }
 
 export type NewProjectData = Omit<Project, 'id' | 'status' | 'progress'>;
@@ -31,6 +37,7 @@ function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData):
         budget: data.budget,
         startDate: data.startDate,
         endDate: data.endDate,
+        team: data.team || [],
     };
 }
 
@@ -46,8 +53,9 @@ export async function getProjects(): Promise<Project[]> {
     }
     return querySnapshot.docs.map(fromFirestore);
   } catch (error) {
-    console.error("Error fetching projects:", error);
-    return [];
+    console.error("Error fetching projects, returning fallback data:", error);
+    // As a fallback in case of firestore error, we can use local data.
+    return initialProjects;
   }
 }
 
@@ -57,6 +65,7 @@ export async function addProject(projectData: NewProjectData): Promise<Project> 
             ...projectData,
             status: 'Planejamento',
             progress: 0,
+            team: projectData.team || [],
         };
         const docRef = await addDoc(collection(db, 'projects'), newProject);
         return { id: docRef.id, ...newProject };
@@ -70,58 +79,82 @@ export async function addProject(projectData: NewProjectData): Promise<Project> 
 // --- Seeding function for demonstration purposes ---
 import { writeBatch } from 'firebase/firestore';
 
+const initialProjects: Project[] = [
+    {
+        id: "proj-1",
+        name: "Projeto Social Comunitário",
+        description: "Iniciativa para capacitação de jovens em tecnologia e habilidades para o mercado de trabalho.",
+        status: "Em Andamento",
+        progress: 75,
+        category: 'Social',
+        subcategory: 'CEAP',
+        budget: 25000,
+        startDate: '2024-02-01',
+        endDate: '2024-08-01',
+        team: [
+            { role: "Product Owner", name: "Ana Pereira" },
+            { role: "Scrum Master", name: "Marcos Viana" },
+            { role: "Time de Desenvolvimento", name: "Equipe Interna" },
+        ]
+    },
+    {
+        id: "proj-2",
+        name: "Campanha de Marketing Digital",
+        description: "Campanha para arrecadação de fundos e divulgação da marca da organização.",
+        status: "Em Andamento",
+        progress: 40,
+        category: 'Institucional',
+        budget: 10000,
+        startDate: '2024-06-01',
+        endDate: '2024-09-01',
+        team: [
+             { role: "Product Owner", name: "Joana Silva" },
+        ]
+    },
+    {
+        id: "proj-3",
+        name: "Desenvolvimento do Website",
+        description: "Criação do novo portal institucional com foco em usabilidade e doações.",
+        status: "Aguardando Revisão",
+        progress: 90,
+        category: 'Institucional',
+        budget: 15000,
+        startDate: '2024-03-01',
+        endDate: '2024-07-30',
+        team: []
+    },
+    {
+        id: "proj-4",
+        name: "Evento Beneficente Anual",
+        description: "Organização da festa julina para arrecadação de fundos e engajamento da comunidade.",
+        status: "Planejamento",
+        progress: 15,
+        category: 'Social',
+        subcategory: 'Parceiros',
+        budget: 5000,
+        startDate: '2024-07-01',
+        endDate: '2024-07-31',
+        team: []
+    }
+];
+
 async function seedInitialProjects() {
-    const initialProjects: Omit<Project, 'id'>[] = [
-        {
-            name: "Projeto Social Comunitário",
-            description: "Iniciativa para capacitação de jovens em tecnologia e habilidades para o mercado de trabalho.",
-            status: "Em Andamento",
-            progress: 75,
-            category: 'Social',
-            subcategory: 'CEAP',
-            budget: 25000,
-            startDate: '2024-02-01',
-            endDate: '2024-08-01',
-        },
-        {
-            name: "Campanha de Marketing Digital",
-            description: "Campanha para arrecadação de fundos e divulgação da marca da organização.",
-            status: "Em Andamento",
-            progress: 40,
-            category: 'Institucional',
-            budget: 10000,
-            startDate: '2024-06-01',
-            endDate: '2024-09-01',
-        },
-        {
-            name: "Desenvolvimento do Website",
-            description: "Criação do novo portal institucional com foco em usabilidade e doações.",
-            status: "Aguardando Revisão",
-            progress: 90,
-            category: 'Institucional',
-            budget: 15000,
-            startDate: '2024-03-01',
-            endDate: '2024-07-30',
-        },
-        {
-            name: "Evento Beneficente Anual",
-            description: "Organização da festa julina para arrecadação de fundos e engajamento da comunidade.",
-            status: "Planejamento",
-            progress: 15,
-            category: 'Social',
-            subcategory: 'Parceiros',
-            budget: 5000,
-            startDate: '2024-07-01',
-            endDate: '2024-07-31',
-        }
-    ];
-
+    console.log("Attempting to seed initial projects...");
     const batch = writeBatch(db);
-    initialProjects.forEach((project) => {
-        const docRef = doc(collection(db, "projects"));
-        batch.set(docRef, project);
-    });
+    
+    for (const project of initialProjects) {
+        const docRef = doc(db, "projects", project.id);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+             const { id, ...data } = project;
+             batch.set(docRef, data);
+        }
+    }
 
-    await batch.commit();
-    console.log("Initial project data seeded to Firestore.");
+    try {
+        await batch.commit();
+        console.log("Initial project data seeding process completed.");
+    } catch (error) {
+        console.error("Error seeding project data:", error);
+    }
 }
