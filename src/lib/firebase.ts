@@ -43,7 +43,7 @@ const getDb = (): Firestore => {
 // Function to ensure persistence is awaited before operations
 const ensurePersistence = async () => {
   getDb(); // Ensure db is initialized
-  return persistencePromise;
+  await persistencePromise;
 };
 
 
