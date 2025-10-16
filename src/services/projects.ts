@@ -1,6 +1,6 @@
 
 // src/services/projects.ts
-import { db, persistencePromise } from '@/lib/firebase';
+import { getDb, ensurePersistence } from '@/lib/firebase';
 import { collection, getDocs, doc, addDoc, type DocumentData, type QueryDocumentSnapshot, getDoc, writeBatch } from 'firebase/firestore';
 
 export interface TeamMember {
@@ -102,7 +102,8 @@ function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData):
 }
 
 export async function getProjects(): Promise<Project[]> {
-  await persistencePromise;
+  await ensurePersistence();
+  const db = getDb();
   try {
     const querySnapshot = await getDocs(collection(db, 'projects'));
     if (querySnapshot.empty) {
@@ -120,7 +121,8 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function addProject(projectData: NewProjectData): Promise<Project> {
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     try {
         const newProject = {
             ...projectData,
@@ -140,7 +142,8 @@ export async function addProject(projectData: NewProjectData): Promise<Project> 
 // --- Seeding function for demonstration purposes ---
 async function seedInitialProjects() {
     console.log("Attempting to seed initial projects...");
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     const batch = writeBatch(db);
     
     for (const project of initialProjects) {

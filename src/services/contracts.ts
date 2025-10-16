@@ -1,6 +1,6 @@
 
 // src/services/contracts.ts
-import { db, persistencePromise } from '@/lib/firebase';
+import { getDb, ensurePersistence } from '@/lib/firebase';
 import { collection, getDocs, doc, writeBatch, type DocumentData, type QueryDocumentSnapshot, setDoc, getDoc } from 'firebase/firestore';
 
 export type ContractStatus = "Ativo" | "Expirado" | "Em Renovação" | "Rascunho";
@@ -93,7 +93,8 @@ export function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | Documen
 }
 
 export async function getContracts(): Promise<Contract[]> {
-  await persistencePromise;
+  await ensurePersistence();
+  const db = getDb();
   try {
     const querySnapshot = await getDocs(collection(db, 'contracts'));
     if (querySnapshot.empty) {
@@ -111,7 +112,8 @@ export async function getContracts(): Promise<Contract[]> {
 }
 
 export async function addContract(contractData: NewContractData): Promise<Contract> {
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     try {
         const id = `CTR-${Date.now()}`;
         const submissionData = {
@@ -129,7 +131,8 @@ export async function addContract(contractData: NewContractData): Promise<Contra
 // --- Seeding function for demonstration purposes ---
 async function seedInitialContracts() {
     console.log("Attempting to seed initial contracts...");
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     const batch = writeBatch(db);
     
     for (const contract of initialContracts) {

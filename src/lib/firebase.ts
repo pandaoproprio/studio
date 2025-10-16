@@ -19,19 +19,33 @@ const firebaseConfig = {
 const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth: Auth = getAuth(app);
 
-// Initialize Firestore with persistence
-const db: Firestore = initializeFirestore(app, {
-  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
-});
+let db: Firestore;
+let persistencePromise: Promise<void | string>;
 
-const persistencePromise = enableIndexedDbPersistence(db)
-  .catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
-    } else if (err.code === 'unimplemented') {
-      console.warn("The current browser does not support all of the features required to enable persistence.");
-    }
-    return err; // Return error to be handled by services
-  });
+// Singleton pattern for Firestore and its persistence
+const getDb = (): Firestore => {
+  if (!db) {
+    db = initializeFirestore(app, {
+      cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+    });
+    persistencePromise = enableIndexedDbPersistence(db)
+      .catch((err) => {
+        if (err.code === 'failed-precondition') {
+          console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
+        } else if (err.code === 'unimplemented') {
+          console.warn("The current browser does not support all of the features required to enable persistence.");
+        }
+        return err; // Return error to be handled by services
+      });
+  }
+  return db;
+};
 
-export { app, auth, db, persistencePromise };
+// Function to ensure persistence is awaited before operations
+const ensurePersistence = async () => {
+  getDb(); // Ensure db is initialized
+  return persistencePromise;
+};
+
+
+export { app, auth, getDb, ensurePersistence };

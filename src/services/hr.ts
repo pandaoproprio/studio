@@ -1,6 +1,6 @@
 
 // src/services/hr.ts
-import { db, persistencePromise } from '@/lib/firebase';
+import { getDb, ensurePersistence } from '@/lib/firebase';
 import { collection, getDocs, doc, getDoc, addDoc, type DocumentData, type QueryDocumentSnapshot, writeBatch } from 'firebase/firestore';
 
 export interface Leave {
@@ -53,7 +53,8 @@ function fromFirestore(doc: QueryDocumentSnapshot<DocumentData> | DocumentData):
 
 
 export async function getEmployees(): Promise<Employee[]> {
-  await persistencePromise;
+  await ensurePersistence();
+  const db = getDb();
   try {
     const querySnapshot = await getDocs(collection(db, 'employees'));
     if (querySnapshot.empty) {
@@ -70,7 +71,8 @@ export async function getEmployees(): Promise<Employee[]> {
 }
 
 export async function getEmployeeById(id: string): Promise<Employee | null> {
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     try {
         const docRef = doc(db, 'employees', id);
         const docSnap = await getDoc(docRef);
@@ -88,7 +90,8 @@ export async function getEmployeeById(id: string): Promise<Employee | null> {
 }
 
 export async function addEmployee(employeeData: NewEmployeeData): Promise<Employee> {
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     try {
         const newEmployee = {
             ...employeeData,
@@ -110,7 +113,8 @@ export async function addEmployee(employeeData: NewEmployeeData): Promise<Employ
 // --- Seeding function for demonstration purposes ---
 async function seedInitialData() {
     console.log("Attempting to seed initial employee data...");
-    await persistencePromise;
+    await ensurePersistence();
+    const db = getDb();
     const initialEmployees = [
       {
         id: "emp-001",
