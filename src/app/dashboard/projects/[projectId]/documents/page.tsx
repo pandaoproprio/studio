@@ -1,6 +1,7 @@
 // src/app/dashboard/projects/[projectId]/documents/page.tsx
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +13,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
 
+interface Document {
+    id: string;
+    name: string;
+    type: string;
+    size: string;
+    uploadDate: string;
+}
 
-const documents = [
+const initialDocuments: Document[] = [
     { id: 'doc-1', name: 'Escopo do Projeto v2.1.pdf', type: 'Planejamento', size: '1.2MB', uploadDate: '25/07/2024' },
     { id: 'doc-2', name: 'Apresentação Kick-off.pptx', type: 'Apresentação', size: '4.5MB', uploadDate: '24/07/2024' },
     { id: 'doc-3', name: 'Contrato Fornecedor Gráfica.pdf', type: 'Contrato', size: '850KB', uploadDate: '22/07/2024' },
@@ -22,6 +33,27 @@ const documents = [
 ]
 
 export default function ProjectDocumentsPage() {
+    const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const handleDocumentAdd = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const file = formData.get('file') as File;
+        
+        if (!file || !formData.get('type')) return;
+
+        const newDocument: Document = {
+            id: `doc-${Date.now()}`,
+            name: file.name,
+            type: formData.get('type') as string,
+            size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+            uploadDate: format(new Date(), 'dd/MM/yyyy'),
+        };
+
+        setDocuments(prev => [newDocument, ...prev]);
+        setIsDialogOpen(false);
+    }
 
     return (
         <Card>
@@ -36,10 +68,37 @@ export default function ProjectDocumentsPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input placeholder="Buscar documento..." className="w-64 pl-9" />
                         </div>
-                        <Button>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Adicionar Documento
-                        </Button>
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Adicionar Documento
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Adicionar Novo Documento</DialogTitle>
+                                    <DialogDescription>
+                                        Faça o upload de um novo arquivo para este projeto.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleDocumentAdd} className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="type">Tipo do Documento</Label>
+                                        <Input id="type" name="type" placeholder="Ex: Relatório, Contrato, Proposta" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="file">Arquivo</Label>
+                                        <Input id="file" name="file" type="file" required />
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+                                        <Button type="submit">Adicionar</Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+
                     </div>
                 </div>
             </CardHeader>
@@ -89,6 +148,13 @@ export default function ProjectDocumentsPage() {
                         ))}
                     </TableBody>
                 </Table>
+                 {documents.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                        <FileText className="h-10 w-10 mx-auto mb-2" />
+                        <p>Nenhum documento encontrado.</p>
+                        <p className="text-sm">Comece adicionando seu primeiro arquivo.</p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     )
