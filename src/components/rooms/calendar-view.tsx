@@ -1,12 +1,10 @@
-
+// src/components/rooms/calendar-view.tsx
 "use client";
 
-import { DayContentProps } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type Booking, type Room } from "./data";
 import { ptBR } from 'date-fns/locale';
-import { Badge } from "@/components/ui/badge";
 import { useMemo } from "react";
 import { format } from "date-fns";
 
@@ -29,33 +27,29 @@ export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: Ca
         }, {} as Record<string, Booking[]>);
     }, [bookings]);
 
-    const bookedDays = Object.keys(bookingsByDay).map(dayStr => new Date(dayStr));
+    const modifiers = useMemo(() => {
+        const bookedDays: Record<string, {
+            style: React.CSSProperties
+        }> = {};
+        
+        for(const day in bookingsByDay) {
+            const uniqueRoomColors = [...new Set(bookingsByDay[day].map(b => rooms.find(r => r.id === b.roomId)?.color).filter(Boolean))];
+            
+            bookedDays[day] = {
+                style: {
+                    background: `linear-gradient(to right, ${uniqueRoomColors.join(',')})`,
+                    backgroundClip: 'padding-box',
+                    borderBottom: '4px solid',
+                    borderColor: 'transparent',
+                    borderImageSlice: 1,
+                    borderImageSource: `linear-gradient(to right, ${uniqueRoomColors.join(',')})`,
+                }
+            }
+        }
 
-    const modifiers = {
-        booked: bookedDays,
-    };
+        return bookedDays
+    }, [bookingsByDay, rooms]);
 
-    const DayWithBookings = (props: DayContentProps) => {
-        const dayKey = format(props.date, 'yyyy-MM-dd');
-        const dayBookings = bookingsByDay[dayKey];
-
-        const uniqueRoomColors = dayBookings 
-            ? [...new Set(dayBookings.map(b => rooms.find(r => r.id === b.roomId)?.color).filter(Boolean))]
-            : [];
-
-        return (
-            <div className="relative flex flex-col items-center justify-center h-full w-full">
-                <span>{format(props.date, 'd')}</span>
-                {dayBookings && (
-                    <div className="absolute bottom-1.5 flex gap-0.5">
-                        {uniqueRoomColors.slice(0, 4).map((color, i) => (
-                            <div key={i} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-                        ))}
-                    </div>
-                )}
-            </div>
-        );
-    }
 
     return (
         <Calendar
@@ -63,13 +57,11 @@ export function CalendarView({ selectedDate, onDateChange, bookings, rooms }: Ca
             selected={selectedDate}
             onSelect={onDateChange}
             locale={ptBR}
-            className="rounded-md border"
+            className="rounded-md border w-full h-auto"
             modifiers={modifiers}
-            modifiersClassNames={{
-                booked: 'booked-day',
-            }}
-             components={{
-                DayContent: DayWithBookings,
+            classNames={{
+                day: 'h-14 w-14 text-lg',
+                head_cell: 'w-14'
             }}
         />
     );
