@@ -8,7 +8,7 @@ import { GanttChart } from "@/components/projects/gantt-chart";
 import { Button } from "@/components/ui/button";
 import { Plus, GanttChartSquare, KanbanSquare, ShieldAlert, Loader2 } from "lucide-react";
 import { projectRiskAnalysisAction } from "@/lib/actions";
-import { type AnalyzeTaskRiskOutput } from "@/ai/flows/project-risk-analysis";
+import { type AnalyzeTaskRiskOutput } from "@/ai/schemas/project-risk-analysis-schemas";
 import {
   AlertDialog,
   AlertDialogAction,
