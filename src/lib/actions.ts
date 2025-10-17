@@ -429,9 +429,29 @@ type NarrativeReportState = {
 };
 
 export async function generateNarrativeReportAction(
-    input: GenerateNarrativeReportInput,
+    prevState: NarrativeReportState,
+    formData: FormData,
 ): Promise<NarrativeReportState> {
-  const validatedFields = GenerateNarrativeReportInputSchema.safeParse(input);
+  const actionsData = JSON.parse(formData.get('actions') as string || '[]');
+
+  const validatedFields = GenerateNarrativeReportInputSchema.safeParse({
+    projectName: formData.get("projectName"),
+    coordinatorName: formData.get("coordinatorName"),
+    monthYear: formData.get("monthYear"),
+    thematicAreas: formData.get("thematicAreas"),
+    projectChanges: {
+        scopeChange: formData.get("projectChanges.scopeChange"),
+        objectivesChange: formData.get("projectChanges.objectivesChange"),
+        outsideScopeActions: formData.get("projectChanges.outsideScopeActions"),
+    },
+    actions: actionsData,
+    indicators: {
+        directImpact: formData.get("indicators.directImpact"),
+        indirectImpact: formData.get("indicators.indirectImpact"),
+        itemsDistributed: formData.get("indicators.itemsDistributed"),
+    },
+    observations: formData.get("observations"),
+  });
 
   if (!validatedFields.success) {
     return {

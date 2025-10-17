@@ -251,10 +251,6 @@ export default function NarrativeReportPage() {
         },
     });
 
-    const onSubmit: SubmitHandler<GenerateNarrativeReportInput> = (data) => {
-        formAction(data);
-    };
-
     const handlePrint = () => {
         window.print();
     };
@@ -283,7 +279,7 @@ export default function NarrativeReportPage() {
                     <Card>
                         <CardContent className="p-6">
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                <form action={formAction} className="space-y-8">
 
                                     <fieldset className="space-y-4">
                                         <h3 className="text-lg font-medium">Informações Gerais</h3>
