@@ -19,6 +19,23 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.hbs$/,
+      loader: 'handlebars-loader',
+    });
+
+    // Fallback para packages que usam require.extensions (genkit, dotprompt)
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        // O `handlebars` completo não é necessário no lado do cliente
+        handlebars: false, 
+      };
+    }
+
+    return config;
+  },
 };
 
 export default nextConfig;
