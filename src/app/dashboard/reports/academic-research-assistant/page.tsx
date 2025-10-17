@@ -3,8 +3,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { academicResearchAssistantAction } from "@/lib/actions";
 import { AcademicResearchAssistantInputSchema, type AcademicResearchAssistantInput, type AcademicResearchAssistantOutput } from "@/ai/schemas/academic-research-assistant-schemas";
 
@@ -55,7 +54,7 @@ function SubmitButton() {
 }
 
 export default function AcademicResearchAssistantPage() {
-    const [state, formAction] = useActionState(academicResearchAssistantAction, initialState);
+    const [state, formAction] = useFormState(academicResearchAssistantAction, initialState);
     
     const form = useForm<AcademicResearchAssistantInput>({
         resolver: zodResolver(AcademicResearchAssistantInputSchema),

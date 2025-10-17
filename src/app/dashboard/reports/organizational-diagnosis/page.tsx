@@ -3,8 +3,7 @@
 
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { organizationalDiagnosisAction } from "@/lib/actions";
 import { OrganizationalDiagnosisInputSchema, type OrganizationalDiagnosisInput, type OrganizationalDiagnosisOutput } from "@/ai/schemas/organizational-diagnosis-schemas";
 
@@ -50,7 +49,7 @@ function SubmitButton() {
 }
 
 export default function OrganizationalDiagnosisPage() {
-  const [state, formAction] = useActionState(organizationalDiagnosisAction, initialState);
+  const [state, formAction] = useFormState(organizationalDiagnosisAction, initialState);
   
   const form = useForm<OrganizationalDiagnosisInput>({
     resolver: zodResolver(OrganizationalDiagnosisInputSchema),

@@ -4,8 +4,7 @@
 import { useState } from "react";
 import { useForm, useFieldArray, useFormContext, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import Image from "next/image";
 
 import { generateNarrativeReportAction } from "@/lib/actions";
@@ -227,7 +226,7 @@ function ActionsArray() {
 
 
 export default function NarrativeReportPage() {
-    const [state, formAction] = useActionState(generateNarrativeReportAction, initialState);
+    const [state, formAction] = useFormState(generateNarrativeReportAction, initialState);
 
     const form = useForm<GenerateNarrativeReportInput>({
         resolver: zodResolver(GenerateNarrativeReportInputSchema),

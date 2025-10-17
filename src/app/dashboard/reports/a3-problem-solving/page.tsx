@@ -4,8 +4,7 @@
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { a3ProblemSolvingAction } from "@/lib/actions";
 import { A3ProblemSolvingInputSchema, type A3ProblemSolvingInput, type A3ProblemSolvingOutput } from "@/ai/schemas/a3-problem-solving-schemas";
 
@@ -48,7 +47,7 @@ function SubmitButton() {
 }
 
 export default function A3ProblemSolvingPage() {
-  const [state, formAction] = useActionState(a3ProblemSolvingAction, initialState);
+  const [state, formAction] = useFormState(a3ProblemSolvingAction, initialState);
   const resultRef = useRef<HTMLDivElement>(null);
   
   const form = useForm<A3ProblemSolvingInput>({

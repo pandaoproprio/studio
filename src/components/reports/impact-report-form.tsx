@@ -4,8 +4,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useActionState, forwardRef, useImperativeHandle } from "react";
-import { useFormStatus } from "react-dom";
+import { forwardRef, useImperativeHandle } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import { generateImpactReportAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,7 +51,7 @@ function SubmitButton() {
 }
 
 export const ImpactReportForm = forwardRef((props, ref) => {
-  const [state, formAction] = useActionState(generateImpactReportAction, initialState);
+  const [state, formAction] = useFormState(generateImpactReportAction, initialState);
   
   const form = useForm<ImpactReportFormValues>({
     resolver: zodResolver(impactReportSchema),
