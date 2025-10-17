@@ -1,7 +1,6 @@
 // @/lib/actions.ts
 "use server";
 
-import "dotenv/config";
 import {
   generateImpactReport,
   GenerateImpactReportInput,
