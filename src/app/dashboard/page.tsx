@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { ProjectsStatusChart } from "@/components/dashboard/projects-status-chart";
 import { QuickAccessCarousel } from "@/components/dashboard/quick-access-carousel";
 import { FinancialOverview } from "@/components/dashboard/financial-overview";
+import { KpiSummary } from "@/components/dashboard/kpi-summary";
+import { DailyTip } from "@/components/dashboard/daily-tip";
 
 export default function DashboardPage() {
   const [greeting, setGreeting] = useState("Bem-vindo(a)");
@@ -29,6 +31,15 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">
           Aqui está um resumo das atividades e métricas da sua organização.
         </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+            <DailyTip />
+        </div>
+        <div className="lg:col-span-1">
+            <KpiSummary />
+        </div>
       </div>
 
       <FinancialOverview />

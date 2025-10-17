@@ -64,6 +64,11 @@ import {
     type AnalyzeContractRiskOutput,
 } from "@/ai/flows/contract-risk-analysis";
 import { AnalyzeContractRiskInputSchema } from "@/ai/schemas/contract-risk-analysis-schemas";
+import {
+  generateNarrativeSummary,
+  type GenerateNarrativeSummaryOutput,
+} from "@/ai/flows/generate-narrative-summary-flow";
+import { getDailyTip } from "@/ai/flows/get-daily-tip";
 
 import { z } from "zod";
 
@@ -273,7 +278,7 @@ export async function diagnoseRelationshipAction(input: DiagnoseRelationshipInpu
     } catch(e) {
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
-        return { message: "Failed to generate diagnosis.", error: errorMessage };
+        return { message: `Failed to generate diagnosis.`, error: errorMessage };
     }
 }
 
@@ -469,5 +474,50 @@ export async function analyzeContractRiskAction(input: AnalyzeContractRiskInput)
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
         return { message: "Failed to analyze contract risk.", error: errorMessage };
+    }
+}
+
+type GetDailyTipState = {
+    message: string;
+    data?: string;
+    error?: string;
+};
+
+export async function getDailyTipAction(): Promise<GetDailyTipState> {
+    try {
+        const result = await getDailyTip();
+        return { message: "Daily tip loaded.", data: result.tip };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to load daily tip.", error: errorMessage};
+    }
+}
+
+type GetAccountStatusSummaryState = {
+    message: string;
+    data?: GenerateNarrativeSummaryOutput;
+    error?: string;
+};
+
+export async function getAccountStatusSummaryAction(): Promise<GetAccountStatusSummaryState> {
+    try {
+        // In a real app, you'd fetch this data from your database
+        const mockData = {
+            tasks: [
+                { projectName: "Projeto Social", taskName: "Alinhar mentores" },
+                { projectName: "Campanha de Marketing", taskName: "Agendar posts da semana" }
+            ],
+            transactions: [
+                { projectName: "Projeto Social", description: "Compra de lanches", amount: 250, type: "Despesa" as const },
+                { projectName: "Geral", description: "Doação anônima", amount: 500, type: "Receita" as const }
+            ]
+        };
+        const result = await generateNarrativeSummary(mockData);
+        return { message: "Summary loaded.", data: result };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return { message: "Failed to load summary.", error: errorMessage};
     }
 }
