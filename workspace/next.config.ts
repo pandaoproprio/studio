@@ -1,14 +1,8 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -23,6 +17,26 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  transpilePackages: ['react-quill'],
+  
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.hbs$/,
+      loader: 'handlebars-loader',
+    });
+
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        handlebars: false,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
+    return config;
   },
 };
 
