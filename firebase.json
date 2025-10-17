@@ -1,11 +1,20 @@
 {
   "hosting": {
-    "public": "out",
+    "source": ".",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
-    "frameworksBackend": {}
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "nextn",
+          "region": "us-central1"
+        }
+      }
+    ]
   }
 }
