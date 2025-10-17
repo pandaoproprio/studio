@@ -140,7 +140,7 @@ export function AppHeader() {
                 <span>Suporte</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push('/')}>
+              <DropdownMenuItem onClick={() => router.push('/login')}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>
               </DropdownMenuItem>

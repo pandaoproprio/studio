@@ -55,7 +55,7 @@ export default function SignupPage() {
           <CardFooter className="flex flex-col items-center space-y-2">
             <p className="text-sm text-muted-foreground">
               Já tem uma conta?{" "}
-              <Link href="/" passHref>
+              <Link href="/login" passHref>
                 <Button variant="link" size="sm" className="p-0">
                   Faça o login
                 </Button>
