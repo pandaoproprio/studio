@@ -254,6 +254,24 @@ export default function NarrativeReportPage() {
         window.print();
     };
 
+    const onSubmit: SubmitHandler<GenerateNarrativeReportInput> = (data) => {
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'actions') {
+            formData.append(key, JSON.stringify(value));
+          } else if (typeof value === 'object' && value !== null) {
+             Object.entries(value).forEach(([subKey, subValue]) => {
+                formData.append(`${key}.${subKey}`, subValue as string);
+             });
+          }
+          else {
+            formData.append(key, value as string);
+          }
+        });
+        formAction(formData);
+    };
+
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between no-print">
@@ -278,7 +296,7 @@ export default function NarrativeReportPage() {
                     <Card>
                         <CardContent className="p-6">
                             <Form {...form}>
-                                <form action={formAction} className="space-y-8">
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
                                     <fieldset className="space-y-4">
                                         <h3 className="text-lg font-medium">Informações Gerais</h3>
