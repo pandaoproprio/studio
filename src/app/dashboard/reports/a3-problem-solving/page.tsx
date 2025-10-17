@@ -150,7 +150,7 @@ export default function A3ProblemSolvingPage() {
                     <div className="w-full space-y-4 overflow-y-auto max-h-[80vh] pr-2">
                         <ResultCard icon={Search} title="4. Análise de Causa Raiz (5 Porquês)">
                         <ul className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                                {state.data.rootCauseAnalysis.map((item, index) => <li key={index} className="pl-2">{item}</li>)}
+                                {state.data.rootCauseAnalysis.map((item: string, index: number) => <li key={index} className="pl-2">{item}</li>)}
                         </ul>
                         </ResultCard>
 
@@ -179,7 +179,7 @@ export default function A3ProblemSolvingPage() {
                             <p className="text-muted-foreground text-sm mb-4">{state.data.followUp.expectedResults}</p>
                             <h4 className="font-semibold text-foreground">Métricas de Sucesso (KPIs)</h4>
                             <ul className="list-disc pl-5 text-muted-foreground text-sm space-y-1 mb-4">
-                                    {state.data.followUp.kpis.map((kpi, i) => <li key={i}>{kpi}</li>)}
+                                    {state.data.followUp.kpis.map((kpi: string, i: number) => <li key={i}>{kpi}</li>)}
                             </ul>
                             <h4 className="font-semibold text-foreground">Método de Acompanhamento</h4>
                             <p className="text-muted-foreground text-sm">{state.data.followUp.monitoringMethod}</p>
