@@ -1,8 +1,8 @@
 // src/app/dashboard/reports/progress-generator/page.tsx
 "use client";
 
-import { useState, useMemo, useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useState, useMemo } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { generateProgressReportAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,7 +46,7 @@ function SubmitButton() {
 }
 
 export default function ProgressGeneratorPage() {
-  const [state, formAction] = useActionState(generateProgressReportAction, initialState);
+  const [state, formAction] = useFormState(generateProgressReportAction, initialState);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const projectData = useMemo(() => {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { LogIn, Leaf } from "lucide-react";
+import { LogIn, Leaf, HandHeart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -19,7 +19,6 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple validation for prototype
     if (email === "test@example.com" && password === "password") {
       router.push("/dashboard");
     } else {
@@ -28,16 +27,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-        <div className="flex items-center justify-center py-12">
-            <div className="mx-auto grid w-[350px] gap-6">
-                <div className="grid gap-2 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                        <Leaf className="h-8 w-8 text-primary" />
-                        <h1 className="text-3xl font-bold font-headline text-primary">AnnIConecta</h1>
+    <div className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-2">
+        <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 opacity-20"></div>
+             <div className="mx-auto w-full max-w-md space-y-8 p-8 relative z-10">
+                <div className="flex flex-col items-center text-center">
+                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 border-2 border-primary/20">
+                        <HandHeart className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-balance text-muted-foreground">
-                        Insira seu e-mail abaixo para fazer login em sua conta
+                    <h1 className="text-4xl font-bold font-headline text-primary">AnnIConecta</h1>
+                    <p className="mt-2 text-muted-foreground">
+                       Conectando propósitos, transformando vidas.
                     </p>
                 </div>
                  {error && (
@@ -45,8 +45,8 @@ export default function LoginPage() {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-                <form onSubmit={handleLogin} className="grid gap-4">
-                    <div className="grid gap-2">
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                             id="email"
@@ -57,10 +57,10 @@ export default function LoginPage() {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
                             <Label htmlFor="password">Senha</Label>
-                            <Link href="#" className="ml-auto inline-block text-sm underline">
+                            <Link href="#" className="text-sm text-primary/80 hover:underline">
                                 Esqueceu sua senha?
                             </Link>
                         </div>
@@ -72,27 +72,29 @@ export default function LoginPage() {
                           onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-                    <Button type="submit" className="w-full">
-                        <LogIn className="mr-2 h-4 w-4" /> Login
+                    <Button type="submit" className="w-full !mt-6" size="lg">
+                        <LogIn className="mr-2 h-5 w-5" /> Entrar
                     </Button>
                 </form>
-                <div className="mt-4 text-center text-sm">
-                    Não tem uma conta?{" "}
-                    <Link href="/signup" className="underline">
-                        Cadastre-se
+                <div className="text-center text-sm text-muted-foreground">
+                    Ainda não tem uma conta?{" "}
+                    <Link href="/signup" className="font-semibold text-primary hover:underline">
+                        Cadastre-se gratuitamente
                     </Link>
                 </div>
             </div>
         </div>
-        <div className="hidden bg-muted lg:block">
+        <div className="hidden lg:block relative">
             <Image
-                src="https://picsum.photos/seed/3/1200/1800"
-                alt="Image"
+                src="https://picsum.photos/seed/social-impact/1200/1800"
+                alt="Pessoas colaborando em um projeto social"
                 width="1920"
                 height="1080"
-                className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                data-ai-hint="social organization community"
+                className="h-full w-full object-cover"
+                data-ai-hint="social impact community"
+                priority
             />
+             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
         </div>
     </div>
   );

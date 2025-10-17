@@ -254,19 +254,6 @@ export default function NarrativeReportPage() {
         window.print();
     };
 
-    const onSubmit: SubmitHandler<GenerateNarrativeReportInput> = (data) => {
-        const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => {
-          if (key === 'actions' || key === 'projectChanges' || key === 'indicators') {
-            formData.append(key, JSON.stringify(value));
-          } else {
-            formData.append(key, value as string);
-          }
-        });
-        formAction(formData);
-    };
-
-
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between no-print">
