@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { diagnoseRelationshipAction } from "@/lib/actions";
-import { type DiagnoseRelationshipOutput } from "@/ai/flows/diagnose-relationship";
+import { type DiagnoseRelationshipOutput } from "@/ai/schemas/diagnose-relationship-schemas";
 
 
 type InteractionType = 'Reunião' | 'Ligação' | 'Email' | 'Evento' | 'Outro';
