@@ -1,10 +1,8 @@
+// src/app/dashboard/layout.tsx
+import { SidebarProvider, Sidebar, SidebarInset } from "@/components/ui/sidebar";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { CommandMenu } from "@/components/layout/command-menu";
-import {
-  SidebarProvider,
-  SidebarInset,
-} from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
   children,
@@ -13,16 +11,16 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <Sidebar>
+        <AppSidebar />
+      </Sidebar>
       <SidebarInset>
-        <div className="flex h-full w-full flex-col">
-          <AppHeader />
-          <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10">
+        <AppHeader />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
             {children}
-          </main>
-        </div>
+        </main>
+        <CommandMenu />
       </SidebarInset>
-      <CommandMenu />
     </SidebarProvider>
   );
 }

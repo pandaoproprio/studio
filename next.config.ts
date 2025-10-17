@@ -1,7 +1,6 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -19,18 +18,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ['react-quill'],
+  
   webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.hbs$/,
       loader: 'handlebars-loader',
     });
 
-    // Fallback para packages que usam require.extensions (genkit, dotprompt)
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        // O `handlebars` completo não é necessário no lado do cliente
-        handlebars: false, 
+        handlebars: false,
+        fs: false,
+        net: false,
+        tls: false,
       };
     }
 

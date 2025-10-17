@@ -1,26 +1,31 @@
-# Etapa 1: Build
-FROM node:20-alpine AS builder
+# Etapa 1: Instalação das dependências
+FROM node:20-alpine AS deps
 WORKDIR /app
-
-# Copiar dependências
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copiar todo o código e buildar
+# Etapa 2: Build da aplicação
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_PRIVATE_TURBOPACK=0
 RUN npm run build
 
-# Etapa 2: Runtime
-FROM node:20-alpine
+# Etapa 3: Imagem final de produção
+FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copiar app buildado
-COPY --from=builder /app ./
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Expor porta padrão do Firebase Cloud Run
+USER nextjs
+
 EXPOSE 8080
 
-# Rodar app
-CMD ["npm", "start"]
+ENV PORT 8080
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]
