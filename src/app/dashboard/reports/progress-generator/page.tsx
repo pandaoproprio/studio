@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Printer } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { initialColumns as kanbanData } from '@/components/projects/kanban-board';
+import { initialColumns as kanbanData } from '@/components/projects/kanban/initial-data';
 
 const projects = [
     { id: "projeto-social", name: "Projeto Social Comunitário" },
@@ -77,7 +77,7 @@ export default function ProgressGeneratorPage() {
             Gerador de Relatório de Progresso com IA
           </h1>
           <p className="text-muted-foreground">
-            Selecione um projeto, ajuste o contexto e deixe a IA criar um relatório de status personalizado.
+            Cria relatórios de status de projetos a partir de dados do seu quadro Kanban. A IA analisa as tarefas (a fazer, em andamento, concluídas) para gerar um resumo coeso, considerando o público e o tom desejados.
           </p>
         </div>
          {state.data && (

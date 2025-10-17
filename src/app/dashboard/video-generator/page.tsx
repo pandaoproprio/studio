@@ -111,7 +111,7 @@ export default function VideoGeneratorPage() {
           Gerador de Histórias em Vídeo com IA
         </h1>
         <p className="text-muted-foreground">
-          Transforme um texto em uma narrativa audiovisual com imagens e narração geradas por IA.
+          Transforme textos (relatórios, descrições de projetos) em vídeos curtos e impactantes. A IA cria o roteiro, as imagens de cada cena e a narração em áudio, gerando uma história audiovisual.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

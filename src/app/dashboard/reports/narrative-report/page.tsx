@@ -261,7 +261,7 @@ export default function NarrativeReportPage() {
                 Gerador de Relatório Narrativo
                 </h1>
                 <p className="text-muted-foreground">
-                Preencha os campos abaixo para que a IA possa construir um relatório de execução detalhado.
+                Ideal para relatórios mensais, esta ferramenta estrutura as informações do seu projeto (ações, indicadores, desafios) e gera um relatório narrativo completo e formatado em HTML.
                 </p>
             </div>
             {state.data && (

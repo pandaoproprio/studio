@@ -72,7 +72,7 @@ export default function A3ProblemSolvingPage() {
             Assistente de Resolução de Problemas (A3)
           </h1>
           <p className="text-muted-foreground">
-            Use a metodologia A3 e a IA para analisar problemas complexos e criar planos de ação eficazes.
+            Ferramenta de análise que utiliza a metodologia A3 Lean para estruturar a resolução de problemas. A IA guia você na identificação da causa raiz, na criação de um plano de ação e na definição de métricas de sucesso.
           </p>
         </div>
         {state.data && (

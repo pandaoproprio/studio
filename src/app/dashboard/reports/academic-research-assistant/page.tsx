@@ -70,7 +70,7 @@ export default function AcademicResearchAssistantPage() {
             Assistente de Pesquisa Acadêmica com IA
             </h1>
             <p className="text-muted-foreground">
-            Obtenha um plano de pesquisa estruturado e fontes confiáveis para qualquer tema.
+            Ideal para iniciar pesquisas, este assistente de IA gera um plano de pesquisa estruturado, incluindo perguntas norteadoras, metodologia e uma lista de fontes acadêmicas relevantes para o seu tópico.
             </p>
         </div>
         {state.data && (

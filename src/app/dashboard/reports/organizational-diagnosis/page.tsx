@@ -98,7 +98,7 @@ export default function OrganizationalDiagnosisPage() {
             Diagnóstico Organizacional com IA
             </h1>
             <p className="text-muted-foreground">
-            Obtenha um panorama estratégico da saúde da sua organização.
+            Forneça métricas-chave da sua organização e receba uma análise estratégica da IA, com pontuações, pontos fortes, fracos e recomendações acionáveis.
             </p>
         </div>
          {state.data && (

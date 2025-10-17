@@ -23,7 +23,7 @@ export default function ImpactGeneratorPage() {
             Gerador de Relatório de Impacto com IA
           </h1>
           <p className="text-muted-foreground">
-            Crie relatórios de impacto detalhados e profissionais em minutos.
+            Transforme dados e resultados de um projeto em um relatório de impacto narrativo e profissional. Basta descrever o projeto, seus resultados e as seções desejadas, e a IA gera o conteúdo em HTML.
           </p>
         </div>
         {result?.data && (
