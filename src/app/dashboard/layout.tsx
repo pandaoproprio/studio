@@ -1,7 +1,16 @@
 // src/app/dashboard/layout.tsx
-import { SidebarProvider, Sidebar, SidebarInset } from "@/components/ui/sidebar";
-import { AppHeader } from "@/components/layout/app-header";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { Separator } from "@/components/ui/separator";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { AppHeader } from "@/components/layout/app-header";
 import { CommandMenu } from "@/components/layout/command-menu";
 
 export default function DashboardLayout({
@@ -11,15 +20,13 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <Sidebar>
-        <AppSidebar />
-      </Sidebar>
+      <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <CommandMenu />
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:p-6">
             {children}
         </main>
-        <CommandMenu />
       </SidebarInset>
     </SidebarProvider>
   );
