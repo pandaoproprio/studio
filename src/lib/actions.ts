@@ -8,16 +8,20 @@ import {
 } from "@/ai/flows/generate-impact-report";
 import {
   generateProgressReport,
-  type GenerateProgressReportInput,
-  type GenerateProgressReportOutput,
 } from "@/ai/flows/generate-progress-report";
+import type {
+  GenerateProgressReportInput,
+  GenerateProgressReportOutput,
+} from "@/ai/schemas/generate-progress-report-schemas";
 import { summarizePost } from "@/ai/flows/summarize-post";
 import type { SummarizePostOutput } from "@/ai/schemas/summarize-post-schemas";
 import {
   describeColaboradorProfile,
-  type DescribeColaboradorProfileInput,
-  type DescribeColaboradorProfileOutput
 } from "@/ai/flows/describe-profile";
+import type {
+  DescribeColaboradorProfileInput,
+  DescribeColaboradorProfileOutput,
+} from "@/ai/schemas/describe-profile-schemas";
 import { DescribeColaboradorProfileInputSchema } from "@/ai/schemas/describe-profile-schemas";
 import { 
     generateVideoStory,
@@ -25,49 +29,64 @@ import {
 import { type GenerateVideoStoryOutput, type GenerateVideoStoryInput, GenerateVideoStoryInputSchema } from "@/ai/schemas/generate-video-story-schemas";
 import {
     diagnoseRelationship,
-    type DiagnoseRelationshipInput,
-    type DiagnoseRelationshipOutput,
 } from "@/ai/flows/diagnose-relationship";
+import type {
+    DiagnoseRelationshipInput,
+    DiagnoseRelationshipOutput,
+} from "@/ai/schemas/diagnose-relationship-schemas";
 import { DiagnoseRelationshipInputSchema } from "@/ai/schemas/diagnose-relationship-schemas";
 import {
     analyzeTaskRisk,
-    type AnalyzeTaskRiskInput,
-    type AnalyzeTaskRiskOutput,
 } from "@/ai/flows/project-risk-analysis";
+import type {
+    AnalyzeTaskRiskInput,
+    AnalyzeTaskRiskOutput,
+} from "@/ai/schemas/project-risk-analysis-schemas";
 import { AnalyzeTaskRiskInputSchema } from "@/ai/schemas/project-risk-analysis-schemas";
 import {
     organizationalDiagnosis,
-    type OrganizationalDiagnosisOutput,
-    type OrganizationalDiagnosisInput,
 } from "@/ai/flows/organizational-diagnosis";
+import type {
+    OrganizationalDiagnosisInput,
+    OrganizationalDiagnosisOutput,
+} from "@/ai/schemas/organizational-diagnosis-schemas";
 import { OrganizationalDiagnosisInputSchema } from "@/ai/schemas/organizational-diagnosis-schemas";
 import {
     academicResearchAssistant,
-    type AcademicResearchAssistantOutput
 } from "@/ai/flows/academic-research-assistant";
-import { AcademicResearchAssistantInputSchema } from "@/ai/schemas/academic-research-assistant-schemas";
+import {
+    AcademicResearchAssistantInputSchema,
+    type AcademicResearchAssistantInput,
+    type AcademicResearchAssistantOutput,
+} from "@/ai/schemas/academic-research-assistant-schemas";
 import {
     a3ProblemSolving,
-    type A3ProblemSolvingOutput,
-    type A3ProblemSolvingInput,
 } from "@/ai/flows/a3-problem-solving";
-import { A3ProblemSolvingInputSchema } from "@/ai/schemas/a3-problem-solving-schemas";
+import {
+    A3ProblemSolvingInputSchema,
+    type A3ProblemSolvingInput,
+    type A3ProblemSolvingOutput,
+} from "@/ai/schemas/a3-problem-solving-schemas";
 import {
     generateNarrativeReport,
-    type GenerateNarrativeReportOutput,
-    type GenerateNarrativeReportInput,
 } from "@/ai/flows/generate-narrative-report";
-import { GenerateNarrativeReportInputSchema } from "@/ai/schemas/generate-narrative-report-schemas";
+import {
+    GenerateNarrativeReportInputSchema,
+    type GenerateNarrativeReportInput,
+    type GenerateNarrativeReportOutput,
+} from "@/ai/schemas/generate-narrative-report-schemas";
 import {
     analyzeContractRisk,
+} from "@/ai/flows/contract-risk-analysis";
+import {
+    AnalyzeContractRiskInputSchema,
     type AnalyzeContractRiskInput,
     type AnalyzeContractRiskOutput,
-} from "@/ai/flows/contract-risk-analysis";
-import { AnalyzeContractRiskInputSchema } from "@/ai/schemas/contract-risk-analysis-schemas";
+} from "@/ai/schemas/contract-risk-analysis-schemas";
 import {
   generateNarrativeSummary,
-  type GenerateNarrativeSummaryOutput,
 } from "@/ai/flows/generate-narrative-summary-flow";
+import type { GenerateNarrativeSummaryOutput } from "@/ai/schemas/generate-narrative-summary-schemas";
 import { getDailyTip } from "@/ai/flows/get-daily-tip";
 
 import { z } from "zod";
