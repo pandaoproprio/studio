@@ -1,7 +1,7 @@
 // src/app/page.tsx
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,15 +11,22 @@ import { Leaf } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+const DEMO_CREDENTIALS = {
+  email: "test@example.com",
+  password: "password",
+};
+
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState(DEMO_CREDENTIALS.email);
+  const [password, setPassword] = useState(DEMO_CREDENTIALS.password);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email === "test@example.com" && password === "password") {
+  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError((previousError) => (previousError ? null : previousError));
+
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
       router.push("/dashboard");
     } else {
       setError("Email ou senha inválidos.");
@@ -47,33 +54,47 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-4">
               {error && (
                 <Alert variant="destructive">
+                  <AlertTitle>Erro ao entrar</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="test@example.com" 
-                  required 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="test@example.com"
+                  required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) {
+                      setError(null);
+                    }
+                  }}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Senha</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  required 
+                <Input
+                  id="password"
+                  type="password"
+                  required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) {
+                      setError(null);
+                    }
+                  }}
                 />
               </div>
               <Button type="submit" className="w-full font-bold" disabled={isFormInvalid}>
                 Entrar
               </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                Credenciais de demonstração: test@example.com / password
+              </p>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col items-center space-y-2">
@@ -93,8 +114,13 @@ export default function LoginPage() {
       </div>
       <footer className="mt-8 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()}{" "}
-        <a href="https://github.com/pandaoproprio/anniconecta" target="_blank" rel="noopener noreferrer" className="hover:underline">
-            AnnITech – IT Solutions
+        <a
+          href="https://github.com/pandaoproprio/anniconecta"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          AnnITech – IT Solutions
         </a>
         . Todos os direitos reservados.
       </footer>
