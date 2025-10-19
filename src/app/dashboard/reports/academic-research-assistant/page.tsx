@@ -163,7 +163,14 @@ export default function AcademicResearchAssistantPage() {
                         <p className="text-muted-foreground text-sm mb-4">{state.data.plan.introduction}</p>
                         <h4 className="font-semibold text-foreground">Perguntas Norteadoras</h4>
                         <ul className="list-disc pl-5 text-muted-foreground text-sm space-y-1 mb-4">
-                                {state.data.plan.researchQuestions.map((q, i) => <li key={i}>{q}</li>)}
+                                {state.data.plan.researchQuestions.map(
+                                  (
+                                    question: AcademicResearchAssistantOutput["plan"]["researchQuestions"][number],
+                                    index: number,
+                                  ) => (
+                                    <li key={index}>{question}</li>
+                                  ),
+                                )}
                         </ul>
                         <h4 className="font-semibold text-foreground">Metodologia Sugerida</h4>
                         <p className="text-muted-foreground text-sm">{state.data.plan.methodology}</p>
@@ -171,7 +178,11 @@ export default function AcademicResearchAssistantPage() {
 
                         <ResultCard icon={Pilcrow} title="Fontes Acadêmicas Recomendadas">
                             <ul className="space-y-3">
-                            {state.data.sources.map((source, index) => (
+                            {state.data.sources.map(
+                              (
+                                source: AcademicResearchAssistantOutput["sources"][number],
+                                index: number,
+                              ) => (
                                 <li key={index} className="text-sm">
                                     <p className="font-semibold text-foreground">{source.title}</p>
                                     <p className="text-muted-foreground text-xs">Autor(es): {source.authors}</p>
@@ -180,7 +191,8 @@ export default function AcademicResearchAssistantPage() {
                                         Acessar Fonte <ExternalLink className="h-3 w-3" />
                                     </a>
                                 </li>
-                            ))}
+                              ),
+                            )}
                             </ul>
                         </ResultCard>
                     </div>

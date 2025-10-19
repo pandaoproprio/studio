@@ -164,13 +164,18 @@ export default function A3ProblemSolvingPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {state.data.actionPlan.map((action, index) => (
+                                    {state.data.actionPlan.map(
+                                      (
+                                        action: A3ProblemSolvingOutput["actionPlan"][number],
+                                        index: number,
+                                      ) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{action.what}</TableCell>
                                             <TableCell>{action.who}</TableCell>
                                             <TableCell>{action.when}</TableCell>
                                         </TableRow>
-                                    ))}
+                                      ),
+                                    )}
                                 </TableBody>
                             </Table>
                         </ResultCard>

@@ -13,6 +13,11 @@ import {
     type GenerateNarrativeSummaryOutput
 } from '@/ai/schemas/generate-narrative-summary-schemas';
 
+export type {
+  GenerateNarrativeSummaryInput,
+  GenerateNarrativeSummaryOutput,
+} from '@/ai/schemas/generate-narrative-summary-schemas';
+
 export async function generateNarrativeSummary(input: GenerateNarrativeSummaryInput): Promise<GenerateNarrativeSummaryOutput> {
   return generateNarrativeSummaryFlow(input);
 }

@@ -1,8 +1,14 @@
 // src/lib/firebase.ts
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
-import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, initializeFirestore, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED, type Firestore } from 'firebase/firestore';
+import { getAuth, type Auth } from "firebase/auth";
+import {
+  getFirestore,
+  initializeFirestore,
+  enableIndexedDbPersistence,
+  CACHE_SIZE_UNLIMITED,
+  type Firestore,
+} from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,21 +20,23 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
-} else {
-    app = getApp();
+const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
+
+let app: FirebaseApp | null = null;
+if (isFirebaseConfigured) {
+  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 }
 
-const auth: Auth = getAuth(app);
+const auth: Auth | null = app ? getAuth(app) : null;
 
-let db: Firestore;
+let db: Firestore | null = null;
 let persistencePromise: Promise<void | string> | null = null;
 
-// Singleton pattern for Firestore and its persistence
 const getDb = (): Firestore => {
+  if (!app || !isFirebaseConfigured) {
+    throw new Error("Firebase não está configurado.");
+  }
+
   if (!db) {
     db = initializeFirestore(app, {
       cacheSizeBytes: CACHE_SIZE_UNLIMITED,
@@ -37,22 +45,23 @@ const getDb = (): Firestore => {
   return db;
 };
 
-// Function to ensure persistence is awaited before operations
 const ensurePersistence = async () => {
-    if (!persistencePromise) {
-        const firestoreDb = getDb();
-        persistencePromise = enableIndexedDbPersistence(firestoreDb)
-          .catch((err) => {
-            if (err.code === 'failed-precondition') {
-              console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
-            } else if (err.code === 'unimplemented') {
-              console.warn("The current browser does not support all of the features required to enable persistence.");
-            }
-            return err; // Return error to be handled by services
-          });
-    }
-    await persistencePromise;
+  if (!isFirebaseConfigured) {
+    return;
+  }
+
+  if (!persistencePromise) {
+    const firestoreDb = getDb();
+    persistencePromise = enableIndexedDbPersistence(firestoreDb).catch((err) => {
+      if (err.code === "failed-precondition") {
+        console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
+      } else if (err.code === "unimplemented") {
+        console.warn("The current browser does not support all of the features required to enable persistence.");
+      }
+      return err;
+    });
+  }
+  await persistencePromise;
 };
 
-
-export { app, auth, getDb, ensurePersistence };
+export { app, auth, getDb, ensurePersistence, isFirebaseConfigured };

@@ -14,6 +14,8 @@ import {
     type GenerateProgressReportOutput
 } from '@/ai/schemas/generate-progress-report-schemas';
 
+export type { GenerateProgressReportInput, GenerateProgressReportOutput } from '@/ai/schemas/generate-progress-report-schemas';
+
 
 export async function generateProgressReport(input: GenerateProgressReportInput): Promise<GenerateProgressReportOutput> {
   return generateProgressReportFlow(input);

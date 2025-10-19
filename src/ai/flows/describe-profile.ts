@@ -14,6 +14,11 @@ import {
     type DescribeColaboradorProfileOutput
 } from '@/ai/schemas/describe-profile-schemas';
 
+export type {
+  DescribeColaboradorProfileInput,
+  DescribeColaboradorProfileOutput,
+} from '@/ai/schemas/describe-profile-schemas';
+
 
 export async function describeColaboradorProfile(input: DescribeColaboradorProfileInput): Promise<DescribeColaboradorProfileOutput> {
   return describeProfileFlow(input);

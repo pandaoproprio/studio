@@ -14,6 +14,11 @@ import {
     type AnalyzeTaskRiskOutput,
 } from '@/ai/schemas/project-risk-analysis-schemas';
 
+export type {
+  AnalyzeTaskRiskInput,
+  AnalyzeTaskRiskOutput,
+} from '@/ai/schemas/project-risk-analysis-schemas';
+
 export async function analyzeTaskRisk(input: AnalyzeTaskRiskInput): Promise<AnalyzeTaskRiskOutput> {
   return analyzeTaskRiskFlow(input);
 }

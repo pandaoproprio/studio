@@ -13,6 +13,11 @@ import {
     type A3ProblemSolvingOutput
 } from '@/ai/schemas/a3-problem-solving-schemas';
 
+export type {
+  A3ProblemSolvingInput,
+  A3ProblemSolvingOutput,
+} from '@/ai/schemas/a3-problem-solving-schemas';
+
 export async function a3ProblemSolving(input: A3ProblemSolvingInput): Promise<A3ProblemSolvingOutput> {
   return a3ProblemSolvingFlow(input);
 }

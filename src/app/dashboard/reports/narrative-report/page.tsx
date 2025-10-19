@@ -52,7 +52,7 @@ function SubmitButton() {
 }
 
 function ActionsArray() {
-    const { control, setValue } = useFormContext<GenerateNarrativeReportInput>();
+    const { control, setValue, getValues } = useFormContext<GenerateNarrativeReportInput>();
     const { fields, append, remove } = useFieldArray({
         control,
         name: "actions"
@@ -60,7 +60,7 @@ function ActionsArray() {
 
     const handleImageUpload = (index: number, files: FileList | null) => {
         if (!files) return;
-        const currentImages = control.getValues(`actions.${index}.images`) || [];
+        const currentImages = getValues(`actions.${index}.images`) || [];
         
         Array.from(files).forEach(file => {
             const reader = new FileReader();
@@ -73,7 +73,7 @@ function ActionsArray() {
     };
 
     const removeImage = (actionIndex: number, imageIndex: number) => {
-        const currentImages = control.getValues(`actions.${actionIndex}.images`) || [];
+        const currentImages = getValues(`actions.${actionIndex}.images`) || [];
         const newImages = currentImages.filter((_, i) => i !== imageIndex);
         setValue(`actions.${actionIndex}.images`, newImages);
     };
@@ -190,7 +190,7 @@ function ActionsArray() {
                                 </div>
                             </FormControl>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                                {(control.getValues(`actions.${index}.images`) || []).map((imgSrc, imgIndex) => (
+                                {(getValues(`actions.${index}.images`) || []).map((imgSrc, imgIndex) => (
                                     <div key={imgIndex} className="relative group aspect-video">
                                         <Image src={imgSrc} alt={`Preview ${imgIndex}`} fill className="object-cover rounded-md" />
                                         <Button
@@ -221,7 +221,10 @@ function ActionsArray() {
 
 
 export default function NarrativeReportPage() {
-  const [state, formAction] = useActionState(generateNarrativeReportAction, initialState);
+  const [state, formAction] = useActionState<typeof initialState, GenerateNarrativeReportInput>(
+    generateNarrativeReportAction,
+    initialState,
+  );
 
   const form = useForm<GenerateNarrativeReportInput>({
     resolver: zodResolver(GenerateNarrativeReportInputSchema),

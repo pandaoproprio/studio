@@ -14,6 +14,11 @@ import {
     type OrganizationalDiagnosisOutput
 } from '@/ai/schemas/organizational-diagnosis-schemas';
 
+export type {
+  OrganizationalDiagnosisInput,
+  OrganizationalDiagnosisOutput,
+} from '@/ai/schemas/organizational-diagnosis-schemas';
+
 
 export async function organizationalDiagnosis(input: OrganizationalDiagnosisInput): Promise<OrganizationalDiagnosisOutput> {
   return organizationalDiagnosisFlow(input);

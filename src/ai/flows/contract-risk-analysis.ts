@@ -13,6 +13,11 @@ import {
     type AnalyzeContractRiskOutput,
 } from '@/ai/schemas/contract-risk-analysis-schemas';
 
+export type {
+  AnalyzeContractRiskInput,
+  AnalyzeContractRiskOutput,
+} from '@/ai/schemas/contract-risk-analysis-schemas';
+
 export async function analyzeContractRisk(input: AnalyzeContractRiskInput): Promise<AnalyzeContractRiskOutput> {
   return analyzeContractRiskFlow(input);
 }

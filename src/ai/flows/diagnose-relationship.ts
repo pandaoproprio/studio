@@ -13,6 +13,11 @@ import {
     type DiagnoseRelationshipOutput,
 } from '@/ai/schemas/diagnose-relationship-schemas';
 
+export type {
+  DiagnoseRelationshipInput,
+  DiagnoseRelationshipOutput,
+} from '@/ai/schemas/diagnose-relationship-schemas';
+
 
 export async function diagnoseRelationship(input: DiagnoseRelationshipInput): Promise<DiagnoseRelationshipOutput> {
   return diagnoseRelationshipFlow(input);

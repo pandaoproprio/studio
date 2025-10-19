@@ -13,6 +13,11 @@ import {
     type AcademicResearchAssistantOutput
 } from '@/ai/schemas/academic-research-assistant-schemas';
 
+export type {
+  AcademicResearchAssistantInput,
+  AcademicResearchAssistantOutput,
+} from '@/ai/schemas/academic-research-assistant-schemas';
+
 export async function academicResearchAssistant(input: AcademicResearchAssistantInput): Promise<AcademicResearchAssistantOutput> {
   return academicResearchAssistantFlow(input);
 }

@@ -429,6 +429,7 @@ type NarrativeReportState = {
 };
 
 export async function generateNarrativeReportAction(
+    _prevState: NarrativeReportState,
     input: GenerateNarrativeReportInput,
 ): Promise<NarrativeReportState> {
   const validatedFields = GenerateNarrativeReportInputSchema.safeParse(input);

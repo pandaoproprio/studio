@@ -13,6 +13,11 @@ import {
     type GenerateNarrativeReportOutput
 } from '@/ai/schemas/generate-narrative-report-schemas';
 
+export type {
+  GenerateNarrativeReportInput,
+  GenerateNarrativeReportOutput,
+} from '@/ai/schemas/generate-narrative-report-schemas';
+
 export async function generateNarrativeReport(input: GenerateNarrativeReportInput): Promise<GenerateNarrativeReportOutput> {
   return generateNarrativeReportFlow(input);
 }
