@@ -11,21 +11,22 @@ import { Leaf } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+const DEMO_CREDENTIALS = {
+  email: "test@example.com",
+  password: "password",
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const demoCredentials = {
-    email: "test@example.com",
-    password: "password",
-  };
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
-    if (email === demoCredentials.email && password === demoCredentials.password) {
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
       router.push("/dashboard");
     } else {
       setError("Email ou senha inválidos.");
@@ -59,23 +60,33 @@ export default function LoginPage() {
               )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="test@example.com" 
-                  required 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="test@example.com"
+                  required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) {
+                      setError(null);
+                    }
+                  }}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Senha</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  required 
+                <Input
+                  id="password"
+                  type="password"
+                  required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) {
+                      setError(null);
+                    }
+                  }}
                 />
               </div>
               <Button type="submit" className="w-full font-bold" disabled={isFormInvalid}>
