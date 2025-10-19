@@ -18,13 +18,13 @@ const DEMO_CREDENTIALS = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(DEMO_CREDENTIALS.email);
+  const [password, setPassword] = useState(DEMO_CREDENTIALS.password);
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
+    setError((previousError) => (previousError ? null : previousError));
 
     if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
       router.push("/dashboard");
