@@ -6,23 +6,45 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { LogIn, Leaf, HandHeart } from "lucide-react";
+import { LogIn, HandHeart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "test@example.com" && password === "password") {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
-    } else {
-      setError("Email ou senha inválidos. Use test@example.com e 'password' para acessar.");
+    } catch (error: any) {
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setError("Nenhum usuário encontrado com este email.");
+          break;
+        case 'auth/wrong-password':
+          setError("Senha incorreta. Por favor, tente novamente.");
+          break;
+        case 'auth/invalid-email':
+            setError("O formato do email é inválido.");
+            break;
+        default:
+          setError("Ocorreu um erro ao fazer login. Tente novamente.");
+          break;
+      }
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -55,6 +77,7 @@ export default function LoginPage() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            disabled={isLoading}
                         />
                     </div>
                     <div className="space-y-2">
@@ -70,10 +93,19 @@ export default function LoginPage() {
                           required 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          disabled={isLoading}
                         />
                     </div>
-                    <Button type="submit" className="w-full !mt-6" size="lg">
-                        <LogIn className="mr-2 h-5 w-5" /> Entrar
+                    <Button type="submit" className="w-full !mt-6" size="lg" disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <LogIn className="mr-2 h-5 w-5 animate-spin" /> Carregando...
+                            </>
+                        ) : (
+                            <>
+                                <LogIn className="mr-2 h-5 w-5" /> Entrar
+                            </>
+                        )}
                     </Button>
                 </form>
                 <div className="text-center text-sm text-muted-foreground">
