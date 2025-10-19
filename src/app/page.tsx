@@ -24,16 +24,18 @@ export default function LoginPage() {
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError((previousError) => (previousError ? null : previousError));
+    setError(null);
 
-    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+    const normalizedEmail = email.trim();
+
+    if (normalizedEmail === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
       router.push("/dashboard");
     } else {
       setError("Email ou senha inválidos.");
     }
   };
 
-  const isFormInvalid = !email || !password;
+  const isFormInvalid = !email.trim() || !password;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
@@ -66,11 +68,9 @@ export default function LoginPage() {
                   placeholder="test@example.com"
                   required
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) {
-                      setError(null);
-                    }
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError(null);
                   }}
                 />
               </div>
@@ -81,11 +81,9 @@ export default function LoginPage() {
                   type="password"
                   required
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) {
-                      setError(null);
-                    }
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setError(null);
                   }}
                 />
               </div>
